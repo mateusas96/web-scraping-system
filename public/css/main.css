@@ -1,0 +1,23 @@
+a.nav-link.btn {
+  border-color: darkRed !important;
+}
+
+a.nav-link.btn:hover {
+  background-color: darkRed !important;
+}
+
+@media (max-width: 768px) {
+  .nav-link.btn {
+    background-color: darkRed !important;
+  }
+}
+
+ul.nav-treeview {
+  margin-left: 30px;
+}
+
+.router-link-active {
+  background-color: lightGrey !important;
+  color: black !important;
+}
+

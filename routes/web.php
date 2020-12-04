@@ -16,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], function(){
+    Route::get('/home', 'HomeController@index')->name('home');
+
+    Route::get('/users/management', 'HomeController@index')->name('users.management');
+});
