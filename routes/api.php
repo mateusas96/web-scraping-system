@@ -20,6 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], function(){
     Route::apiResources([
-
+        'user'=>'API\UserController',
     ]);
 });
