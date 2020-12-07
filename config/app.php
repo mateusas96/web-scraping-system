@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Web Scraping System'),
 
     /*
     |--------------------------------------------------------------------------
@@ -27,6 +27,10 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+
+    'contentUrl' => env('APP_CONTENT_URL', 'https://github.com/mateusas96/web-scraping-system'),
+
+    'creator' => env('APP_CREATOR', 'Matas Mikušauskas'),
 
     /*
     |--------------------------------------------------------------------------

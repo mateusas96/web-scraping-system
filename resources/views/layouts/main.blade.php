@@ -12,6 +12,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <title>{{ config('app.name') }}</title>
     <link rel="icon" href="{!! asset('./img/bot.jpeg')!!}" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons">
 
     <!-- Styles -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
@@ -71,7 +72,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         <img src="{!! asset('./img/user.png')!!}" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a class="d-block">Hello, {{Auth::user()->first_name}}!</a>
+                        <a class="d-block" style="color: #C2C7D0 !important;">Hello, {{Auth::user()->first_name}}!</a>
                     </div>
                 </div>
 
@@ -108,7 +109,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <a class="nav-link btn" href="{{ route('logout') }}" onclick="
                                         event.preventDefault();
                                         document.getElementById('logout-form').submit();
-                                        ">
+                                        "
+                                        style="color: #C2C7D0;">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <p>{{ __('Logout') }}</p>
                             </a>

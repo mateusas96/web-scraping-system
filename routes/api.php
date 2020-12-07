@@ -22,4 +22,6 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
     Route::apiResources([
         'user'=>'API\UserController',
     ]);
+
+    Route::get('findUser','API\UserController@search')->name('find.user');
 });

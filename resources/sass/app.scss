@@ -13,3 +13,20 @@ $fa-font-path: "../webfonts";
 @import "~@fortawesome/fontawesome-free/scss/solid.scss";
 @import "~@fortawesome/fontawesome-free/scss/brands.scss";
 
+@media (min-width: 768px) {
+    body:not(.sidebar-mini-md) .content-wrapper,
+    body:not(.sidebar-mini-md) .main-footer,
+    body:not(.sidebar-mini-md) .main-header {
+        transition: margin-left 0.3s ease-in-out;
+        margin-left: 270px;
+    }
+}
+
+.main-sidebar, .main-sidebar::before {
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+    width: 270px;
+}
+
+.sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
+    margin-left: -270px;
+}

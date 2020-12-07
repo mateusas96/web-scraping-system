@@ -23,7 +23,7 @@ class UserController extends Controller
             'is_disabled',
             'created_at',
             'email_verified_at'
-        )->paginate(5);
+        )->paginate(10);
     }
 
     /**
@@ -57,11 +57,11 @@ class UserController extends Controller
      */
     public function update(Request $request, $email)
     {
-        $user = User::firstOrFail($email);
+        $user = User::where('email', $email)->firstOrFail();
 
         $this->validate($request,[
-            'is_admin'   => 'required',
-            'is_disabled'          => 'required',
+            'is_admin'      => 'required',
+            'is_disabled'   => 'required',
         ]);
 
         $user->update($request->all());
@@ -78,5 +78,26 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Search for user in data base
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function search(){
+        if($search = \Request::get('query')){
+            $users = User::where(function($query) use ($search){
+                $query
+                    ->where('first_name', 'LIKE', "%$search%")
+                    ->orWhere('last_name', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->orWhere('created_at', 'LIKE', "%$search%")
+                    ->orWhere('email_verified_at', 'LIKE', "%$search%");
+            })->latest()->paginate(10);
+            return $users;
+        }
+        
+        return $users = User::latest()->paginate(10);
     }
 }
