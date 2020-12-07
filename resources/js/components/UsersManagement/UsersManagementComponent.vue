@@ -134,6 +134,7 @@
                 this.getUsersList();
             });
             Fire.$on('searching',()=>{
+                this.loading = true;
                 axios.get('../api/findUser?query=' + this.search)
                 .then(({data})=>{
                     this.users = data.data;

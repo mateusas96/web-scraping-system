@@ -2097,6 +2097,7 @@ __webpack_require__.r(__webpack_exports__);
       _this.getUsersList();
     });
     Fire.$on('searching', function () {
+      _this.loading = true;
       axios.get('../api/findUser?query=' + _this.search).then(function (_ref) {
         var data = _ref.data;
         _this.users = data.data;
