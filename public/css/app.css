@@ -50003,6 +50003,21 @@ readers do not read off random characters that represent icons */
     transition: margin-left 0.3s ease-in-out;
     margin-left: 270px;
   }
+
+  .nav-link[data-widget] {
+    display: none;
+  }
+
+  html {
+    overflow: hidden !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 }
 
 .main-sidebar,

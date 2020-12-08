@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use DB;
 
 class UserController extends Controller
 {
@@ -60,8 +61,8 @@ class UserController extends Controller
         $user = User::where('email', $email)->firstOrFail();
 
         $this->validate($request,[
-            'is_admin'      => 'required',
-            'is_disabled'   => 'required',
+            'is_admin'      => 'required|int',
+            'is_disabled'   => 'required|int',
         ]);
 
         $user->update($request->all());
@@ -87,7 +88,15 @@ class UserController extends Controller
      */
     public function search(){
         if($search = \Request::get('query')){
-            $users = User::where(function($query) use ($search){
+            $users = User::select(
+                'first_name',
+                'last_name',
+                'email',
+                'is_admin',
+                'is_disabled',
+                'created_at',
+                'email_verified_at'
+            )->where(function($query) use ($search){
                 $query
                     ->where('first_name', 'LIKE', "%$search%")
                     ->orWhere('last_name', 'LIKE', "%$search%")
@@ -98,6 +107,14 @@ class UserController extends Controller
             return $users;
         }
         
-        return $users = User::latest()->paginate(10);
+        return $users = User::select(
+            'first_name',
+            'last_name',
+            'email',
+            'is_admin',
+            'is_disabled',
+            'created_at',
+            'email_verified_at'
+        )->latest()->paginate(10);
     }
 }

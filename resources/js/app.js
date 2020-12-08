@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import VueMaterial from 'vue-material';
 import 'vue-material/dist/vue-material.min.css';
 import 'vue-material/dist/theme/default.css';
+import Vuetify from 'vuetify';
 
 require('./bootstrap');
 
@@ -14,6 +15,7 @@ window.Form = Form;
 window.Swal = Swal;
 
 Vue.use(VueRouter);
+Vue.use(Vuetify);
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component(HasError.name, HasError);
 Vue.component(AlertError.name, AlertError);
@@ -39,4 +41,5 @@ const router = new VueRouter({
 const app = new Vue({
     el: '#app',
     router,
+    vuetify: new Vuetify(),
 });
