@@ -59,12 +59,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <router-link to="/home" class="brand-link"
                     style="background-color: #343a40 !important; color: #C2C7D0 !important;">
                     <img src="{!! asset('./img/bot.jpeg')!!}" alt="WSS Logo" class="brand-image img-circle elevation-3"
-                        style="opacity: .8">
+                        style="opacity: .8; margin-left: 0px">
                     <span class="brand-text font-weight-light">{{ config('app.name') }}</span>
                 </router-link>
 
                 <!-- Sidebar -->
-                <div class="sidebar">
+                <div class="sidebar"  style="margin-left: -3px">
                     <!-- Sidebar user panel (optional) -->
                     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                         <div class="image">
