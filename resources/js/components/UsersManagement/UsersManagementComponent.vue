@@ -1,7 +1,12 @@
 <template>
     <div class="container">
         <div class="row justify-content-center">
-            <v-hover>
+            <v-alert
+                v-if="error.error"
+                border="left"
+                type="error"
+            >{{error.message}}</v-alert>
+            <v-hover v-else>
                 <template v-slot:default="{ hover }">
                     <v-card 
                         style="width: 1200px;"
@@ -125,14 +130,14 @@
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
                                         <v-btn
-                                            color="blue darken-1"
+                                            color="error darken-1"
                                             text
                                             v-on:click="editUserDialog = false"
                                         >
                                             Cancel
                                         </v-btn>
                                         <v-btn
-                                            color="blue darken-1"
+                                            color="success darken-1"
                                             text
                                             v-on:click="updateUser"
                                         >
@@ -162,6 +167,11 @@
         data: () => ({
             loading: false,
             editUserDialog: false,
+            error: [
+                { 'error': false },
+                { 'message': '' },
+            ],
+            showContent: false,
             usersPagination: [],
             users: [],
             userForm: new Form({
@@ -226,6 +236,11 @@
                     this.users = data.data;
                     this.usersPagination = data;
                     this.loading = false;
+                })
+                .catch((error) => {
+                    this.loading = false;
+                    this.error = error.response.data;
+
                 })
             },
             editUser(user) {

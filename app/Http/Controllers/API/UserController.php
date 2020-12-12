@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use DB;
 
 class UserController extends Controller
 {
@@ -86,8 +85,8 @@ class UserController extends Controller
      * 
      * @return \Illuminate\Http\Response
      */
-    public function search(){
-        if($search = \Request::get('query')){
+    public function search(Request $request){
+        if($search = $request->get('query')){
             $users = User::select(
                 'first_name',
                 'last_name',
