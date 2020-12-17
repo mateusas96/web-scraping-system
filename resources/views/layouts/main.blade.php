@@ -82,24 +82,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <!-- Add icons to the links using the .nav-icon class
                                 with font-awesome or any other icon font library -->
                             @if(Auth::user()->is_admin === 1)
-                                <li class="nav-item has-treeview menu-open">
+                                <li class="nav-item has-treeview menu-close">
                                     <a class="nav-link">
-                                        <i class="nav-icon fas fa-crown"></i>
+                                        <i class="nav-icon fas fa-crown teal"></i>
                                         <p>
                                             {{__('Administration')}}
-                                            <i class="right fas fa-angle-left"></i>
+                                            <i class="right fas fa-angle-left teal"></i>
                                         </p>
                                     </a>
                                     <ul class="nav nav-treeview">
                                         <li class="nav-item">
                                             <router-link to="/users/management" class="nav-link">
-                                                <i class="nav-icon fas fa-users-cog"></i>
+                                                <i class="nav-icon fas fa-users-cog green"></i>
                                                 <p>{{__('Users management')}}</p>
                                             </router-link>
                                         </li>
                                     </ul>
                                 </li>
                             @endif
+                            <li class="nav-item">
+                                <router-link to="/upload-configs" class="nav-link">
+                                    <i class="nav-icon fas fa-file-upload orange"></i>
+                                    <p>{{__('Scraping config upload')}}</p>
+                                </router-link>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link btn" href="{{ route('logout') }}" onclick="
                                             event.preventDefault();

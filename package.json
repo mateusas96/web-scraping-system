@@ -30,6 +30,7 @@
         "vue-material": "^1.0.0-beta-15",
         "vue-progressbar": "^0.7.5",
         "vue-router": "^3.4.9",
+        "vue-toastr": "^2.1.2",
         "vuetify": "^2.3.19"
     }
 }

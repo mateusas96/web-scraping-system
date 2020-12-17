@@ -9,7 +9,6 @@
             <v-hover v-else>
                 <template v-slot:default="{ hover }">
                     <v-card 
-                        style="width: 1200px;"
                         :class="`elevation-${hover ? 24 : 6}`"
                         class="mx-auto pa-6 transition-swing"
                     >
@@ -194,8 +193,8 @@
                 { text: 'Edit User', value: 'actions' , sortable: false}
             ],
             selectOptions: [
-                { name: 'True', value: 1},
-                { name: 'False', value: 0},
+                { name: 'True', value: 1 },
+                { name: 'False', value: 0 },
             ]
         }),
         mounted() {
@@ -205,7 +204,7 @@
             });
             Fire.$on('searching',()=>{
                 this.loading = true;
-                axios.get('../api/findUser?query=' + this.search)
+                axios.get('/api/findUser?query=' + this.search)
                 .then(({data})=>{
                     this.users = data.data;
                     this.usersPagination = data;
@@ -222,7 +221,7 @@
             }, 500),
             getResults(page = 1) {
                 this.loading = true;
-                axios.get('../api/user?page=' + page)
+                axios.get('/api/user?page=' + page)
                     .then(({data})=> {
                     this.users = data.data;
                     this.usersPagination = data;
@@ -231,7 +230,7 @@
             },
             getUsersList() {
                 this.loading = true;
-                axios.get('../api/user')
+                axios.get('/api/user')
                 .then(({data}) => {
                     this.users = data.data;
                     this.usersPagination = data;
@@ -250,7 +249,7 @@
                 this.userForm.fill(user); 
             },
             updateUser() {
-                this.userForm.put('../api/user/' + this.userForm.email)
+                this.userForm.put('/api/user/' + this.userForm.email)
                 .then(() =>{
                     this.editUserDialog = false;
                     Fire.$emit('AfterUpdate');
@@ -277,9 +276,3 @@
         }
     }
 </script>
-
-<style lang="scss" scoped>
-    .md-field {
-        max-width: 300px;
-    }
-</style>

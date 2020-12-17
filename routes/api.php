@@ -24,7 +24,8 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
 
 Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function() {
     Route::apiResources([
-        'user'=>'API\UserController',
+        'user' => 'API\UserController',
+        'file' => 'API\FileController',
     ]);
 
     Route::get('findUser','API\UserController@search')->name('find.user');
