@@ -95,7 +95,7 @@
                         </v-card-actions>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel v-on:click="banger">
+                <v-expansion-panel v-on:click="loadFiles = !loadFiles">
                     <v-expansion-panel-header>
                         Manage files
                     </v-expansion-panel-header>
@@ -115,10 +115,21 @@
                 panelOpened: [0],
                 tempFiles: [],
                 readyForUploadFiles: [],
+                loadFiles: false,
+
             }
         },
         mounted() {
 
+        },
+        watch: {
+            loadFiles: {
+                handler: function(newVal, oldVal) {
+                    if (newVal) {
+                        this.banger();
+                    }
+                }
+            }
         },
         methods: {
             banger() {
