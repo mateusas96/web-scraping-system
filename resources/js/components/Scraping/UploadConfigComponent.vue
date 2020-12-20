@@ -126,12 +126,29 @@
             },
             uploadFiles() {
                 let formData = new FormData();
+
+                formData.append('filesCount', this.readyForUploadFiles.length);
+
                 this.readyForUploadFiles.forEach((value, index) => {
                     formData.append('file' + index, this.readyForUploadFiles[index]);
                 })
+
                 axios.post('api/file', formData)
-                .then((response) => {
-                    this.postForm.reset();
+                .then(({data}) => {
+                    if (data.error) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'info',
+                            title: data.message + ': ',
+                            text: data.not_uploaded_files,
+                            timer: 7000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        })
+                    } else {
+                        this.readyForUploadFiles = [];
+                    }
                 })
                 .catch((error) => {
                     console.log(error);
@@ -156,7 +173,8 @@
                             icon: 'warning',
                             title: 'Only .txt file formats are supported',
                             showConfirmButton: false,
-                            timer: 2500
+                            timer: 2500,
+                            timerProgressBar: true,
                         })
                     } else {
                         this.readyForUploadFiles.push(this.tempFiles[index]);
@@ -182,7 +200,8 @@
                             icon: 'success',
                             title: 'All files successfully removed',
                             showConfirmButton: false,
-                            timer: 2500
+                            timer: 2500,
+                            timerProgressBar: true,
                         })
                     }
                 })
