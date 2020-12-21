@@ -202,7 +202,7 @@
             Fire.$on('AfterUpdate', () => {
                 this.getUsersList();
             });
-            Fire.$on('searching',()=>{
+            Fire.$on('searching', ()=>{
                 this.loading = true;
                 axios.get('/api/findUser?query=' + this.search)
                 .then(({data})=>{

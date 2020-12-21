@@ -18,7 +18,12 @@ class FileController extends Controller
      */
     public function index()
     {
-        return File::select('*')->get();
+        return File::select(
+            'uploaded_by_user_username',
+            'file_name',
+            'file_size',
+            'file_path',
+        )->paginate(8);
     }
 
     /**
@@ -40,16 +45,18 @@ class FileController extends Controller
     public function store(Request $request)
     {
         $activeUserId = auth()->user()->id;
+        $activeUserUsername = auth()->user()->username;
         $existingFiles = null;
+        $filesUploaded = [];
         
         for($i = 0; $i < $request->get('filesCount'); $i++) {
             $file = $request->file('file' . $i);
             if (count(File::where('file_name', $file->getClientOriginalName())->get())) {
-                // array_push($existingFiles, $file->getClientOriginalName());
                 $existingFiles === null ? 
                     $existingFiles = $file->getClientOriginalName() : 
                     $existingFiles = $existingFiles . ', ' . $file->getClientOriginalName();
             } else {
+                array_push($filesUploaded, $i);
                 Storage::disk('public', $file->getClientOriginalName())
                 ->put(
                     $file->getClientOriginalName(), 
@@ -57,6 +64,7 @@ class FileController extends Controller
                 );
                 File::create([
                     'uploaded_by_user_id' => $activeUserId,
+                    'uploaded_by_user_username' => $activeUserUsername,
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
                     'file_size' => $file->getSize(),
@@ -69,6 +77,7 @@ class FileController extends Controller
             'error' => $existingFiles !== null ? true : false,
             'message' => $existingFiles !== null ? 'These files already exist' : 'All files uploaded successfully',
             $existingFiles !== null ? 'not_uploaded_files' : null => $existingFiles,
+            'files_uploaded' => $filesUploaded,
         ]);
     }
 
