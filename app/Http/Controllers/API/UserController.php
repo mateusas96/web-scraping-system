@@ -19,6 +19,7 @@ class UserController extends Controller
             'first_name',
             'last_name',
             'email',
+            'username',
             'is_admin',
             'is_disabled',
             'created_at',
@@ -90,6 +91,7 @@ class UserController extends Controller
             $users = User::select(
                 'first_name',
                 'last_name',
+                'username',
                 'email',
                 'is_admin',
                 'is_disabled',
@@ -99,6 +101,7 @@ class UserController extends Controller
                 $query
                     ->where('first_name', 'LIKE', "%$search%")
                     ->orWhere('last_name', 'LIKE', "%$search%")
+                    ->orWhere('username', 'LIKE', "%$search%")
                     ->orWhere('email', 'LIKE', "%$search%")
                     ->orWhere('created_at', 'LIKE', "%$search%")
                     ->orWhere('email_verified_at', 'LIKE', "%$search%");
@@ -109,6 +112,7 @@ class UserController extends Controller
         return $users = User::select(
             'first_name',
             'last_name',
+            'username',
             'email',
             'is_admin',
             'is_disabled',

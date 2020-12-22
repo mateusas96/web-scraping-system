@@ -130,7 +130,7 @@
                                 :page.sync="filesPagination.current_page"
                                 :items-per-page="filesPagination.per_page"
                                 hide-default-footer
-                                :loading="loading"
+                                :loading="loading || loadFiles"
                                 sort-by="last_name"
                                 loading-text="Loading... Please wait"
                                 :headers="headers"
@@ -140,6 +140,16 @@
                                     #
                                 </template>
                                 <template v-slot:[`item.actions`]="{ item }">
+                                    <a
+                                        :href="'./config-uploads/' + item.file_name"
+                                        download
+                                    >
+                                        <v-icon
+                                            class="ml-4"
+                                        >
+                                        mdi-arrow-down-bold-box-outline
+                                        </v-icon>
+                                    </a>
                                     <v-icon
                                         class="ml-4"
                                         v-on:click="editFile(item)"
@@ -267,26 +277,44 @@
                     { text: 'File name', value: 'file_name' }, 
                     { text: 'Uploaded by', value: 'uploaded_by_user_username' },
                     { text: 'File size', value: 'file_size' },
-                    { text: 'Edit User', value: 'actions' , sortable: false}
+                    { text: 'Uploaded at', value: 'created_at' },
+                    { text: 'Actions', value: 'actions' , sortable: false}
                 ],
                 loading: true,
                 search: '',
             }
         },
         mounted() {
-
+            // TODO
+            // Fire.$on('searchFile', ()=>{
+            //     this.loading = true;
+            //     axios.get('/api/findFile?query=' + this.search)
+            //     .then(({data})=>{
+            //         this.users = data.data;
+            //         this.usersPagination = data;
+            //         this.loading = false;
+            //     })
+            //     .catch(()=>{
+            //         this.loading = false;
+            //     });
+            // })
         },
         watch: {
             loadFiles: {
                 handler: function(newVal, oldVal) {
                     if (newVal) {
-                        this.getFilesData();
+                        if (this.panelOpened === 0) {
+                            this.getFilesData();
+                        } else {
+                            this.loadFiles = false;
+                        }
                     }
                 }
             },
             refreshFiles: {
                 handler: function(newVal, oldVal) {
                     if (newVal) {
+                        this.loading = true;
                         this.getFilesData();
                     }
                 }
@@ -297,7 +325,7 @@
                 console.log(file);
             },
             searchit: _.debounce(() => {
-                Fire.$emit('searching');
+                Fire.$emit('searchFile');
             }, 500),
             getResults(page = 1) {
                 this.loading = true;
@@ -315,6 +343,7 @@
                     this.filesData = data.data;
                     this.refreshFiles = false;
                     this.loading = false;
+                    this.loadFiles = false;
                 })
                 .catch((error) => {
 

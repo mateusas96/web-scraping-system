@@ -23,6 +23,7 @@ class FileController extends Controller
             'file_name',
             'file_size',
             'file_path',
+            'created_at',
         )->paginate(8);
     }
 
@@ -68,7 +69,7 @@ class FileController extends Controller
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
                     'file_size' => $file->getSize(),
-                    'file_path' => '/public/config-uploads',
+                    'file_path' => './config-uploads',
                 ]);
             }
         }

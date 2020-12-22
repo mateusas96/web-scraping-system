@@ -185,6 +185,7 @@
                 { text: '#', align: 'start', sortable: false, value: 'hashtag' }, 
                 { text: 'First Name', value: 'first_name' },
                 { text: 'Last Name', value: 'last_name' },
+                { text: 'Username', value: 'username' },
                 { text: 'Email', value: 'email' },
                 { text: 'Is Admin', value: 'is_admin' }, 
                 { text: 'Is Disabled', value: 'is_disabled' },
@@ -202,7 +203,7 @@
             Fire.$on('AfterUpdate', () => {
                 this.getUsersList();
             });
-            Fire.$on('searching', ()=>{
+            Fire.$on('searchUser', ()=>{
                 this.loading = true;
                 axios.get('/api/findUser?query=' + this.search)
                 .then(({data})=>{
@@ -217,7 +218,7 @@
         },
         methods: {
             searchit: _.debounce(() => {
-                Fire.$emit('searching');
+                Fire.$emit('searchUser');
             }, 500),
             getResults(page = 1) {
                 this.loading = true;
