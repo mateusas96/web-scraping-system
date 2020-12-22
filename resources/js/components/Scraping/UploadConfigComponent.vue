@@ -141,7 +141,7 @@
                                 </template>
                                 <template v-slot:[`item.actions`]="{ item }">
                                     <a
-                                        :href="'./config-uploads/' + item.file_name"
+                                        :href="item.file_path + '/' + item.file_name"
                                         download
                                     >
                                         <v-icon
