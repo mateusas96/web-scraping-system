@@ -147,7 +147,7 @@
                                         <v-icon
                                             class="ml-4"
                                         >
-                                        mdi-arrow-down-bold-box-outline
+                                        mdi-arrow-down-bold
                                         </v-icon>
                                     </a>
                                     <v-icon
