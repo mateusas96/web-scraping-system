@@ -19,12 +19,14 @@ class FileController extends Controller
     public function index()
     {
         return File::select(
+            'uuid',
             'uploaded_by_user_username',
+            'version',
             'file_name',
             'file_size',
             'file_path',
             'created_at',
-        )->paginate(8);
+        )->paginate(10);
     }
 
     /**
@@ -58,8 +60,7 @@ class FileController extends Controller
                     $existingFiles = $existingFiles . ', ' . $file->getClientOriginalName();
             } else {
                 array_push($filesUploaded, $i);
-                Storage::disk('public', $file->getClientOriginalName())
-                ->put(
+                Storage::disk('public')->put(
                     $file->getClientOriginalName(), 
                     StorageFile::get($file)
                 );
@@ -68,8 +69,8 @@ class FileController extends Controller
                     'uploaded_by_user_username' => $activeUserUsername,
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
-                    'file_size' => $file->getSize(),
-                    'file_path' => './config-uploads',
+                    'file_size' => $file->getSize() === 0 ? '0 MB' : $file->getSize() / 1000 . ' MB',
+                    'file_path' => './config-uploads/',
                 ]);
             }
         }
@@ -114,6 +115,40 @@ class FileController extends Controller
     public function update(Request $request, File $file)
     {
         //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  String $uuid 
+     * @return \Illuminate\Http\Response
+     */
+    public function updateFile(Request $request, $uuid)
+    {
+        $file = File::findByUuid($uuid);
+
+        if (array_key_exists('error', $file)) {
+            return $file;
+        }
+
+        $reuploadedFile = $request->file('file');
+
+        unlink($file['file_path'] . $file['file_name']);
+
+        Storage::disk('public')->put(
+            $reuploadedFile->getClientOriginalName(), 
+            StorageFile::get($reuploadedFile)
+        );
+
+        $file->version = $file['version'] + 1;
+        $file->file_size = $reuploadedFile->getSize() === 0 ? '0 MB' : $reuploadedFile->getSize() / 1000 . ' MB';
+        $file->save();
+
+        return response([
+            'error' => false,
+            'message' => 'File successfully updated',
+        ]);
     }
 
     /**

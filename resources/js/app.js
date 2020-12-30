@@ -28,13 +28,28 @@ Vue.use(VueProgressBar, {
 Vue.use(VueMaterial);
 Vue.use(VueToastr);
 
-Vue.material.locale.dateFormat = 'dd/MM/yyyy';
-
 let routes = [
     { path: '/home', component: require('./components/Home/HomeComponent.vue').default },
     { path: '/users/management', component: require('./components/UsersManagement/UsersManagementComponent.vue').default },
     { path: '/upload-configs', component: require('./components/Scraping/UploadConfigComponent.vue').default }
 ];
+
+// hide scrollbar if needed
+export function hideScrollbar() {
+    window.scrollTo({
+        top: 0, 
+        left: 0, 
+        behavior: 'smooth',
+    });
+    let elHtml = document.getElementsByTagName('html')[0];
+    elHtml.style.overflowY = 'hidden';
+}
+
+// show scrollbar if needed
+export function showScrollbar() {
+    let elHtml = document.getElementsByTagName('html')[0];
+    elHtml.style.overflowY = null;
+}
 
 const router = new VueRouter({
     mode: 'history',

@@ -63,3 +63,9 @@
     </div>
 </div>
 @endsection
+
+<style>
+    .col-md-4.col-form-label.text-md-right {
+        margin-top: 0.625rem;
+    }
+</style>

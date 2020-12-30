@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container component">
         <div class="row justify-content-center">
             <v-expansion-panels 
                 focusable
@@ -23,7 +23,7 @@
                                     prepend-icon="mdi-paperclip"
                                     outlined
                                     accept=".txt"
-                                    v-on:change="handleFilesChange"
+                                    v-on:change="handleFilesUpload"
                                 >
                                     <template v-slot:selection="{ text }">
                                         <v-chip
@@ -41,7 +41,7 @@
                                 <v-btn
                                     color="success"
                                     v-on:click="uploadFiles"
-                                    :disabled="readyForUploadFiles < 1"
+                                    :disabled="readyForUploadFiles.length < 1"
                                 >
                                     Upload files
                                 </v-btn>
@@ -95,7 +95,7 @@
                         </v-card-actions>
                     </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-expansion-panel v-on:click="loadFiles = !loadFiles">
+                <v-expansion-panel>
                     <v-expansion-panel-header>
                         Manage files
                         <div
@@ -141,7 +141,7 @@
                                 </template>
                                 <template v-slot:[`item.actions`]="{ item }">
                                     <a
-                                        :href="item.file_path + '/' + item.file_name"
+                                        :href="item.file_path + item.file_name"
                                         download
                                     >
                                         <v-icon
@@ -152,76 +152,87 @@
                                     </a>
                                     <v-icon
                                         class="ml-4"
-                                        v-on:click="editFile(item)"
+                                        v-on:click="prepareReuploadFileDialog(item)"
                                     >
                                         mdi-pencil
                                     </v-icon>
                                 </template>
 
-                                <!-- <template v-slot:top>
+                                <template v-slot:top>
                                     <v-dialog
-                                        v-model="editUserDialog"
-                                        max-width="500px"
+                                        v-model="reuploadFileDialog"
+                                        max-width="600px"
+                                        @click:outside="reuploadFileDialog = false; canUpload = false;"
                                     >
                                         <v-card>
                                         <v-card-title>
-                                            <span class="headline">Edit User</span>
+                                            <span class="headline">File Reupload</span>
                                         </v-card-title>
                             
                                         <v-card-text>
                                             <v-container>
-                                            <v-row>
-                                                <v-col
-                                                    cols="12"
-                                                    sm="6"
-                                                    md="6"
-                                                >
-                                                <v-text-field
-                                                    v-model="userForm.first_name"
-                                                    label="First Name"
-                                                    :disabled="true"
-                                                ></v-text-field>
-                                                </v-col>
-                                                <v-col
-                                                    cols="12"
-                                                    sm="6"
-                                                    md="6"
-                                                >
-                                                <v-text-field
-                                                    v-model="userForm.last_name"
-                                                    label="Last Name"
-                                                    :disabled="true"
-                                                ></v-text-field>
-                                                </v-col>
-                                            </v-row>
-                                            <v-row>
-                                                <v-col
-                                                    class="d-flex"
-                                                    cols="12"
-                                                >
-                                                    <v-select
-                                                        v-model="userForm.is_admin"
-                                                        label="Is Admin"
-                                                        :items="selectOptions"
-                                                        item-text="name"
-                                                        item-value="value"
-                                                    ></v-select>
-                                                </v-col>
-                                            </v-row>
-                                            <v-row>
-                                                <v-col
-                                                    class="d-flex"
-                                                    cols="12"
-                                                >
-                                                    <v-select
-                                                        v-model="userForm.is_disabled"
-                                                        label="Is Disabled"
-                                                        :items="selectOptions"
-                                                        item-text="name"
-                                                        item-value="value"
-                                                    ></v-select>
-                                                </v-col>
-                                            </v-row>
+                                                <v-row>
+                                                    <v-col
+                                                        cols="12"
+                                                        md="12"
+                                                    >
+                                                    <v-text-field
+                                                        v-model="fileReuploadForm.file_name"
+                                                        label="File name"
+                                                        :disabled="true"
+                                                    ></v-text-field>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        sm="6"
+                                                        md="6"
+                                                    >
+                                                    <v-text-field
+                                                        v-model="fileReuploadForm.uploaded_by_user_username"
+                                                        label="Uploaded by"
+                                                        :disabled="true"
+                                                    ></v-text-field>
+                                                    </v-col>
+                                                    <v-col
+                                                        cols="12"
+                                                        sm="6"
+                                                        md="6"
+                                                    >
+                                                    <v-text-field
+                                                        v-model="fileReuploadForm.created_at"
+                                                        label="Uploaded at"
+                                                        :disabled="true"
+                                                    ></v-text-field>
+                                                    </v-col>
+                                                </v-row>
+                                                <v-row>
+                                                    <v-col cols="12">
+                                                        <v-file-input
+                                                            type="file"
+                                                            v-model="fileReuploadForm.file"
+                                                            color="deep-purple accent-4"
+                                                            label="File input"
+                                                            placeholder="Select file"
+                                                            prepend-icon="mdi-paperclip"
+                                                            outlined
+                                                            accept=".txt"
+                                                            v-on:change="handleFileReupload"
+                                                            :rules="fileReuploadError"
+                                                            show-size
+                                                        >
+                                                            <template v-slot:selection="{ text }">
+                                                                <v-chip
+                                                                    color="deep-purple accent-4"
+                                                                    dark
+                                                                    label
+                                                                    small
+                                                                >
+                                                                    {{ text }}
+                                                                </v-chip>
+                                                            </template>
+                                                        </v-file-input>
+                                                    </v-col>
+                                                </v-row>
                                             </v-container>
                                         </v-card-text>
                             
@@ -230,22 +241,22 @@
                                             <v-btn
                                                 color="error darken-1"
                                                 text
-                                                v-on:click="console.log('idiNX')"
+                                                v-on:click="reuploadFileDialog = false;"
                                             >
                                                 Cancel
                                             </v-btn>
                                             <v-btn
                                                 color="success darken-1"
                                                 text
-                                                v-on:click="console.log('idiNX')"
+                                                :disabled="!canUpload"
+                                                v-on:click="reuploadFile"
                                             >
                                                 Save
                                             </v-btn>
                                         </v-card-actions>
                                         </v-card>
                                     </v-dialog>
-                                </template> -->
-
+                                </template>
                             </v-data-table>
                             <v-pagination
                                 v-model="filesPagination.current_page"
@@ -262,187 +273,265 @@
 </template>
 
 <script>
-    export default {
-        data: () => {
-            return {
-                panelOpened: [0],
-                tempFiles: [],
-                readyForUploadFiles: [],
-                loadFiles: false,
-                filesData: [],
-                filesPagination: [],
-                refreshFiles: false,
-                headers: [
-                    { text: '#', align: 'start', sortable: false, value: 'hashtag' }, 
-                    { text: 'File name', value: 'file_name' }, 
-                    { text: 'Uploaded by', value: 'uploaded_by_user_username' },
-                    { text: 'File size', value: 'file_size' },
-                    { text: 'Uploaded at', value: 'created_at' },
-                    { text: 'Actions', value: 'actions' , sortable: false}
-                ],
-                loading: true,
-                search: '',
+import {showScrollbar ,hideScrollbar} from '../../app';
+
+export default {
+    data: () => {
+        return {
+            panelOpened: 0,
+            tempFiles: [],
+            readyForUploadFiles: [],
+            filesData: [],
+            filesPagination: [],
+            refreshFiles: false,
+            headers: [
+                { text: '#', align: 'start', sortable: false, value: 'hashtag' },
+                { text: 'File name', value: 'file_name' },
+                { text: 'File version', value: 'version' },
+                { text: 'Uploaded by', value: 'uploaded_by_user_username' },
+                { text: 'File size', value: 'file_size' },
+                { text: 'Uploaded at', value: 'created_at' },
+                { text: 'Actions', value: 'actions' , sortable: false},
+            ],
+            loading: true,
+            search: '',
+            reuploadFileDialog: false,
+            fileReuploadForm: new Form({
+                uuid: '',
+                file_name: '',
+                uploaded_by_user_username: '',
+                created_at: '',
+                file: [],
+            }),
+            formData: new FormData(),
+            canUpload: false,
+            fileReuploadError: [],
+        }
+    },
+    mounted() {
+        hideScrollbar();
+        Fire.$on('reloadDataAfterUpdate', () => {
+            this.getFilesData();
+        });
+        // TODO
+        // Fire.$on('searchFile', () => {
+        //     this.loading = true;
+        //     axios.get('/api/findFile?query=' + this.search)
+        //     .then(({data}) => {
+        //         this.users = data.data;
+        //         this.usersPagination = data;
+        //         this.loading = false;
+        //     })
+        //     .catch(() => {
+        //         this.loading = false;
+        //     });
+        // })
+    },
+    watch: {
+        refreshFiles: {
+            handler: function(newVal, oldVal) {
+                if (newVal) {
+                    this.loading = true;
+                    this.getFilesData();
+                }
             }
         },
-        mounted() {
-            // TODO
-            // Fire.$on('searchFile', ()=>{
-            //     this.loading = true;
-            //     axios.get('/api/findFile?query=' + this.search)
-            //     .then(({data})=>{
-            //         this.users = data.data;
-            //         this.usersPagination = data;
-            //         this.loading = false;
-            //     })
-            //     .catch(()=>{
-            //         this.loading = false;
-            //     });
-            // })
-        },
-        watch: {
-            loadFiles: {
-                handler: function(newVal, oldVal) {
-                    if (newVal) {
-                        if (this.panelOpened === 0) {
-                            this.getFilesData();
-                        } else {
-                            this.loadFiles = false;
-                        }
-                    }
-                }
-            },
-            refreshFiles: {
-                handler: function(newVal, oldVal) {
-                    if (newVal) {
-                        this.loading = true;
-                        this.getFilesData();
-                    }
+        panelOpened: {
+            handler: function(newVal, oldVal) {
+                if (newVal) {
+                    this.getFilesData();
+                } else if (newVal === 0) {
+                    hideScrollbar();
                 }
             }
         },
-        methods: {
-            editFile(file) {
-                console.log(file);
-            },
-            searchit: _.debounce(() => {
-                Fire.$emit('searchFile');
-            }, 500),
-            getResults(page = 1) {
-                this.loading = true;
-                axios.get('/api/file?page=' + page)
-                    .then(({data})=> {
-                    this.filesPagination = data;
-                    this.filesData = data.data;
-                    this.loading = false;
-                });
-            },
-            getFilesData() {
-                axios.get('/api/file')
-                .then(({data}) => {
-                    this.filesPagination = data;
-                    this.filesData = data.data;
-                    this.refreshFiles = false;
-                    this.loading = false;
-                    this.loadFiles = false;
-                })
-                .catch((error) => {
-
-                });
-            },
-            uploadFiles() {
-                let formData = new FormData();
-
-                formData.append('filesCount', this.readyForUploadFiles.length);
-
-                this.readyForUploadFiles.forEach((value, index) => {
-                    formData.append('file' + index, this.readyForUploadFiles[index]);
-                })
-
-                axios.post('/api/file', formData)
-                .then(({data}) => {
-                    console.log(data);
-                    if (data.error) {
-                        this.$toastr.Add({
-                            title: data.message + ': ',
-                            msg: data.not_uploaded_files,
-                            type: 'info',
-                            timeout: 7000,
-                            progressbar: true,
-                            position: 'toast-top-right',
-                        });
-                        if (data.files_uploaded.length > 0) {
-                            this.$toastr.s('Other files uploaded successfully');
-                        }
-                        this.readyForUploadFiles = [];
-                    } else {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Files uploaded successfully',
-                            showConfirmButton: false,
-                            timer: 2500,
-                            timerProgressBar: true,
-                        });
-                        this.readyForUploadFiles = [];
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-            },
-            handleFilesChange() {
-                if (this.readyForUploadFiles.length > 0) {
-                    this.readyForUploadFiles.forEach((value, index) => {
-                        this.tempFiles.forEach((val, idx) => {
-                            if (value.name === val.name) {
-                                this.$toastr.w('File: ' + value.name + ' already exists in the list');
-                                this.tempFiles.splice(idx, 1);
-                            }
-                        })
-                    });
+        filesData: {
+            handler: function(newVal, oldVal) {
+                if (newVal.length === 10) {
+                    showScrollbar();
+                } else {
+                    hideScrollbar();
                 }
-                this.tempFiles.forEach((value, index) => {
-                    if (value.type !== 'text/plain') {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'warning',
-                            title: 'Only .txt file formats are supported',
-                            showConfirmButton: false,
-                            timer: 2500,
-                            timerProgressBar: true,
-                        })
-                    } else {
-                        this.readyForUploadFiles.push(this.tempFiles[index]);
-                    }
-                });
-                this.tempFiles = [];
-            },
-            handleFileDelete(index) {
-                this.readyForUploadFiles.splice(index, 1);
-            },
-            handleAllFilesDelete() {
-                Swal.fire({
-                    title: 'Are you sure you want to remove all files?',
-                    showDenyButton: true,
-                    confirmButtonText: 'Yes',
-                    denyButtonText: 'No',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        this.readyForUploadFiles = [];
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'All files successfully removed',
-                            showConfirmButton: false,
-                            timer: 2500,
-                            timerProgressBar: true,
-                        })
-                    }
-                })
             }
         }
+    },
+    methods: {
+        handleFileReupload() {
+            if (this.fileReuploadForm.file === undefined || this.fileReuploadForm.file < 1 ) {
+                this.fileReuploadError = [];
+                this.canUpload = false;
+                return;
+            }
+            if (this.fileReuploadForm.file.type !== 'text/plain') {
+                this.fileReuploadError = [
+                    'Only .txt file formats are supported',
+                ];
+                return;
+            } else if (this.fileReuploadForm.file.name !== this.fileReuploadForm.file_name) {
+                this.fileReuploadError = [
+                    'Uploaded file should be with the same name: ' + this.fileReuploadForm.file_name,
+                ];
+                return;
+            } else {
+                this.fileReuploadError = [];
+                this.canUpload = true;
+            }
+        },
+        reuploadFile() {
+            this.formData.append('file', this.fileReuploadForm.file);
+            axios.post('api/updateFile/' + this.fileReuploadForm.uuid, this.formData)
+                .then(({data}) => {
+                    if (data.error) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 3500,
+                            timerProgressBar: true,
+                        });
+                        return;
+                    }
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true,
+                    });
+                    this.canUpload = false;
+                    this.loading = true;
+                    this.fileReuploadForm.clear();
+                    this.formData = new FormData();
+                    this.reuploadFileDialog = false;
+                    this.getFilesData();
+                });
+        },
+        prepareReuploadFileDialog(file) {
+            this.reuploadFileDialog = true;
+            this.fileReuploadForm.clear();
+            this.fileReuploadForm.fill(file);
+        },
+        searchit: _.debounce(() => {
+            Fire.$emit('searchFile');
+        }, 500),
+        getResults(page = 1) {
+            this.loading = true;
+            axios.get('/api/file?page=' + page)
+                .then(({data}) => {
+                this.filesPagination = data;
+                this.filesData = data.data;
+                this.loading = false;
+            });
+        },
+        getFilesData() {
+            axios.get('/api/file')
+            .then(({data}) => {
+                this.filesPagination = data;
+                this.filesData = data.data;
+                this.refreshFiles = false;
+                this.loading = false;
+                this.loadFiles = false;
+            })
+            .catch((error) => {
+
+            });
+        },
+        uploadFiles() {
+            this.formData.append('filesCount', this.readyForUploadFiles.length);
+
+            this.readyForUploadFiles.forEach((value, index) => {
+                this.formData.append('file' + index, this.readyForUploadFiles[index]);
+            })
+
+            axios.post('/api/file', this.formData)
+            .then(({data}) => {
+                if (data.error) {
+                    this.$toastr.Add({
+                        title: data.message + ': ',
+                        msg: data.not_uploaded_files,
+                        type: 'info',
+                        timeout: 7000,
+                        progressbar: true,
+                        position: 'toast-top-right',
+                    });
+                    if (data.files_uploaded.length > 0) {
+                        this.$toastr.s('Other files uploaded successfully');
+                    }
+                    this.readyForUploadFiles = [];
+                } else {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Files uploaded successfully',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true,
+                    });
+                    this.readyForUploadFiles = [];
+                }
+                this.formData.clear();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        },
+        handleFilesUpload() {
+            if (this.readyForUploadFiles.length > 0) {
+                this.readyForUploadFiles.forEach((value, index) => {
+                    this.tempFiles.forEach((val, idx) => {
+                        if (value.name === val.name) {
+                            this.$toastr.w('File: ' + value.name + ' already exists in the list');
+                            this.tempFiles.splice(idx, 1);
+                        }
+                    })
+                });
+            }
+            this.tempFiles.forEach((value, index) => {
+                if (value.type !== 'text/plain') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Only .txt file formats are supported',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true,
+                    });
+                    return;
+                }
+                this.readyForUploadFiles.push(this.tempFiles[index]);
+            });
+            this.tempFiles = [];
+        },
+        handleFileDelete(index) {
+            this.readyForUploadFiles.splice(index, 1);
+        },
+        handleAllFilesDelete() {
+            Swal.fire({
+                title: 'Are you sure you want to remove all files?',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.readyForUploadFiles = [];
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'All files successfully removed',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        timerProgressBar: true,
+                    });
+                }
+            });
+        }
     }
+}
 </script>

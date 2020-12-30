@@ -2,7 +2,6 @@
 @import "toastr";
 
 @import url('https://fonts.googleapis.com/css?family=Material+Icons');
-@import url('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
 @import url('https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css');
 
 
@@ -28,6 +27,6 @@ ul.nav-treeview {
     margin-left: 30px;
 }
 
-.container {
+.container.component {
     width: 65vw;
 }

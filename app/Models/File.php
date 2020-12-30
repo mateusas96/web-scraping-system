@@ -12,7 +12,14 @@ class File extends Model
      * @var array
      */
     protected $fillable = [
-        'uuid', 'uploaded_by_user_id', 'file_name', 'mime_type', 'file_size', 'file_path', 'uploaded_by_user_username'
+        'uuid',
+        'uploaded_by_user_id',
+        'file_name',
+        'mime_type',
+        'file_size',
+        'file_path',
+        'uploaded_by_user_username',
+        'version'
     ];
 
     /**
@@ -31,4 +38,20 @@ class File extends Model
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:m:s',
     ];
+
+    /**
+     * find data by uuid
+     */
+    public static function findByUuid($uuid) {
+        $file = File::select('*')->where('uuid', $uuid)->first();
+
+        if (isset($file)) {
+            return $file;
+        }
+
+        return [
+            'error' => true,
+            'message' => 'Object not found'
+        ];
+    }
 }

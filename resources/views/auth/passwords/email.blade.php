@@ -36,6 +36,9 @@
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Send Password Reset Link') }}
                                 </button>
+                                <a id="cancel" class="btn border" href="{{ route('login') }}">
+                                    Cancel
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -45,3 +48,21 @@
     </div>
 </div>
 @endsection
+
+<style>
+    button[type="submit"]:hover {
+        background-color: green !important;
+        border-color: green !important;
+    }
+    #cancel {
+        border-color: red !important;
+        color: red;
+    }
+    #cancel:hover {
+        color: white;
+        background-color: red;
+    }
+    .col-md-4.col-form-label.text-md-right {
+        margin-top: 0.625rem;
+    }
+</style>

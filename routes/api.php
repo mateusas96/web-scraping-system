@@ -28,5 +28,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], 
         'file' => 'API\FileController',
     ]);
 
+    Route::post('updateFile/{uuid}', 'API\FileController@updateFile')->name('update.file');
+
     Route::get('findUser','API\UserController@search')->name('find.user');
 });

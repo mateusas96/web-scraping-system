@@ -24,17 +24,6 @@ $fa-font-path: "../webfonts";
     .nav-link[data-widget] {
         display: none;
     }
-
-    html {
-        overflow: hidden !important;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-    
-    html::-webkit-scrollbar {
-        width: 0;
-        height: 0;
-    }
 }
 
 .main-sidebar, .main-sidebar::before {

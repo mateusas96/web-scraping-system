@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container component">
         <div class="row justify-content-center">
             <v-alert
                 v-if="error.error"
@@ -63,6 +63,7 @@
                                 <v-dialog
                                     v-model="editUserDialog"
                                     max-width="500px"
+                                    @click:outside="dirty = false"
                                 >
                                     <v-card>
                                     <v-card-title>
@@ -106,6 +107,7 @@
                                                     :items="selectOptions"
                                                     item-text="name"
                                                     item-value="value"
+                                                    v-on:change="handleSelectChange"
                                                 ></v-select>
                                             </v-col>
                                         </v-row>
@@ -120,6 +122,7 @@
                                                     :items="selectOptions"
                                                     item-text="name"
                                                     item-value="value"
+                                                    v-on:change="handleSelectChange"
                                                 ></v-select>
                                             </v-col>
                                         </v-row>
@@ -139,6 +142,7 @@
                                             color="success darken-1"
                                             text
                                             v-on:click="updateUser"
+                                            :disabled="!dirty"
                                         >
                                             Save
                                         </v-btn>
@@ -162,118 +166,122 @@
 </template>
 
 <script>
-    export default {
-        data: () => ({
-            loading: false,
-            editUserDialog: false,
-            error: [
-                { 'error': false },
-                { 'message': '' },
-            ],
-            showContent: false,
-            usersPagination: [],
-            users: [],
-            userForm: new Form({
-                first_name: '',
-                last_name: '',
-                email: '',
-                is_admin: '',
-                is_disabled: '',
-            }),
-            search: '',
-            headers: [
-                { text: '#', align: 'start', sortable: false, value: 'hashtag' }, 
-                { text: 'First Name', value: 'first_name' },
-                { text: 'Last Name', value: 'last_name' },
-                { text: 'Username', value: 'username' },
-                { text: 'Email', value: 'email' },
-                { text: 'Is Admin', value: 'is_admin' }, 
-                { text: 'Is Disabled', value: 'is_disabled' },
-                { text: 'Created At', value: 'created_at' },
-                { text: 'Email Verified At', value: 'email_verified_at' },
-                { text: 'Edit User', value: 'actions' , sortable: false}
-            ],
-            selectOptions: [
-                { name: 'True', value: 1 },
-                { name: 'False', value: 0 },
-            ]
+import {hideScrollbar} from '../../app';
+
+export default {
+    data: () => ({
+        loading: false,
+        editUserDialog: false,
+        error: [
+            { 'error': false },
+            { 'message': '' },
+        ],
+        showContent: false,
+        usersPagination: [],
+        users: [],
+        userForm: new Form({
+            first_name: '',
+            last_name: '',
+            email: '',
+            is_admin: '',
+            is_disabled: '',
         }),
-        mounted() {
-            this.getUsersList();
-            Fire.$on('AfterUpdate', () => {
-                this.getUsersList();
+        search: '',
+        headers: [
+            { text: '#', align: 'start', sortable: false, value: 'hashtag' }, 
+            { text: 'First Name', value: 'first_name' },
+            { text: 'Last Name', value: 'last_name' },
+            { text: 'Username', value: 'username' },
+            { text: 'Email', value: 'email' },
+            { text: 'Is Admin', value: 'is_admin' }, 
+            { text: 'Is Disabled', value: 'is_disabled' },
+            { text: 'Created At', value: 'created_at' },
+            { text: 'Email Verified At', value: 'email_verified_at' },
+            { text: 'Edit User', value: 'actions' , sortable: false}
+        ],
+        selectOptions: [
+            { name: 'True', value: 1 },
+            { name: 'False', value: 0 },
+        ],
+        dirty: false,
+    }),
+    mounted() {
+        hideScrollbar();
+        this.getUsersList();
+        Fire.$on('searchUser', () => {
+            this.loading = true;
+            axios.get('/api/findUser?query=' + this.search)
+            .then(({data}) => {
+                this.users = data.data;
+                this.usersPagination = data;
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
             });
-            Fire.$on('searchUser', ()=>{
-                this.loading = true;
-                axios.get('/api/findUser?query=' + this.search)
-                .then(({data})=>{
-                    this.users = data.data;
-                    this.usersPagination = data;
-                    this.loading = false;
-                })
-                .catch(()=>{
-                    this.loading = false;
-                });
+        })
+    },
+    methods: {
+        handleSelectChange(user) {
+            // TODO not finished
+            this.dirty = true;
+        },
+        searchit: _.debounce(() => {
+            Fire.$emit('searchUser');
+        }, 500),
+        getResults(page = 1) {
+            this.loading = true;
+            axios.get('/api/user?page=' + page)
+                .then(({data}) => {
+                this.users = data.data;
+                this.usersPagination = data;
+                this.loading = false;
+            });
+        },
+        getUsersList() {
+            this.loading = true;
+            axios.get('/api/user')
+            .then(({data}) => {
+                this.users = data.data;
+                this.usersPagination = data;
+                this.loading = false;
+            })
+            .catch((error) => {
+                this.loading = false;
+                this.error = error.response.data;
+
             })
         },
-        methods: {
-            searchit: _.debounce(() => {
-                Fire.$emit('searchUser');
-            }, 500),
-            getResults(page = 1) {
-                this.loading = true;
-                axios.get('/api/user?page=' + page)
-                    .then(({data})=> {
-                    this.users = data.data;
-                    this.usersPagination = data;
-                    this.loading = false;
-                });
-            },
-            getUsersList() {
-                this.loading = true;
-                axios.get('/api/user')
-                .then(({data}) => {
-                    this.users = data.data;
-                    this.usersPagination = data;
-                    this.loading = false;
+        editUser(user) {
+            this.editUserDialog = true;
+            this.userForm.clear();
+            this.userForm.fill(user); 
+        },
+        updateUser() {
+            this.userForm.put('/api/user/' + this.userForm.email)
+            .then(() => {
+                this.editUserDialog = false;
+                this.getUsersList();
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'User info updated successfully',
+                    showConfirmButton: false,
+                    timer: 2500
                 })
-                .catch((error) => {
-                    this.loading = false;
-                    this.error = error.response.data;
-
+            })
+            .catch(() => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Something went wrong',
+                    showConfirmButton: false,
+                    timer: 4000
                 })
-            },
-            editUser(user) {
-                this.editUserDialog = true;
-                this.userForm.reset();
-                this.userForm.clear();
-                this.userForm.fill(user); 
-            },
-            updateUser() {
-                this.userForm.put('/api/user/' + this.userForm.email)
-                .then(() =>{
-                    this.editUserDialog = false;
-                    Fire.$emit('AfterUpdate');
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'User info updated successfully',
-                        showConfirmButton: false,
-                        timer: 2500
-                    })
-                })
-                .catch(()=>{
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        showConfirmButton: false,
-                        timer: 4000
-                    })
-                })
-            }
+            })
         }
     }
+}
 </script>
