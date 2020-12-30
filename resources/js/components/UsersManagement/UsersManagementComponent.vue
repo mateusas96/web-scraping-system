@@ -222,9 +222,17 @@ export default {
         })
     },
     methods: {
-        handleSelectChange(user) {
-            // TODO not finished
-            this.dirty = true;
+        handleSelectChange() {
+            this.users.forEach((value, index) => {
+                if (value.email === this.userForm.email) {
+                    if (value.is_admin !== this.userForm.is_admin || value.is_disabled !== this.userForm.is_disabled) {
+                        this.dirty = true;
+                        return;
+                    }
+                    this.dirty = false;
+                    return;
+                }
+            });
         },
         searchit: _.debounce(() => {
             Fire.$emit('searchUser');
