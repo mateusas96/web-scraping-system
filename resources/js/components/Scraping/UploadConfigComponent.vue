@@ -162,7 +162,7 @@
                                     <v-dialog
                                         v-model="reuploadFileDialog"
                                         max-width="600px"
-                                        @click:outside="reuploadFileDialog = false; canUpload = false;"
+                                        @click:outside="reuploadFileDialog = false; canUpload = false; fileReuploadError = [];"
                                     >
                                         <v-card>
                                         <v-card-title>
@@ -241,7 +241,7 @@
                                             <v-btn
                                                 color="error darken-1"
                                                 text
-                                                v-on:click="reuploadFileDialog = false;"
+                                                v-on:click="reuploadFileDialog = false; canUpload = false; fileReuploadError = [];"
                                             >
                                                 Cancel
                                             </v-btn>
