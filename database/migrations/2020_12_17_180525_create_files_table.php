@@ -19,7 +19,7 @@ class CreateFilesTable extends Migration
             $table->unsignedBigInteger('uploaded_by_user_id');
             $table->string('file_name');
             $table->string('mime_type');
-            $table->double('file_size');
+            $table->string('file_size');
             $table->string('file_path');
             $table->timestamps();
             $table->foreign('uploaded_by_user_id')->references('id')->on('users');
