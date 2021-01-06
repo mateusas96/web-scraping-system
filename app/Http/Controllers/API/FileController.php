@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Storage;
 use File as StorageFile;
+use Carbon\Carbon;
 
 class FileController extends Controller
 {
@@ -25,7 +26,7 @@ class FileController extends Controller
             'file_name',
             'file_size',
             'file_path',
-            'created_at',
+            'updated_at',
         )->paginate(10);
     }
 
@@ -69,7 +70,7 @@ class FileController extends Controller
                     'uploaded_by_user_username' => $activeUserUsername,
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
-                    'file_size' => $file->getSize() === 0 ? '0 MB' : $file->getSize() / 1000 . ' MB',
+                    'file_size' => $file->getSize() === 0 ? '0 KB' : round($file->getSize() / 1024, 3) . ' KB',
                     'file_path' => './config-uploads/',
                 ]);
             }
@@ -78,7 +79,7 @@ class FileController extends Controller
         return response()->json([
             'error' => $existingFiles !== null ? true : false,
             'message' => $existingFiles !== null ? 'These files already exist' : 'All files uploaded successfully',
-            $existingFiles !== null ? 'not_uploaded_files' : null => $existingFiles,
+            'not_uploaded_files' => $existingFiles,
             'files_uploaded' => $filesUploaded,
         ]);
     }
@@ -142,7 +143,7 @@ class FileController extends Controller
         );
 
         $file->version = $file['version'] + 1;
-        $file->file_size = $reuploadedFile->getSize() === 0 ? '0 MB' : $reuploadedFile->getSize() / 1000 . ' MB';
+        $file->file_size = $reuploadedFile->getSize() === 0 ? '0 KB' : round($reuploadedFile->getSize() / 1024, 3) . ' KB';
         $file->save();
 
         return response([
@@ -160,5 +161,39 @@ class FileController extends Controller
     public function destroy(File $file)
     {
         //
+    }
+
+    /**
+     * Search for file in data base
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request){
+        if($search = $request->get('query')){
+            $files = File::select(
+                'uuid',
+                'uploaded_by_user_username',
+                'version',
+                'file_name',
+                'file_size',
+                'file_path',
+                'updated_at',
+            )->where(function($query) use ($search){
+                $query
+                    ->where('uploaded_by_user_username', 'LIKE', "%$search%")
+                    ->orWhere('file_name', 'LIKE', "%$search%");
+            })->latest()->paginate(10);
+            return $files;
+        }
+        
+        return $files = File::select(
+            'uuid',
+            'uploaded_by_user_username',
+            'version',
+            'file_name',
+            'file_size',
+            'file_path',
+            'updated_at',
+        )->latest()->paginate(10);
     }
 }

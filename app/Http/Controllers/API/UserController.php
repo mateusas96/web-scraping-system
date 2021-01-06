@@ -23,7 +23,8 @@ class UserController extends Controller
             'is_admin',
             'is_disabled',
             'created_at',
-            'email_verified_at'
+            'updated_at',
+            'email_verified_at',
         )->paginate(10);
     }
 
@@ -96,7 +97,8 @@ class UserController extends Controller
                 'is_admin',
                 'is_disabled',
                 'created_at',
-                'email_verified_at'
+                'updated_at',
+                'email_verified_at',
             )->where(function($query) use ($search){
                 $query
                     ->where('first_name', 'LIKE', "%$search%")
@@ -117,7 +119,8 @@ class UserController extends Controller
             'is_admin',
             'is_disabled',
             'created_at',
-            'email_verified_at'
+            'updated_at',
+            'email_verified_at',
         )->latest()->paginate(10);
     }
 }

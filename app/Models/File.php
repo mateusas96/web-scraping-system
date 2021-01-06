@@ -19,7 +19,7 @@ class File extends Model
         'file_size',
         'file_path',
         'uploaded_by_user_username',
-        'version'
+        'version',
     ];
 
     /**
@@ -36,7 +36,8 @@ class File extends Model
      * @var array
      */
     protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:m:s',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**

@@ -1,5 +1,5 @@
 <template>
-    <div class="container component">
+    <div class="container component" style="width: auto;">
         <div class="row justify-content-center">
             <v-alert
                 v-if="error.error"
@@ -14,6 +14,24 @@
                     >
                         <v-card-title>
                             Users list
+                            <div
+                                class="d-flex justify-end ml-6"
+                            >
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn 
+                                            v-on:click="refreshUsers = !refreshUsers"
+                                            v-on="on"
+                                            small
+                                            :disabled="refreshUsers"
+                                        >
+                                            <v-icon v-if="refreshUsers" small>fas fa-sync fa-spin</v-icon>
+                                            <v-icon v-else small>fas fa-sync</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Refresh users list</small>
+                                </v-tooltip>
+                            </div>
                         <v-spacer></v-spacer>
                             <v-text-field
                                 v-on:input="searchit"
@@ -23,6 +41,8 @@
                                 single-line
                                 hide-details
                                 style="max-width: 300px;"
+                                clearable
+                                clear-icon="mdi-close-circle-outline"
                             ></v-text-field>
                         </v-card-title>
                         <v-data-table
@@ -35,28 +55,34 @@
                             :headers="headers"
                             :items="users"
                         >
-                        <template v-slot:[`item.hashtag`]="{}">
-                            #
-                        </template>
-                        <template v-slot:[`item.is_admin`]="{ item }">
-                            <span v-if="item.is_admin" style="color: green;">True</span>
-                            <span v-else style="color: red;">False</span>
-                        </template>
-                        <template v-slot:[`item.is_disabled`]="{ item }">
-                            <span v-if="item.is_disabled" style="color: red;">True</span>
-                            <span v-else style="color: green;">False</span>
-                        </template>
-                        <template v-slot:[`item.email_verified_at`]="{ item }">
-                            <span v-if="item.email_verified_at !== null">{{item.email_verified_at}}</span>
-                            <span v-else class="d-flex justify-center">-</span>
-                        </template>
+                            <template v-slot:[`item.hashtag`]="{}">
+                                #
+                            </template>
+                            <template v-slot:[`item.is_admin`]="{ item }">
+                                <span v-if="item.is_admin" style="color: green;">True</span>
+                                <span v-else style="color: red;">False</span>
+                            </template>
+                            <template v-slot:[`item.is_disabled`]="{ item }">
+                                <span v-if="item.is_disabled" style="color: red;">True</span>
+                                <span v-else style="color: green;">False</span>
+                            </template>
+                            <template v-slot:[`item.email_verified_at`]="{ item }">
+                                <span v-if="item.email_verified_at !== null">{{item.email_verified_at}}</span>
+                                <span v-else class="d-flex justify-center">-</span>
+                            </template>
                             <template v-slot:[`item.actions`]="{ item }">
-                                <v-icon
-                                    class="ml-4"
-                                    v-on:click="editUser(item)"
-                                >
-                                    mdi-pencil
-                                </v-icon>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-icon
+                                            class="ml-4"
+                                            v-on:click="editUser(item)"
+                                            v-on="on"
+                                        >
+                                            mdi-pencil
+                                        </v-icon>
+                                    </template>
+                                    <small>Edit user</small>
+                                </v-tooltip>
                             </template>
 
                             <template v-slot:top>
@@ -189,28 +215,40 @@ export default {
         search: '',
         headers: [
             { text: '#', align: 'start', sortable: false, value: 'hashtag' }, 
-            { text: 'First Name', value: 'first_name' },
-            { text: 'Last Name', value: 'last_name' },
+            { text: 'First name', value: 'first_name' },
+            { text: 'Last name', value: 'last_name' },
             { text: 'Username', value: 'username' },
             { text: 'Email', value: 'email' },
-            { text: 'Is Admin', value: 'is_admin' }, 
-            { text: 'Is Disabled', value: 'is_disabled' },
-            { text: 'Created At', value: 'created_at' },
-            { text: 'Email Verified At', value: 'email_verified_at' },
-            { text: 'Edit User', value: 'actions' , sortable: false}
+            { text: 'Is admin', value: 'is_admin' }, 
+            { text: 'Is disabled', value: 'is_disabled' },
+            { text: 'Created at', value: 'created_at' },
+            { text: 'Updated at', value: 'updated_at' },
+            { text: 'Email verified at', value: 'email_verified_at' },
+            { text: 'Actions', value: 'actions' , sortable: false}
         ],
         selectOptions: [
             { name: 'True', value: 1 },
             { name: 'False', value: 0 },
         ],
         dirty: false,
+        refreshUsers: false,
     }),
+    watch: {
+        refreshUsers: {
+            handler: function(newVal, oldVal) {
+                if (newVal) {
+                    this.loading = true;
+                    this.getUsersList();
+                }
+            }
+        },
+    },
     mounted() {
         hideScrollbar();
         this.getUsersList();
         Fire.$on('searchUser', () => {
             this.loading = true;
-            axios.get('/api/findUser?query=' + this.search)
+            axios.get('/api/find_user?query=' + (this.search === null ? '' : this.search))
             .then(({data}) => {
                 this.users = data.data;
                 this.usersPagination = data;
@@ -252,6 +290,7 @@ export default {
             .then(({data}) => {
                 this.users = data.data;
                 this.usersPagination = data;
+                this.refreshUsers = false;
                 this.loading = false;
             })
             .catch((error) => {

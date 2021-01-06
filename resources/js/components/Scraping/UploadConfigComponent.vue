@@ -101,14 +101,20 @@
                         <div
                             class="d-flex justify-end mr-6"
                         >
-                            <v-btn 
-                                v-on:click="refreshFiles = !refreshFiles" 
-                                small
-                                :disabled="refreshFiles"
-                            >
-                            <v-icon v-if="refreshFiles" small>fas fa-sync fa-spin</v-icon>
-                            <v-icon v-else small>fas fa-sync</v-icon>
-                        </v-btn>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn 
+                                        v-on:click="refreshFiles = !refreshFiles" 
+                                        small
+                                        v-on="on"
+                                        :disabled="refreshFiles"
+                                    >
+                                        <v-icon v-if="refreshFiles" small>fas fa-sync fa-spin</v-icon>
+                                        <v-icon v-else small>fas fa-sync</v-icon>
+                                    </v-btn>
+                                </template>
+                                <small>Refresh files list</small>
+                            </v-tooltip>
                         </div>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
@@ -124,6 +130,8 @@
                                     single-line
                                     hide-details
                                     style="max-width: 300px;"
+                                    clearable
+                                    clear-icon="mdi-close-circle-outline"
                                 ></v-text-field>
                             </v-card-title>
                             <v-data-table
@@ -140,22 +148,32 @@
                                     #
                                 </template>
                                 <template v-slot:[`item.actions`]="{ item }">
-                                    <a
-                                        :href="item.file_path + item.file_name"
-                                        download
-                                    >
-                                        <v-icon
-                                            class="ml-4"
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                        <a
+                                            :href="item.file_path + item.file_name"
+                                            download
+                                            v-on="on"
                                         >
-                                        mdi-arrow-down-bold
+                                            <v-icon>
+                                                mdi-arrow-down-bold
+                                            </v-icon>
+                                        </a>
+                                        </template>
+                                    <small>Download file</small>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                        <v-icon
+                                            class="ml-1"
+                                            v-on="on"
+                                            v-on:click="prepareReuploadFileDialog(item)"
+                                        >
+                                            mdi-pencil
                                         </v-icon>
-                                    </a>
-                                    <v-icon
-                                        class="ml-4"
-                                        v-on:click="prepareReuploadFileDialog(item)"
-                                    >
-                                        mdi-pencil
-                                    </v-icon>
+                                        </template>
+                                    <small>Edit file</small>
+                                </v-tooltip>
                                 </template>
 
                                 <template v-slot:top>
@@ -199,7 +217,7 @@
                                                         md="6"
                                                     >
                                                     <v-text-field
-                                                        v-model="fileReuploadForm.created_at"
+                                                        v-model="fileReuploadForm.updated_at"
                                                         label="Uploaded at"
                                                         :disabled="true"
                                                     ></v-text-field>
@@ -290,7 +308,7 @@ export default {
                 { text: 'File version', value: 'version' },
                 { text: 'Uploaded by', value: 'uploaded_by_user_username' },
                 { text: 'File size', value: 'file_size' },
-                { text: 'Uploaded at', value: 'created_at' },
+                { text: 'Uploaded at', value: 'updated_at' },
                 { text: 'Actions', value: 'actions' , sortable: false},
             ],
             loading: true,
@@ -300,7 +318,7 @@ export default {
                 uuid: '',
                 file_name: '',
                 uploaded_by_user_username: '',
-                created_at: '',
+                updated_at: '',
                 file: [],
             }),
             formData: new FormData(),
@@ -313,19 +331,19 @@ export default {
         Fire.$on('reloadDataAfterUpdate', () => {
             this.getFilesData();
         });
-        // TODO
-        // Fire.$on('searchFile', () => {
-        //     this.loading = true;
-        //     axios.get('/api/findFile?query=' + this.search)
-        //     .then(({data}) => {
-        //         this.users = data.data;
-        //         this.usersPagination = data;
-        //         this.loading = false;
-        //     })
-        //     .catch(() => {
-        //         this.loading = false;
-        //     });
-        // })
+        Fire.$on('searchFile', () => {
+            this.loading = true;
+            axios.get('/api/find_file?query=' + (this.search === null ? '' : this.search))
+            .then(({data}) => {
+                this.loading = false;
+                this.filesPagination = data;
+                this.filesData = data.data;
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
+            });
+        })
     },
     watch: {
         refreshFiles: {
@@ -379,7 +397,7 @@ export default {
         },
         reuploadFile() {
             this.formData.append('file', this.fileReuploadForm.file);
-            axios.post('api/updateFile/' + this.fileReuploadForm.uuid, this.formData)
+            axios.post('api/update_file/' + this.fileReuploadForm.uuid, this.formData)
                 .then(({data}) => {
                     if (data.error) {
                         Swal.fire({
