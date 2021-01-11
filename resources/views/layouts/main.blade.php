@@ -14,7 +14,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="icon" href="{!! asset('./img/bot.jpeg')!!}" />
 
     <!-- Styles -->
-    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    <!-- <link href="{{ mix('css/app.css') }}" rel="stylesheet"> -->
     <link href="{{ mix('css/main.css') }}" rel="stylesheet">
 
 </head>

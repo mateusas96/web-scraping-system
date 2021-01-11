@@ -53,7 +53,4 @@
         background-color: green !important;
         border-color: green !important;
     }
-    .col-md-4.col-form-label.text-md-right {
-        margin-top: 0.625rem;
-    }
 </style>
