@@ -237,8 +237,7 @@ export default {
         refreshUsers: {
             handler: function(newVal, oldVal) {
                 if (newVal) {
-                    this.loading = true;
-                    this.getUsersList();
+                    Fire.$emit('refreshUsers');
                 }
             }
         },
@@ -257,7 +256,11 @@ export default {
             .catch(() => {
                 this.loading = false;
             });
-        })
+        });
+        Fire.$on('refreshUsers', () => {
+            this.loading = true;
+            this.getUsersList();
+        });
     },
     methods: {
         handleSelectChange() {
@@ -285,7 +288,6 @@ export default {
             });
         },
         getUsersList() {
-            this.loading = true;
             axios.get('/api/user')
             .then(({data}) => {
                 this.users = data.data;
@@ -308,7 +310,7 @@ export default {
             this.userForm.put('/api/user/' + this.userForm.email)
             .then(() => {
                 this.editUserDialog = false;
-                this.getUsersList();
+                Fire.$emit('refreshUsers');
                 Swal.fire({
                     toast: true,
                     position: 'top-end',

@@ -328,7 +328,12 @@ export default {
     },
     mounted() {
         hideScrollbar();
-        Fire.$on('reloadDataAfterUpdate', () => {
+        Fire.$on('refreshFiles', () => {
+            this.canUpload = false;
+            this.loading = true;
+            this.fileReuploadForm.clear();
+            this.formData = new FormData();
+            this.reuploadFileDialog = false;
             this.getFilesData();
         });
         Fire.$on('searchFile', () => {
@@ -343,21 +348,20 @@ export default {
             .catch(() => {
                 this.loading = false;
             });
-        })
+        });
     },
     watch: {
         refreshFiles: {
             handler: function(newVal, oldVal) {
                 if (newVal) {
-                    this.loading = true;
-                    this.getFilesData();
+                    Fire.$emit('refreshFiles');
                 }
             }
         },
         panelOpened: {
             handler: function(newVal, oldVal) {
                 if (newVal) {
-                    this.getFilesData();
+                    Fire.$emit('refreshFiles');
                 } else if (newVal === 0) {
                     hideScrollbar();
                 }
@@ -397,7 +401,7 @@ export default {
         },
         reuploadFile() {
             this.formData.append('file', this.fileReuploadForm.file);
-            axios.post('api/update_file/' + this.fileReuploadForm.uuid, this.formData)
+            axios.post('/api/update_file/' + this.fileReuploadForm.uuid, this.formData)
                 .then(({data}) => {
                     if (data.error) {
                         Swal.fire({
@@ -420,12 +424,7 @@ export default {
                         timer: 3500,
                         timerProgressBar: true,
                     });
-                    this.canUpload = false;
-                    this.loading = true;
-                    this.fileReuploadForm.clear();
-                    this.formData = new FormData();
-                    this.reuploadFileDialog = false;
-                    this.getFilesData();
+                    Fire.$emit('refreshFiles');
                 });
         },
         prepareReuploadFileDialog(file) {
