@@ -31,6 +31,19 @@ class FileController extends Controller
     }
 
     /**
+     * Display a listing of the resource for select.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getFilesForSelect()
+    {
+        return File::select(
+            'id',
+            'file_name'
+        )->get();
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

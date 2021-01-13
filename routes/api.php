@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], 
     Route::apiResources([
         'user' => 'API\UserController',
         'file' => 'API\FileController',
+        'selectedFilesForScraping' => 'API\SelectedFilesForScrapingController',
     ]);
 
     Route::post('update_file/{uuid}', 'API\FileController@updateFile')->name('update.file');
@@ -33,4 +34,6 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], 
     Route::get('find_file', 'API\FileController@search')->name('find.file');
 
     Route::get('find_user','API\UserController@search')->name('find.user');
+
+    Route::get('get_files_for_select', 'API\FileController@getFilesForSelect')->name('get.files.for.select');
 });

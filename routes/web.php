@@ -25,4 +25,6 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
     Route::get('/users/management', 'HomeController@index')->name('users.management');
 
     Route::get('/upload-configs', 'HomeController@index')->name('config.upload');
+
+    Route::get('/scrape-data', 'HomeController@index')->name('scrape.data');
 });

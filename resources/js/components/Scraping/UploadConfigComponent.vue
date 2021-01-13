@@ -53,33 +53,33 @@
                                 height="250px"
                             >
                                 <template v-slot:default>
-                                <thead>
-                                    <tr>
-                                    <th class="text-left">
-                                        Name
-                                    </th>
-                                    <th class="text-left">
-                                        Action
-                                    </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr
-                                    v-for="(file, index) in readyForUploadFiles"
-                                    :key="index"
-                                    >
-                                    <td>{{ file.name }}</td>
-                                    <td>
-                                        <v-icon
-                                            class="ml-4"
-                                            v-on:click="handleFileDelete(index)"
-                                            color="error darken-2"
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">
+                                                Name
+                                            </th>
+                                            <th class="text-left">
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                        v-for="(file, index) in readyForUploadFiles"
+                                        :key="index"
                                         >
-                                            mdi-trash-can
-                                        </v-icon>
-                                    </td>
-                                    </tr>
-                                </tbody>
+                                            <td>{{ file.name }}</td>
+                                            <td>
+                                                <v-icon
+                                                    class="ml-4"
+                                                    v-on:click="handleFileDelete(index)"
+                                                    color="error darken-2"
+                                                >
+                                                    mdi-trash-can
+                                                </v-icon>
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </template>
                             </v-simple-table>
                         </v-card>
@@ -150,30 +150,30 @@
                                 <template v-slot:[`item.actions`]="{ item }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                        <a
-                                            :href="item.file_path + item.file_name"
-                                            download
-                                            v-on="on"
-                                        >
-                                            <v-icon>
-                                                mdi-arrow-down-bold
-                                            </v-icon>
-                                        </a>
-                                        </template>
-                                    <small>Download file</small>
-                                </v-tooltip>
-                                <v-tooltip bottom>
+                                            <a
+                                                :href="item.file_path + item.file_name"
+                                                download
+                                                v-on="on"
+                                            >
+                                                <v-icon>
+                                                    mdi-arrow-down-bold
+                                                </v-icon>
+                                            </a>
+                                            </template>
+                                        <small>Download file</small>
+                                    </v-tooltip>
+                                    <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                        <v-icon
-                                            class="ml-1"
-                                            v-on="on"
-                                            v-on:click="prepareReuploadFileDialog(item)"
-                                        >
-                                            mdi-pencil
-                                        </v-icon>
+                                            <v-icon
+                                                class="ml-1"
+                                                v-on="on"
+                                                v-on:click="prepareReuploadFileDialog(item)"
+                                            >
+                                                mdi-pencil
+                                            </v-icon>
                                         </template>
-                                    <small>Edit file</small>
-                                </v-tooltip>
+                                        <small>Edit file</small>
+                                    </v-tooltip>
                                 </template>
 
                                 <template v-slot:top>
@@ -194,33 +194,33 @@
                                                         cols="12"
                                                         md="12"
                                                     >
-                                                    <v-text-field
-                                                        v-model="fileReuploadForm.file_name"
-                                                        label="File name"
-                                                        :disabled="true"
-                                                    ></v-text-field>
+                                                        <v-text-field
+                                                            v-model="fileReuploadForm.file_name"
+                                                            label="File name"
+                                                            :disabled="true"
+                                                        ></v-text-field>
                                                     </v-col>
                                                     <v-col
                                                         cols="12"
                                                         sm="6"
                                                         md="6"
                                                     >
-                                                    <v-text-field
-                                                        v-model="fileReuploadForm.uploaded_by_user_username"
-                                                        label="Uploaded by"
-                                                        :disabled="true"
-                                                    ></v-text-field>
+                                                        <v-text-field
+                                                            v-model="fileReuploadForm.uploaded_by_user_username"
+                                                            label="Uploaded by"
+                                                            :disabled="true"
+                                                        ></v-text-field>
                                                     </v-col>
                                                     <v-col
                                                         cols="12"
                                                         sm="6"
                                                         md="6"
                                                     >
-                                                    <v-text-field
-                                                        v-model="fileReuploadForm.updated_at"
-                                                        label="Uploaded at"
-                                                        :disabled="true"
-                                                    ></v-text-field>
+                                                        <v-text-field
+                                                            v-model="fileReuploadForm.updated_at"
+                                                            label="Uploaded at"
+                                                            :disabled="true"
+                                                        ></v-text-field>
                                                     </v-col>
                                                 </v-row>
                                                 <v-row>
@@ -354,28 +354,21 @@ export default {
         refreshFiles: {
             handler: function(newVal, oldVal) {
                 if (newVal) {
-                    Fire.$emit('refreshFiles');
+                    this.loading = true;
+                    this.getFilesData();
                 }
             }
         },
         panelOpened: {
             handler: function(newVal, oldVal) {
                 if (newVal) {
-                    Fire.$emit('refreshFiles');
+                    this.loading = true;
+                    this.getFilesData();
                 } else if (newVal === 0) {
                     hideScrollbar();
                 }
             }
         },
-        filesData: {
-            handler: function(newVal, oldVal) {
-                if (newVal.length === 10) {
-                    showScrollbar();
-                } else {
-                    hideScrollbar();
-                }
-            }
-        }
     },
     methods: {
         handleFileReupload() {
@@ -424,7 +417,12 @@ export default {
                         timer: 3500,
                         timerProgressBar: true,
                     });
-                    Fire.$emit('refreshFiles');
+                    this.canUpload = false;
+                    this.loading = true;
+                    this.fileReuploadForm.clear();
+                    this.formData = new FormData();
+                    this.reuploadFileDialog = false;
+                    this.getFilesData();
                 });
         },
         prepareReuploadFileDialog(file) {

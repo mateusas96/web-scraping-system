@@ -14,12 +14,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="icon" href="{!! asset('./img/bot.jpeg')!!}" />
 
     <!-- Styles -->
-    <!-- <link href="{{ mix('css/app.css') }}" rel="stylesheet"> -->
+    <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     <link href="{{ mix('css/main.css') }}" rel="stylesheet">
 
 </head>
 
-<body class="hold-transition sidebar-mini layout-footer-fixed">
+<body class="hold-transition sidebar-mini">
     <div class="wrapper" id="app">
         <!-- <v-app data-app> -->
             <!-- Navbar -->
@@ -104,6 +104,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 <router-link to="/upload-configs" class="nav-link">
                                     <i class="nav-icon fas fa-file-upload orange"></i>
                                     <p>{{__('Scraping config upload')}}</p>
+                                </router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link to="/scrape-data" class="nav-link">
+                                    <i class="nav-icon fas fa-spider pink"></i>
+                                    <p>{{__('Scrape data')}}</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">
