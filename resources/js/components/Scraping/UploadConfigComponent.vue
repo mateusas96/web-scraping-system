@@ -484,18 +484,24 @@ export default {
                         position: 'toast-top-right',
                     });
                     if (data.files_uploaded.length > 0) {
-                        this.$toastr.s('Other files uploaded successfully');
+                        this.$toastr.Add({
+                            title: 'Uploaded',
+                            msg: 'Other files uploaded successfully',
+                            type: 'success',
+                            timeout: 3500,
+                            progressbar: true,
+                            position: 'toast-top-right',
+                        });
                     }
                     this.readyForUploadFiles = [];
                 } else {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Files uploaded successfully',
-                        showConfirmButton: false,
-                        timer: 2500,
-                        timerProgressBar: true,
+                    this.$toastr.Add({
+                        title: 'Uploaded',
+                        msg: 'Files uploaded successfully',
+                        type: 'success',
+                        timeout: 3500,
+                        progressbar: true,
+                        position: 'toast-top-right',
                     });
                     this.readyForUploadFiles = [];
                 }
@@ -507,6 +513,7 @@ export default {
         },
         handleFilesUpload() {
             let showedTooManyFilesErrorOnce = false;
+            let showedWrongFileTypeErrorOnce = false;
 
             if (this.readyForUploadFiles.length > 0) {
                 this.readyForUploadFiles.forEach((value, index) => {
@@ -520,15 +527,16 @@ export default {
             }
             this.tempFiles.forEach((value, index) => {
                 if (value.type !== 'text/plain') {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'warning',
-                        title: 'Only .txt file formats are supported',
-                        showConfirmButton: false,
-                        timer: 2500,
-                        timerProgressBar: true,
-                    });
+                    showedWrongFileTypeErrorOnce === false ? 
+                    this.$toastr.Add({
+                        title: 'Wrong file type',
+                        msg: 'Only .txt file formats are supported',
+                        type: 'warning',
+                        timeout: 3500,
+                        progressbar: true,
+                        position: 'toast-top-right',
+                    }) : null;
+                    showedWrongFileTypeErrorOnce = true;
                     return;
                 }
                 if (this.readyForUploadFiles.length === 10) {
@@ -560,14 +568,13 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.readyForUploadFiles = [];
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'All files successfully removed',
-                        showConfirmButton: false,
-                        timer: 2500,
-                        timerProgressBar: true,
+                    this.$toastr.Add({
+                        title: 'Removed',
+                        msg: 'All files successfully removed',
+                        type: 'success',
+                        timeout: 3500,
+                        progressbar: true,
+                        position: 'toast-top-right',
                     });
                 }
             });

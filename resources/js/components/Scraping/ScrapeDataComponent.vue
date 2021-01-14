@@ -379,7 +379,7 @@ export default {
                         title: 'Success',
                         msg: data.message,
                         type: 'success',
-                        timeout: 3000,
+                        timeout: 3500,
                         progressbar: true,
                         position: 'toast-top-right',
                     });

@@ -303,7 +303,6 @@ export default {
             .catch((error) => {
                 this.loading = false;
                 this.error = error.response.data;
-
             })
         },
         editUser(user) {
@@ -315,26 +314,26 @@ export default {
             this.userForm.put('/api/user/' + this.userForm.email)
             .then(() => {
                 this.editUserDialog = false;
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'User info updated successfully',
-                    showConfirmButton: false,
-                    timer: 2500
+                this.$toastr.Add({
+                    title: 'Updated',
+                    msg: 'User info updated successfully',
+                    type: 'success',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
                 });
                 this.loading = true;
                 this.getUsersList();
             })
             .catch(() => {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Something went wrong',
-                    showConfirmButton: false,
-                    timer: 4000
-                })
+                this.$toastr.Add({
+                    title: 'Error',
+                    msg: 'Something went wrong',
+                    type: 'error',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
             })
         }
     }
