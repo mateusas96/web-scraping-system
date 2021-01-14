@@ -56,6 +56,9 @@
                                     <thead>
                                         <tr>
                                             <th class="text-left">
+                                                Nr.
+                                            </th>
+                                            <th class="text-left">
                                                 Name
                                             </th>
                                             <th class="text-left">
@@ -68,6 +71,7 @@
                                         v-for="(file, index) in readyForUploadFiles"
                                         :key="index"
                                         >
+                                            <td>{{ index + 1 }}</td>
                                             <td>{{ file.name }}</td>
                                             <td>
                                                 <v-icon
@@ -374,7 +378,7 @@ export default {
                     showScrollbar() : hideScrollbar();
                 }, 300);
             }
-        }
+        },
     },
     methods: {
         handleFileReupload() {
@@ -495,13 +499,15 @@ export default {
                     });
                     this.readyForUploadFiles = [];
                 }
-                this.formData.clear();
+                this.formData = new FormData();
             })
             .catch((error) => {
                 console.log(error);
             });
         },
         handleFilesUpload() {
+            let showedTooManyFilesErrorOnce = false;
+
             if (this.readyForUploadFiles.length > 0) {
                 this.readyForUploadFiles.forEach((value, index) => {
                     this.tempFiles.forEach((val, idx) => {
@@ -523,6 +529,19 @@ export default {
                         timer: 2500,
                         timerProgressBar: true,
                     });
+                    return;
+                }
+                if (this.readyForUploadFiles.length === 10) {
+                    showedTooManyFilesErrorOnce === false ? 
+                    this.$toastr.Add({
+                        title: 'Too many files',
+                        msg: 'You can upload only 10 files at once!',
+                        type: 'error',
+                        timeout: 7000,
+                        progressbar: true,
+                        position: 'toast-top-right',
+                    }) : null;
+                    showedTooManyFilesErrorOnce = true;
                     return;
                 }
                 this.readyForUploadFiles.push(this.tempFiles[index]);
