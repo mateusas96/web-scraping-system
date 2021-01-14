@@ -1,5 +1,5 @@
 <template>
-    <div class="container component">
+    <div class="container component" style="width: 80vw;">
         <div class="row justify-content-center">
             <v-card 
                 class="mx-auto"
@@ -37,7 +37,8 @@
                             <small>Add file for scraping</small>
                         </v-tooltip>
                     </div>
-                    <!-- <v-text-field
+                    <v-spacer></v-spacer>
+                    <v-text-field
                         v-on:input="searchit"
                         v-model="search"
                         append-icon="mdi-magnify"
@@ -47,26 +48,34 @@
                         style="max-width: 300px;"
                         clearable
                         clear-icon="mdi-close-circle-outline"
-                    ></v-text-field> -->
+                    ></v-text-field>
                 </v-card-title>
                 <v-data-table
                     hide-default-footer
                     :loading="loading"
-                    sort-by="last_name"
+                    sort-by="scraper_created_at"
                     loading-text="Loading... Please wait"
                     :headers="headers"
+                    :items="myFiles"
+                    id="myFilesTable"
                 >
                     <template v-slot:[`item.hashtag`]="{}">
                         #
                     </template>
+                    <template v-slot:[`item.started_scraping_date`]="{ item }">
+                        {{item.started_scraping_date === null ? '-' : item.started_scraping_date}}
+                    </template>
+                    <template v-slot:[`item.stopped_scraping_date`]="{ item }">
+                        {{item.stopped_scraping_date === null ? '-' : item.stopped_scraping_date}}
+                    </template>
 
                 </v-data-table>
-                <!-- <v-pagination
-                    v-model="usersPagination.current_page"
-                    :length="usersPagination.last_page"
-                    v-on:input="getResults"
+                <v-pagination
+                    v-model="myFilesPagination.current_page"
+                    :length="myFilesPagination.last_page"
+                    v-on:input="getFileResults"
                     :total-visible="7"
-                ></v-pagination> -->
+                ></v-pagination>
             </v-card>
             <v-navigation-drawer
                 v-model="showDrawer"
@@ -143,7 +152,7 @@
                                 <v-col
                                     cols="12"
                                     sm="12"
-                                    style="margin-bottom: -2.75rem; margin-top: -2.5rem;"
+                                    style="margin-bottom: -2.5rem; margin-top: -2rem;"
                                     v-show="!selectedFilesForm.scrape_all"
                                 >
                                     <div v-for="(param, index) in selectedFilesForm.scraper_params" :key="index">
@@ -156,10 +165,11 @@
                                             }"
                                         >
                                             <v-row
-                                                v-bind:style="{ 'margin-top': index > 0 ? '-2rem' : '0rem'}"
+                                                v-bind:style="{ 'margin-top': index > 0 ? '-1.5rem' : '0rem'}"
                                             >
                                                 <v-col
                                                     sm="10"
+                                                    v-bind:style="{ 'margin-top': index > 0 ? '0.75rem' : '0rem'}"
                                                 >
                                                 <v-text-field
                                                     rows="1"
@@ -168,7 +178,7 @@
                                                     :error-messages="errors"
                                                     label="Products to scrape"
                                                     auto-grow
-                                                    :clearable="index === 0"
+                                                    clearable
                                                     :disabled="selectedFilesForm.scrape_all"
                                                 ></v-text-field>
                                                 </v-col>
@@ -238,6 +248,9 @@
                                 </v-row>
                             </v-row>
                         </form>
+                        <br><br><br><br><br>
+                        <br><br><br><br><br>
+                        <br><br><br><br><br>
                         <br><br>
                     </validation-observer>
                 </v-container>
@@ -274,6 +287,7 @@ export default {
     data: () => {
         return {
             myFiles: [],
+            myFilesPagination: [],
             loading: false,
             refreshMyFiles: false,
             showDrawer: false,
@@ -288,18 +302,35 @@ export default {
             headers: [
                 { text: '#', align: 'start', sortable: false, value: 'hashtag' },
                 { text: 'Scraper name', value: 'scraper_name' },
-                { text: 'Selected files', value: 'selected_files' },
+                { text: 'Selected files', value: 'selected_files', width: '250px' },
+                { text: 'Scraping status', value: 'scraping_status' },
                 { text: 'Scrape everything', value: 'scrape_all' },
                 { text: 'Products to scrape', value: 'scraping_params' },
+                { text: 'Started scraping date', value: 'started_scraping_date' },
+                { text: 'Stopped scraping date', value: 'stopped_scraping_date' },
+                { text: 'Scraper created at', value: 'scraper_created_at' },
                 { text: 'Actions', value: 'actions', sortable: false },
             ],
+            search: '',
         }
     },
     mounted() {
-        this.getFilesForSelect();
         hideScrollbar();
+        this.getFilesForSelect();
         this.loading = true;
         this.getMyFiles();
+        Fire.$on('searchMyFile', () => {
+            this.loading = true;
+            axios.get('/api/find_my_file?query=' + (this.search === null ? '' : this.search))
+            .then(({data}) => {
+                this.myFilesPagination = data;
+                this.myFiles = data.data;
+                this.loading = false;
+            })
+            .catch(() => {
+                this.loading = false;
+            });
+        });
     },
     watch: {
         refreshMyFiles: {
@@ -317,14 +348,23 @@ export default {
                     this.selectedFilesForm.reset();
                 }
             }
+        },
+        myFiles: {
+            handler: function(newVal, oldVal) {
+                setTimeout(() => {
+                    $(window).height() < 950 &&
+                    $('.container.component').height() > $(window).height() ?
+                    showScrollbar() : hideScrollbar();
+                }, 300);          
+            }
         }
     },
     methods: {
         getMyFiles() {
             axios.get('/api/selectedFilesForScraping')
             .then(({data}) => {
-                this.filesPagination = data;
-                this.filesData = data.data;
+                this.myFilesPagination = data;
+                this.myFiles = data.data;
                 this.loading = false;
                 this.refreshMyFiles = false;
             })
@@ -332,7 +372,6 @@ export default {
         },
         submitSelectedFilesForm() {
             this.$refs.observer.validate();
-            console.log(this.selectedFilesForm);
             axios.post('/api/selectedFilesForScraping', this.selectedFilesForm)
             .then(({data}) => {
                 if (!data.error) {
@@ -345,6 +384,7 @@ export default {
                         position: 'toast-top-right',
                     });
                     this.showDrawer = false;
+                    this.getMyFiles();
                 }
             });
         },
@@ -356,13 +396,24 @@ export default {
             .catch(() => {})
         },
         addScraperParam() {
-            // if (this.selectedFilesForm.scraper_params.length < 5) {
-                this.selectedFilesForm.scraper_params.push({ name: '' });
-            // }
+            this.selectedFilesForm.scraper_params.push({ name: '' });
         },
         deleteScraperParam(index) {
             this.selectedFilesForm.scraper_params.splice(index, 1);
         },
+        getFileResults(page = 1) {
+            this.loading = true;
+            axios.get('/api/selectedFilesForScraping?page=' + page)
+                .then(({data}) => {
+                this.myFilesPagination = data;
+                this.myFiles = data.data;
+                this.loading = false;
+                this.refreshMyFiles = false;
+            });
+        },
+        searchit: _.debounce(() => {
+            Fire.$emit('searchMyFile');
+        }, 500),
     },
 }
 </script>

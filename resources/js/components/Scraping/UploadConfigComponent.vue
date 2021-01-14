@@ -327,7 +327,6 @@ export default {
         }
     },
     mounted() {
-        hideScrollbar();
         Fire.$on('refreshFiles', () => {
             this.canUpload = false;
             this.loading = true;
@@ -364,11 +363,18 @@ export default {
                 if (newVal) {
                     this.loading = true;
                     this.getFilesData();
-                } else if (newVal === 0) {
-                    hideScrollbar();
                 }
             }
         },
+        filesData: {
+            handler: function() {
+                setTimeout(() => {
+                    $(window).height() < 950 &&
+                    $('.container.component').height() > $(window).height() ?
+                    showScrollbar() : hideScrollbar();
+                }, 300);
+            }
+        }
     },
     methods: {
         handleFileReupload() {

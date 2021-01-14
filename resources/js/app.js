@@ -37,13 +37,17 @@ let routes = [
 
 // hide scrollbar if needed
 export function hideScrollbar() {
-    window.scrollTo({
-        top: 0, 
-        left: 0, 
-        behavior: 'smooth',
-    });
-    let elHtml = document.getElementsByTagName('html')[0];
-    elHtml.style.overflowY = 'hidden';
+    let isMobile = window.matchMedia("only screen and (max-width: 768px)").matches;
+
+    if (!isMobile) {
+        window.scrollTo({
+            top: 0, 
+            left: 0, 
+            behavior: 'smooth',
+        });
+        let elHtml = document.getElementsByTagName('html')[0];
+        elHtml.style.overflowY = 'hidden';
+    }
 }
 
 // show scrollbar if needed

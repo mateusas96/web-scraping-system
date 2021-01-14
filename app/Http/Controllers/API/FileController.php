@@ -195,7 +195,7 @@ class FileController extends Controller
                 $query
                     ->where('uploaded_by_user_username', 'LIKE', "%$search%")
                     ->orWhere('file_name', 'LIKE', "%$search%");
-            })->latest()->paginate(10);
+            })->paginate(10);
             return $files;
         }
         
@@ -207,6 +207,6 @@ class FileController extends Controller
             'file_size',
             'file_path',
             'updated_at',
-        )->latest()->paginate(10);
+        )->paginate(10);
     }
 }

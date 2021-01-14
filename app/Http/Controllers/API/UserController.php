@@ -107,7 +107,7 @@ class UserController extends Controller
                     ->orWhere('email', 'LIKE', "%$search%")
                     ->orWhere('created_at', 'LIKE', "%$search%")
                     ->orWhere('email_verified_at', 'LIKE', "%$search%");
-            })->latest()->paginate(10);
+            })->paginate(10);
             return $users;
         }
         
@@ -121,6 +121,6 @@ class UserController extends Controller
             'created_at',
             'updated_at',
             'email_verified_at',
-        )->latest()->paginate(10);
+        )->paginate(10);
     }
 }

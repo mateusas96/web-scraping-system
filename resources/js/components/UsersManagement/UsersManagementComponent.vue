@@ -190,7 +190,7 @@
 </template>
 
 <script>
-import {hideScrollbar} from '../../app';
+import {showScrollbar, hideScrollbar} from '../../app';
 
 export default {
     data: () => ({
@@ -240,9 +240,18 @@ export default {
                 }
             }
         },
+        users: {
+            handler: function() {
+                setTimeout(() => {
+                    $(window).height() < 950 &&
+                    $('.container.component').height() > $(window).height() ?
+                    showScrollbar() : hideScrollbar();
+                }, 300);
+            }
+        }
     },
     mounted() {
-        hideScrollbar();
+        $(window).height() < 950 && $('.container.component').height() > $(window).height() ? showScrollbar() : hideScrollbar();
         this.loading = true;
         this.getUsersList();
         Fire.$on('searchUser', () => {

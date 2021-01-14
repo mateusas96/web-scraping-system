@@ -19,6 +19,8 @@ class SelectedFilesForScraping extends Model
         'status_id',
         'scrape_all',
         'scraping_params',
+        'started_scraping_date',
+        'stopped_scraping_date',
     ];
 
     /**
@@ -37,6 +39,8 @@ class SelectedFilesForScraping extends Model
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
+        'started_scraping_date' => 'datetime:Y-m-d H:i:s',
+        'stopped_scraping_date' => 'datetime:Y-m-d H:i:s',
     ];
 
 }
