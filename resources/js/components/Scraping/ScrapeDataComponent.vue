@@ -37,6 +37,16 @@
                             <small>Add file for scraping</small>
                         </v-tooltip>
                     </div>
+                    <!-- TODO -->
+                    <v-select 
+                        label="Scrape everything"
+                        :items="scrapingEverything"
+                        item-text="name"
+                        item-value="value"
+                        style="max-width: 10.5rem;"
+                        class="ml-8"
+                        clearable
+                    ></v-select> 
                     <v-spacer></v-spacer>
                     <v-text-field
                         v-on:input="searchit"
@@ -45,9 +55,10 @@
                         label="Search"
                         single-line
                         hide-details
-                        style="max-width: 300px;"
+                        style="max-width: 18.75rem;"
                         clearable
                         clear-icon="mdi-close-circle-outline"
+                        class="mb-6"
                     ></v-text-field>
                 </v-card-title>
                 <v-data-table
@@ -312,6 +323,10 @@ export default {
                 { text: 'Actions', value: 'actions', sortable: false },
             ],
             search: '',
+            scrapingEverything: [
+                { name: 'True', value: 1 },
+                { name: 'False', value: 0 },
+            ],
         }
     },
     mounted() {

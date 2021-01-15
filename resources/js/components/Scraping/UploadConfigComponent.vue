@@ -133,7 +133,7 @@
                                     label="Search"
                                     single-line
                                     hide-details
-                                    style="max-width: 300px;"
+                                    style="max-width: 18.75rem;"
                                     clearable
                                     clear-icon="mdi-close-circle-outline"
                                 ></v-text-field>
