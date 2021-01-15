@@ -22,6 +22,9 @@ class SelectedFilesForScrapingController extends Controller
                     'selected_files_for_scrapings.uuid',
                     '=',
                     'selected_files_for_scraping_view.uuid'
+                )->where(
+                    'selected_files_for_scrapings.selected_by_user_id',
+                    auth()->user()->id
                 )->paginate(10);
     }
 
@@ -117,6 +120,9 @@ class SelectedFilesForScrapingController extends Controller
                 'selected_files_for_scrapings.uuid',
                 '=',
                 'selected_files_for_scraping_view.uuid'
+            )->where(
+                'selected_files_for_scrapings.selected_by_user_id',
+                auth()->user()->id
             )->where(function($query) use ($search){
                 $query
                     ->where('selected_files_for_scraping_view.scraper_name', 'LIKE', "%$search%")
@@ -135,6 +141,9 @@ class SelectedFilesForScrapingController extends Controller
                 'selected_files_for_scrapings.uuid',
                 '=',
                 'selected_files_for_scraping_view.uuid'
+            )->where(
+                'selected_files_for_scrapings.selected_by_user_id',
+                auth()->user()->id
             )->paginate(10);
     }
 }
