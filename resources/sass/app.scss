@@ -34,3 +34,17 @@ $fa-font-path: "../webfonts";
 .sidebar-collapse .main-sidebar, .sidebar-collapse .main-sidebar::before {
     margin-left: -270px;
 }
+
+// .layout-navbar-fixed .wrapper .brand-link {
+//     overflow: hidden;
+//     position: fixed;
+//     top: 0;
+//     transition: width 0.3s ease-in-out;
+//     width: 270px;
+//     z-index: 1035;
+// }
+
+// .layout-navbar-fixed .wrapper .main-sidebar:hover .brand-link {
+//     transition: width 0.3s ease-in-out;
+//     width: 270px;
+// }

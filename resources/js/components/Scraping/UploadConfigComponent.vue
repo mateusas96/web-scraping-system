@@ -331,6 +331,7 @@ export default {
         }
     },
     mounted() {
+        hideScrollbar();
         Fire.$on('refreshFiles', () => {
             this.canUpload = false;
             this.loading = true;
@@ -353,6 +354,9 @@ export default {
             });
         });
     },
+    destroyed() {
+        hideScrollbar();
+    },
     watch: {
         refreshFiles: {
             handler: function(newVal, oldVal) {
@@ -374,7 +378,7 @@ export default {
             handler: function() {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() ?
+                    $('.container.component').height() > $(window).height() - 100 ?
                     showScrollbar() : hideScrollbar();
                 }, 300);
             }

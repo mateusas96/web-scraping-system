@@ -36,6 +36,4 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], 
     Route::get('find_user','API\UserController@search')->name('find.user');
 
     Route::get('get_files_for_select', 'API\FileController@getFilesForSelect')->name('get.files.for.select');
-
-    Route::get('find_my_file', 'API\SelectedFilesForScrapingController@search')->name('find.my.file');
 });

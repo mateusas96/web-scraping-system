@@ -14,8 +14,12 @@ class SelectedFilesForScrapingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $scrapeEverything = $request->get('scrape_everything');
+        $scrapingStatus = $request->get('scraping_status');
+        $search = $request->get('query');
+
         return SFFS::select('selected_files_for_scraping_view.*')
                 ->join(
                     'selected_files_for_scraping_view',
@@ -25,7 +29,31 @@ class SelectedFilesForScrapingController extends Controller
                 )->where(
                     'selected_files_for_scrapings.selected_by_user_id',
                     auth()->user()->id
-                )->paginate(10);
+                )->where(function($query) use ($search){
+                    $query
+                        ->where('selected_files_for_scraping_view.scraper_name', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.selected_files', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.scraping_params', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.started_scraping_date', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.stopped_scraping_date', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.scraper_created_at', 'LIKE', "%$search%");
+                })->whereRaw(
+                    '(
+                        CASE WHEN ? IS NOT NULL AND ? <> "" THEN
+                            selected_files_for_scrapings.scrape_all = ?
+                        ELSE
+                            1
+                        END
+                    )'
+                , [$scrapeEverything, $scrapeEverything, $scrapeEverything])->whereRaw(
+                    '(
+                        CASE WHEN ? IS NOT NULL AND ? <> "" THEN
+                            selected_files_for_scraping_view.scraping_status = ?
+                        ELSE
+                            1
+                        END
+                    )'
+                , [$scrapingStatus, $scrapingStatus, $scrapingStatus])->paginate(10);
     }
 
     /**
@@ -107,43 +135,4 @@ class SelectedFilesForScrapingController extends Controller
         //
     }
 
-    /**
-     * Search for file in data base
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function search(Request $request){
-        if($search = $request->get('query')){
-            $myFiles = SFFS::select('selected_files_for_scraping_view.*')
-            ->join(
-                'selected_files_for_scraping_view',
-                'selected_files_for_scrapings.uuid',
-                '=',
-                'selected_files_for_scraping_view.uuid'
-            )->where(
-                'selected_files_for_scrapings.selected_by_user_id',
-                auth()->user()->id
-            )->where(function($query) use ($search){
-                $query
-                    ->where('selected_files_for_scraping_view.scraper_name', 'LIKE', "%$search%")
-                    ->orWhere('selected_files_for_scraping_view.selected_files', 'LIKE', "%$search%")
-                    ->orWhere('selected_files_for_scraping_view.scraping_params', 'LIKE', "%$search%")
-                    ->orWhere('selected_files_for_scraping_view.started_scraping_date', 'LIKE', "%$search%")
-                    ->orWhere('selected_files_for_scraping_view.stopped_scraping_date', 'LIKE', "%$search%")
-                    ->orWhere('selected_files_for_scraping_view.scraper_created_at', 'LIKE', "%$search%");
-            })->paginate(10);
-            return $myFiles;
-        }
-        
-        return SFFS::select('selected_files_for_scraping_view.*')
-            ->join(
-                'selected_files_for_scraping_view',
-                'selected_files_for_scrapings.uuid',
-                '=',
-                'selected_files_for_scraping_view.uuid'
-            )->where(
-                'selected_files_for_scrapings.selected_by_user_id',
-                auth()->user()->id
-            )->paginate(10);
-    }
 }

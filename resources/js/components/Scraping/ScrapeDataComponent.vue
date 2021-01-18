@@ -5,10 +5,10 @@
                 class="mx-auto"
             >
                 <v-card-title>
-                    My selected scraping files list
-                    <div
-                        class="d-flex justify-end ml-6"
+                    <v-col
+                        cols="12"
                     >
+                        My selected scraping files list
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-btn 
@@ -16,6 +16,7 @@
                                     v-on="on"
                                     small
                                     :disabled="refreshMyFiles"
+                                    class="ml-3"
                                 >
                                     <v-icon v-if="refreshMyFiles" small>fas fa-sync fa-spin</v-icon>
                                     <v-icon v-else small>fas fa-sync</v-icon>
@@ -36,30 +37,79 @@
                             </template>
                             <small>Add file for scraping</small>
                         </v-tooltip>
-                    </div>
+                    </v-col>
                     <!-- TODO -->
-                    <v-select 
-                        label="Scrape everything"
-                        :items="scrapingEverything"
-                        item-text="name"
-                        item-value="value"
-                        style="max-width: 10.5rem;"
-                        class="ml-8"
-                        clearable
-                    ></v-select> 
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                        v-on:input="searchit"
-                        v-model="search"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                        style="max-width: 18.75rem;"
-                        clearable
-                        clear-icon="mdi-close-circle-outline"
-                        class="mb-6"
-                    ></v-text-field>
+                    <v-row>
+                        <v-col
+                            cols="2"
+                        >
+                            <v-select
+                                v-model="scrape_everything"
+                                id="scrape-everything"
+                                label="Scrape everything"
+                                :items="scrapingEverything"
+                                item-text="name"
+                                item-value="value"
+                                clearable
+                                v-on:change="getMyFiles"
+                                :open-on-clear="true"
+                            ></v-select>
+                        </v-col>
+                        <v-col
+                            cols="2"
+                        >
+                            <v-select
+                                v-model="scraping_status"
+                                id="scraping-status"
+                                label="Scraping status"
+                                :items="scrapingStatus"
+                                item-text="name"
+                                item-value="value"
+                                clearable
+                                v-on:change="getMyFiles"
+                                :open-on-clear="true"
+                            ></v-select>
+                        </v-col>
+                        <v-col
+                            cols="2"
+                        >
+                            <v-text-field
+                                v-on:input="searchit"
+                                v-model="search"
+                                append-icon="mdi-magnify"
+                                label="Search"
+                                single-line
+                                hide-details
+                                style="max-width: 18.75rem;"
+                                clearable
+                            ></v-text-field>
+                        </v-col>
+                        <v-col
+                            cols="2"
+                        >
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn 
+                                        v-on:click="
+                                            () => {
+                                                search = '';
+                                                scraping_status = '';
+                                                scrape_everything = '';
+                                                loading = true;
+                                                getMyFiles();
+                                            }
+                                        "
+                                        v-on="on"
+                                        small
+                                        class="mt-4"
+                                    >
+                                        <v-icon small>fas fa-times</v-icon>
+                                    </v-btn>
+                                </template>
+                                <small>Clear filters</small>
+                            </v-tooltip>
+                        </v-col>
+                    </v-row>
                 </v-card-title>
                 <v-data-table
                     hide-default-footer
@@ -72,6 +122,11 @@
                 >
                     <template v-slot:[`item.hashtag`]="{}">
                         #
+                    </template>
+                    <template v-slot:[`item.scraping_status`]="{ item }">
+                        <div v-for="status in scrapingStatus" :key="status.value">
+                            {{ status.value == item.scraping_status ? status.name : null }}
+                        </div>
                     </template>
                     <template v-slot:[`item.started_scraping_date`]="{ item }">
                         {{item.started_scraping_date === null ? '-' : item.started_scraping_date}}
@@ -95,6 +150,8 @@
                 bottom
                 right
                 width="30vw"
+                height="100vh"
+                class="mt-12"
             >
                 <v-container>
                     <v-list-item>
@@ -191,6 +248,8 @@
                                                     auto-grow
                                                     clearable
                                                     :disabled="selectedFilesForm.scrape_all"
+                                                    :persistent-hint="true"
+                                                    :hint="'Product #' + `${index + 1}`"
                                                 ></v-text-field>
                                                 </v-col>
                                                 <v-col
@@ -259,10 +318,7 @@
                                 </v-row>
                             </v-row>
                         </form>
-                        <br><br><br><br><br>
-                        <br><br><br><br><br>
-                        <br><br><br><br><br>
-                        <br><br>
+                        <br><br><br><br>
                     </validation-observer>
                 </v-container>
             </v-navigation-drawer>
@@ -327,25 +383,26 @@ export default {
                 { name: 'True', value: 1 },
                 { name: 'False', value: 0 },
             ],
+            scrapingStatus: [
+                { value: 'scraping_not_started', name: 'Scraping not started' },
+                { value: 'scraping_initiated', name: 'Scraping started' },
+                { value: 'scraping_finished', name: 'Scraping finished' },
+                { value: 'scraping_stopped_for_a_reason', name: 'Scraping stopped for a reason' },
+            ],
+            scrape_everything: '',
+            scraping_status: '',
         }
     },
     mounted() {
-        hideScrollbar();
         this.getFilesForSelect();
         this.loading = true;
         this.getMyFiles();
         Fire.$on('searchMyFile', () => {
-            this.loading = true;
-            axios.get('/api/find_my_file?query=' + (this.search === null ? '' : this.search))
-            .then(({data}) => {
-                this.myFilesPagination = data;
-                this.myFiles = data.data;
-                this.loading = false;
-            })
-            .catch(() => {
-                this.loading = false;
-            });
+            this.getMyFiles();
         });
+    },
+    destroyed() {
+        hideScrollbar();
     },
     watch: {
         refreshMyFiles: {
@@ -368,15 +425,21 @@ export default {
             handler: function(newVal, oldVal) {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() ?
+                    $('.container.component').height() > $(window).height() - 100 ?
                     showScrollbar() : hideScrollbar();
-                }, 300);          
+                }, 300);        
             }
         }
     },
     methods: {
         getMyFiles() {
-            axios.get('/api/selectedFilesForScraping')
+            let params = {
+                'query': (this.search === null ? '' : this.search),
+                'scrape_everything': this.scrape_everything,
+                'scraping_status': this.scraping_status,
+            };
+
+            axios.get('/api/selectedFilesForScraping', { params: params })
             .then(({data}) => {
                 this.myFilesPagination = data;
                 this.myFiles = data.data;
@@ -418,7 +481,14 @@ export default {
         },
         getFileResults(page = 1) {
             this.loading = true;
-            axios.get('/api/selectedFilesForScraping?page=' + page)
+            let params = {
+                'page': page,
+                'query': (this.search === null ? '' : this.search),
+                'scrape_everything': this.scrape_everything,
+                'scraping_status': this.scraping_status,
+            };
+
+            axios.get('/api/selectedFilesForScraping', { params: params })
                 .then(({data}) => {
                 this.myFilesPagination = data;
                 this.myFiles = data.data;

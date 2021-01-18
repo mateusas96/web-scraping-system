@@ -7,7 +7,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <title>{{ config('app.name') }}</title>
@@ -19,11 +19,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 </head>
 
-<body class="hold-transition sidebar-mini layout-footer-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-footer-fixed">
     <div class="wrapper" id="app">
         <!-- <v-app data-app> -->
             <!-- Navbar -->
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="position: fixed; top: 0; left: 0; right: 0;">
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -64,9 +64,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </router-link>
 
                 <!-- Sidebar -->
-                <div class="sidebar"  style="margin-left: -3px">
+                <div class="sidebar">
                     <!-- Sidebar user panel (optional) -->
-                    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="user-panel pb-3 mb-3 d-flex">
                         <div class="image">
                             <img src="{!! asset('./img/user.png')!!}" class="img-circle elevation-2" alt="User Image">
                         </div>
@@ -158,7 +158,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- /.content-header -->
                 <v-app style="background-color: #f4f6f9 !important;">
                     <!-- Vue content -->
-                    <main class="py-4">
+                    <main class="py-4 mt-15">
                         <router-view></router-view>
                         <vue-progress-bar></vue-progress-bar>
                         @yield('content')

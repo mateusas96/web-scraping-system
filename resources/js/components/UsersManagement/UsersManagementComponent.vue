@@ -244,14 +244,13 @@ export default {
             handler: function() {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() ?
+                    $('.container.component').height() > $(window).height() - 100 ?
                     showScrollbar() : hideScrollbar();
                 }, 300);
             }
         }
     },
     mounted() {
-        $(window).height() < 950 && $('.container.component').height() > $(window).height() ? showScrollbar() : hideScrollbar();
         this.loading = true;
         this.getUsersList();
         Fire.$on('searchUser', () => {
@@ -266,6 +265,9 @@ export default {
                 this.loading = false;
             });
         });
+    },
+    destroyed() {
+        hideScrollbar();
     },
     methods: {
         handleSelectChange() {
