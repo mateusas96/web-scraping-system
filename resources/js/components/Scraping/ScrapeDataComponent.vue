@@ -247,7 +247,6 @@
                                                     label="Products to scrape"
                                                     auto-grow
                                                     clearable
-                                                    :disabled="selectedFilesForm.scrape_all"
                                                     :persistent-hint="true"
                                                     :hint="'Product #' + `${index + 1}`"
                                                 ></v-text-field>
@@ -259,7 +258,6 @@
                                                     <v-tooltip bottom>
                                                         <template v-slot:activator="{ on }">
                                                             <v-icon 
-                                                                :disabled="selectedFilesForm.scrape_all" 
                                                                 v-if="index === 0" 
                                                                 medium 
                                                                 v-on="on"
