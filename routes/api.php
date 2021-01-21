@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], 
         'user' => 'API\UserController',
         'file' => 'API\FileController',
         'selectedFilesForScraping' => 'API\SelectedFilesForScrapingController',
+        'scraping' => 'API/ScrapingController',
     ]);
 
     Route::post('update_file/{uuid}', 'API\FileController@updateFile')->name('update.file');

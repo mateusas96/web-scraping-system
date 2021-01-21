@@ -23,7 +23,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <div class="wrapper" id="app">
         <!-- <v-app data-app> -->
             <!-- Navbar -->
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="position: fixed; top: 0; left: 0; right: 0;">
+            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -66,7 +66,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- Sidebar -->
                 <div class="sidebar">
                     <!-- Sidebar user panel (optional) -->
-                    <div class="user-panel pb-3 mb-3 d-flex">
+                    <div class="user-panel pb-3 mb-3 d-flex pt-3">
                         <div class="image">
                             <img src="{!! asset('./img/user.png')!!}" class="img-circle elevation-2" alt="User Image">
                         </div>

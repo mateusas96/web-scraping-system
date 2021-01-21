@@ -28,7 +28,7 @@ ul.nav-treeview {
 }
 
 a.nav-link {
-    color: $primary !important;
+    color: $primary2 !important;
     &.router-link-active {
         background-color: lightGrey !important;
         color: black !important;
@@ -39,4 +39,15 @@ a.nav-link {
     position: fixed;
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
+}
+
+.layout-fixed .brand-link {
+    width: 270px;
+}
+
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
 }

@@ -64,6 +64,10 @@ class SelectedFilesForScrapingController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request,[
+            'scraper_name'  => 'unique:selected_files_for_scrapings',
+        ]);
+
         $scraperName = $request->get('scraper_name');
         $scraperParamsObj = $request->get('scraper_params');
         $selectedFiles = $request->get('selected_files');

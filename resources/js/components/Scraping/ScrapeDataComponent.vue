@@ -102,6 +102,11 @@
                                         v-on="on"
                                         small
                                         class="mt-4"
+                                        :disabled="
+                                            (search === '' || search === null) &&
+                                            (scraping_status === '' || scraping_status === undefined) &&
+                                            (scrape_everything === '' || scrape_everything === undefined)
+                                        "
                                     >
                                         <v-icon small>fas fa-times</v-icon>
                                     </v-btn>
@@ -135,6 +140,61 @@
                         {{item.stopped_scraping_date === null ? '-' : item.stopped_scraping_date}}
                     </template>
 
+                    <template v-slot:[`item.actions`]="{ item }">
+                        <v-row>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <a 
+                                        :href="'/scrape-data/view-scraper/' + item.uuid"
+                                        target="_blank"
+                                        v-on="on"
+                                    >
+                                        <v-icon>
+                                            fas fa-external-link-alt
+                                        </v-icon>
+                                    </a>
+                                </template>
+                                <small>Open scraper</small>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon
+                                        v-on="on"
+                                        class="ml-4"
+                                        v-if="item.scraping_status == 'scraping_not_started'"
+                                    >
+                                        fas fa-ban
+                                    </v-icon>
+                                </template>
+                                <small>Stop scraper</small>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon
+                                        v-on="on"
+                                        class="ml-4"
+                                        v-if="item.scraping_status == 'scraping_stopped_manually'"
+                                    >
+                                        fas fa-play-circle
+                                    </v-icon>
+                                </template>
+                                <small>Start scraper</small>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon
+                                        v-on="on"
+                                        class="ml-4"
+                                        v-if="item.scraping_status == 'scraping_stopped_for_a_reason'"
+                                    >
+                                        fas fa-exclamation-triangle
+                                    </v-icon>
+                                </template>
+                                <small>Will be fixed by administration</small>
+                            </v-tooltip>
+                        </v-row>
+                    </template>
+
                 </v-data-table>
                 <v-pagination
                     v-model="myFilesPagination.current_page"
@@ -164,7 +224,7 @@
 
                     <v-divider></v-divider>
                     <validation-observer
-                        ref="observer"
+                        ref="form"
                         v-slot="{ invalid }"
                     >
                         <form
@@ -177,11 +237,11 @@
                                 >
                                     <validation-provider
                                         v-slot="{ errors }"
-                                        name="Scraper name"
+                                        name="scraper name"
                                         :rules="{
                                             required: true,
                                             min: 3,
-                                            max: 50
+                                            max: 50,
                                         }"
                                     >
                                     <v-text-field
@@ -199,7 +259,7 @@
                                 >
                                     <validation-provider
                                         v-slot="{ errors }"
-                                        name="Scraper select"
+                                        name="scraper select"
                                         :rules="{
                                             required: true,
                                         }"
@@ -233,11 +293,11 @@
                                             }"
                                         >
                                             <v-row
-                                                v-bind:style="{ 'margin-top': index > 0 ? '-1.5rem' : '0rem'}"
+                                                v-bind:style="{ 'margin-top': index > 0 ? '-1.5rem' : '0rem' }"
                                             >
                                                 <v-col
                                                     sm="10"
-                                                    v-bind:style="{ 'margin-top': index > 0 ? '0.75rem' : '0rem'}"
+                                                    v-bind:style="{ 'margin-top': index > 0 ? '0.75rem' : '0rem' }"
                                                 >
                                                 <v-text-field
                                                     rows="1"
@@ -333,15 +393,15 @@ setInteractionMode('eager');
 
 extend('required', {
     ...required,
-    message: '{_field_} can not be empty',
+    message: 'The {_field_} can not be empty',
 });
 extend('min', {
     ...min,
-    message: '{_field_} must contain at least three character',
+    message: 'The {_field_} must contain at least {length} characters',
 });
 extend('max', {
     ...max,
-    message: '{_field_} may not be greater than {length} characters',
+    message: 'The {_field_} may not be greater than {length} characters',
 });
 
 export default {
@@ -386,6 +446,7 @@ export default {
                 { value: 'scraping_initiated', name: 'Scraping started' },
                 { value: 'scraping_finished', name: 'Scraping finished' },
                 { value: 'scraping_stopped_for_a_reason', name: 'Scraping stopped for a reason' },
+                { value: 'scraping_stopped_manually', name: 'Scraping was stopped manually' },
             ],
             scrape_everything: '',
             scraping_status: '',
@@ -414,7 +475,7 @@ export default {
         showDrawer: {
             handler: function(newVal, oldVal) {
                 if (oldVal) {
-                    this.$refs.observer.reset();
+                    this.$refs.form.reset();
                     this.selectedFilesForm.reset();
                 }
             }
@@ -447,7 +508,6 @@ export default {
             .catch({});
         },
         submitSelectedFilesForm() {
-            this.$refs.observer.validate();
             axios.post('/api/selectedFilesForScraping', this.selectedFilesForm)
             .then(({data}) => {
                 if (!data.error) {
@@ -461,6 +521,13 @@ export default {
                     });
                     this.showDrawer = false;
                     this.getMyFiles();
+                }
+            })
+            .catch((error) => {
+                if (error.response.status === 422) {
+                    this.$refs.form.setErrors({
+                        'scraper name': error.response.data.errors.scraper_name[0],
+                    });
                 }
             });
         },

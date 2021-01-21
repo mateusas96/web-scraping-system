@@ -27,4 +27,6 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
     Route::get('/upload-configs', 'HomeController@index')->name('config.upload');
 
     Route::get('/scrape-data', 'HomeController@index')->name('scrape.data');
+
+    Route::get('/scrape-data/view-scraper/{uuid}', 'HomeController@index')->name('scrape.data');
 });

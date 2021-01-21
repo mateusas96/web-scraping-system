@@ -81,7 +81,7 @@
 @endsection
 
 <style scoped="scss">
-    button[type="submit"]:hover{
+    button[type="submit"]:hover {
         background-color: green !important;
         border-color: green !important;
     }
