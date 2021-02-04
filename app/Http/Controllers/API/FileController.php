@@ -27,7 +27,7 @@ class FileController extends Controller
             'file_size',
             'file_path',
             'updated_at',
-        )->paginate(10);
+        )->latest()->paginate(10);
     }
 
     /**
@@ -39,6 +39,7 @@ class FileController extends Controller
     {
         return File::select(
             'id',
+            'uuid',
             'file_name'
         )->get();
     }
@@ -168,12 +169,21 @@ class FileController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\File  $file
+     * @param  String file uuid $uuid
      * @return \Illuminate\Http\Response
      */
-    public function destroy(File $file)
+    public function destroy($uuid)
     {
-        //
+        $file = File::select('file_path', 'file_name')->where('uuid', $uuid)->get()[0];
+
+        unlink($file['file_path'] . $file['file_name']);
+
+        File::where('uuid', $uuid)->delete();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'File deleted successfully',
+        ]); 
     }
 
     /**
@@ -195,7 +205,7 @@ class FileController extends Controller
                 $query
                     ->where('uploaded_by_user_username', 'LIKE', "%$search%")
                     ->orWhere('file_name', 'LIKE', "%$search%");
-            })->paginate(10);
+            })->latest()->paginate(10);
             return $files;
         }
         
@@ -207,6 +217,6 @@ class FileController extends Controller
             'file_size',
             'file_path',
             'updated_at',
-        )->paginate(10);
+        )->latest()->paginate(10);
     }
 }

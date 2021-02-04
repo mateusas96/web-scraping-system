@@ -18,7 +18,7 @@ class SelectedFilesForScraping extends Model
         'selected_files_id',
         'status_id',
         'scrape_all',
-        'scraping_params',
+        'detailed_information_about_product',
         'started_scraping_date',
         'stopped_scraping_date',
     ];
@@ -42,5 +42,21 @@ class SelectedFilesForScraping extends Model
         'started_scraping_date' => 'datetime:Y-m-d H:i:s',
         'stopped_scraping_date' => 'datetime:Y-m-d H:i:s',
     ];
+
+    /**
+     * find data by uuid
+     */
+    public static function findByUuid($uuid) {
+        $file = SelectedFilesForScraping::select('*')->where('uuid', $uuid)->first();
+
+        if (isset($file)) {
+            return $file;
+        }
+
+        return [
+            'error' => true,
+            'message' => 'Object not found'
+        ];
+    }
 
 }

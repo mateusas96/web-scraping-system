@@ -38,7 +38,7 @@ let routes = [
 
 // hide scrollbar if needed
 export function hideScrollbar() {
-    let isMobile = window.matchMedia("only screen and (max-width: 768px)").matches;
+    let isMobile = window.matchMedia('only screen and (max-width: 768px)').matches;
 
     if (!isMobile) {
         window.scrollTo({

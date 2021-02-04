@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\SelectedFilesForScraping as SFFS;
+use App\Models\ScrapingParam as SP;
 use Illuminate\Http\Request;
 use DB;
 
@@ -64,7 +65,7 @@ class SelectedFilesForScrapingController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
+        $this->validate($request, [
             'scraper_name'  => 'unique:selected_files_for_scrapings',
         ]);
 
@@ -76,18 +77,17 @@ class SelectedFilesForScrapingController extends Controller
 
         if ($scrapeAll === null) {
             foreach($scraperParamsObj as $key => $value) {
-                if ($key + 1 !== count($scraperParamsObj)) {
-                    $scraperParams = $scraperParams === null ? 
-                        '"' . $value['name'] . '", ' :
-                        $scraperParams . '"' . $value['name'] . '", ';
-                } else {
-                    $scraperParams = $scraperParams . '"' . $value['name'] . '"';
-                }
+                SP::create([
+                    'scraper_name' => $scraperName,
+                    'root_category' => $value['selected_root_category'],
+                    'subcategory' => $value['subcategory'],
+                    'product_name' => $value['name'],
+                ]);
             }
         }
 
         $statusId = collect(
-            DB::select('SELECT get_status_id_by_code("scraping_not_started") as statusId')
+            DB::select('SELECT get_status_id_by_code("scraping_not_started") AS statusId')
         )->first()->statusId;
         
         SFFS::create([
@@ -96,6 +96,7 @@ class SelectedFilesForScrapingController extends Controller
             'selected_files_id' => implode(',', $request->get('selected_files')),
             'status_id' => $statusId,
             'scrape_all' => $scrapeAll === null ? false : $scrapeAll,
+            'detailed_information_about_product' => $request->get('detailed_information_about_product'),
             'scraping_params' => $scraperParams,
         ]);
 
@@ -131,12 +132,20 @@ class SelectedFilesForScrapingController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\SelectedFilesForScraping  $selectedFilesForScraping
+     * @param  String scraper uuid $uuid
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SelectedFilesForScraping $selectedFilesForScraping)
+    public function destroy($uuid)
     {
-        //
-    }
+        $sffs = SFFS::select('scraper_name')->where('uuid', $uuid)->get()[0];
 
+        SP::where('scraper_name', $sffs['scraper_name'])->delete();
+
+        SFFS::where('uuid', $uuid)->delete();
+
+        return response()->json([
+            'error' => false,
+            'message' => 'Scraper deleted successfully',
+        ]); 
+    }
 }

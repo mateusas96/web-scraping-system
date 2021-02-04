@@ -22,7 +22,7 @@
                                     placeholder="Select your files"
                                     prepend-icon="mdi-paperclip"
                                     outlined
-                                    accept=".txt"
+                                    accept=".json"
                                     v-on:change="handleFilesUpload"
                                 >
                                     <template v-slot:selection="{ text }">
@@ -178,6 +178,19 @@
                                         </template>
                                         <small>Edit file</small>
                                     </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon
+                                                v-on="on"
+                                                class="ml-2"
+                                                v-on:click="deleteFile(item.uuid, item.file_name)"
+                                                dense
+                                            >
+                                                fas fa-trash
+                                            </v-icon>
+                                        </template>
+                                        <small>Delete file</small>
+                                    </v-tooltip>
                                 </template>
 
                                 <template v-slot:top>
@@ -237,7 +250,7 @@
                                                             placeholder="Select file"
                                                             prepend-icon="mdi-paperclip"
                                                             outlined
-                                                            accept=".txt"
+                                                            accept=".json"
                                                             v-on:change="handleFileReupload"
                                                             :rules="fileReuploadError"
                                                             show-size
@@ -391,9 +404,9 @@ export default {
                 this.canUpload = false;
                 return;
             }
-            if (this.fileReuploadForm.file.type !== 'text/plain') {
+            if (this.fileReuploadForm.file.type !== 'application/json') {
                 this.fileReuploadError = [
-                    'Only .txt file formats are supported',
+                    'Only JSON file formats are supported',
                 ];
                 return;
             } else if (this.fileReuploadForm.file.name !== this.fileReuploadForm.file_name) {
@@ -530,11 +543,11 @@ export default {
                 });
             }
             this.tempFiles.forEach((value, index) => {
-                if (value.type !== 'text/plain') {
+                if (value.type !== 'application/json') {
                     showedWrongFileTypeErrorOnce === false ? 
                     this.$toastr.Add({
                         title: 'Wrong file type',
-                        msg: 'Only .txt file formats are supported',
+                        msg: 'Only JSON file formats are supported',
                         type: 'warning',
                         timeout: 3500,
                         progressbar: true,
@@ -579,6 +592,33 @@ export default {
                         timeout: 3500,
                         progressbar: true,
                         position: 'toast-top-right',
+                    });
+                }
+            });
+        },
+        deleteFile(fileUuid, fileName) {
+            Swal.fire({
+                title: 'Delete file',
+                text: `Are you sure you want to  delete file - ${fileName}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete(`/api/file/${fileUuid}`)
+                    .then(({data}) => {
+                        if (!data.error) {
+                            this.refreshFiles = true;
+                            this.$toastr.Add({
+                                title: 'Success',
+                                msg: data.message,
+                                type: 'success',
+                                timeout: 3500,
+                                progressbar: true,
+                                position: 'toast-top-right',
+                            });
+                        }
                     });
                 }
             });

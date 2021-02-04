@@ -4,7 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Scraping;
+use App\Models\SelectedFilesForScraping as SFFS;
+use App\Models\File;
+use App\Models\ScrapingCategoryData AS SCD;
 use Illuminate\Http\Request;
+use App\Jobs\ScrapeData;
 
 class ScrapingController extends Controller
 {
@@ -61,5 +65,20 @@ class ScrapingController extends Controller
     public function destroy(Scraping $scraping)
     {
         //
+    }
+
+    public function startScrapingData($uuid) {
+        // $selectedFilesId = SFFS::findByUuid($uuid)['selected_files_id'];
+
+        // $selectedFiles = File::select('file_path', 'file_name')
+        //     ->whereRaw('FIND_IN_SET(id, ?)', $selectedFilesId)
+        //     ->get();
+
+        // $json = json_decode(file_get_contents($selectedFiles[0]['file_path'] . $selectedFiles[0]['file_name']), true);
+
+        // return $selectedFiles[0]['file_name'];
+        // return SCD::select('category_link')->where('category', 'Women')->where('scraper_name', 'apc json test')->get();
+        $scraper = new ScrapeData($uuid);
+        dispatch($scraper);
     }
 }

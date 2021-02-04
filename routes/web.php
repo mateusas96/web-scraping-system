@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\DomCrawler\Crawler;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,4 +30,24 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
     Route::get('/scrape-data', 'HomeController@index')->name('scrape.data');
 
     Route::get('/scrape-data/view-scraper/{uuid}', 'HomeController@index')->name('scrape.data');
+});
+
+Route::get('/testscraper', function() {
+
+    $crawler = Goutte::request('GET', 'https://www.apcstore.co.uk/women/women-shoes.html');
+
+    $crawler->filterXpath('//div/div/div/div/div/div/div/ul/li[contains(@class, "product-item")]')->each(function ($node) {
+        dump($node->filterXpath('//a[contains(@class, "product-link")]/span/span[1]/text()')->text());
+        dump($node->filterXpath('//a[contains(@class, "product-link")]/@href')->text());
+        dump($node->filterXpath('//a[contains(@class, "product-link")]/span/span[2]/div/span[contains(@class, "normal-price")]/span/text()')->text());
+        try{
+            $arr[] = $node->filterXpath('//a[contains(@class, "product-link")]/span/span[2]/div/span[contains(@class, "old-price")]/span/text()')->text();
+            dump(
+                $node->filterXpath('//a[contains(@class, "product-link")]/span/span[2]/div/span[contains(@class, "old-price")]/span/text()')->text()
+            );
+        } catch(Exception $e) {
+            dump(null);
+        }
+    });
+
 });

@@ -8,7 +8,7 @@
                     <v-col
                         cols="12"
                     >
-                        My selected scraping files list
+                        My scrapers
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
                                 <v-btn 
@@ -16,7 +16,7 @@
                                     v-on="on"
                                     small
                                     :disabled="refreshMyFiles"
-                                    class="ml-3"
+                                    class="ml-16"
                                 >
                                     <v-icon v-if="refreshMyFiles" small>fas fa-sync fa-spin</v-icon>
                                     <v-icon v-else small>fas fa-sync</v-icon>
@@ -38,7 +38,6 @@
                             <small>Add file for scraping</small>
                         </v-tooltip>
                     </v-col>
-                    <!-- TODO -->
                     <v-row>
                         <v-col
                             cols="2"
@@ -51,7 +50,12 @@
                                 item-text="name"
                                 item-value="value"
                                 clearable
-                                v-on:change="getMyFiles"
+                                v-on:change="
+                                    () => {
+                                        loading = true;
+                                        getMyFiles();
+                                    }
+                                "
                                 :open-on-clear="true"
                             ></v-select>
                         </v-col>
@@ -66,7 +70,12 @@
                                 item-text="name"
                                 item-value="value"
                                 clearable
-                                v-on:change="getMyFiles"
+                                v-on:change="
+                                    () => {
+                                        loading = true;
+                                        getMyFiles();
+                                    }
+                                "
                                 :open-on-clear="true"
                             ></v-select>
                         </v-col>
@@ -78,7 +87,6 @@
                                 v-model="search"
                                 append-icon="mdi-magnify"
                                 label="Search"
-                                single-line
                                 hide-details
                                 style="max-width: 18.75rem;"
                                 clearable
@@ -160,8 +168,21 @@
                                 <template v-slot:activator="{ on }">
                                     <v-icon
                                         v-on="on"
-                                        class="ml-4"
+                                        class="ml-2"
                                         v-if="item.scraping_status == 'scraping_not_started'"
+                                        v-on:click="startScraping(item.uuid)"
+                                    >
+                                        fas fa-play-circle
+                                    </v-icon>
+                                </template>
+                                <small>Start scraper</small>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon
+                                        v-on="on"
+                                        class="ml-2"
+                                        v-if="item.scraping_status == 'scraping_initiated'"
                                     >
                                         fas fa-ban
                                     </v-icon>
@@ -172,7 +193,7 @@
                                 <template v-slot:activator="{ on }">
                                     <v-icon
                                         v-on="on"
-                                        class="ml-4"
+                                        class="ml-2"
                                         v-if="item.scraping_status == 'scraping_stopped_manually'"
                                     >
                                         fas fa-play-circle
@@ -184,13 +205,25 @@
                                 <template v-slot:activator="{ on }">
                                     <v-icon
                                         v-on="on"
-                                        class="ml-4"
+                                        class="ml-2"
                                         v-if="item.scraping_status == 'scraping_stopped_for_a_reason'"
                                     >
                                         fas fa-exclamation-triangle
                                     </v-icon>
                                 </template>
                                 <small>Will be fixed by administration</small>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon
+                                        v-on="on"
+                                        class="ml-2"
+                                        v-on:click="deleteScraper(item.uuid, item.scraper_name)"
+                                    >
+                                        fas fa-trash
+                                    </v-icon>
+                                </template>
+                                <small>Delete scraper</small>
                             </v-tooltip>
                         </v-row>
                     </template>
@@ -284,67 +317,114 @@
                                     v-show="!selectedFilesForm.scrape_all"
                                 >
                                     <div v-for="(param, index) in selectedFilesForm.scraper_params" :key="index">
-                                        <validation-provider
-                                            v-slot="{ errors }"
-                                            name="Products to scrape"
-                                            :rules="{
-                                                required: !selectedFilesForm.scrape_all,
-                                                max: 15
-                                            }"
+                                        <v-row
+                                            v-bind:style="{ marginTop: index > 0 ? '-1.5rem' : '0rem' }"
                                         >
-                                            <v-row
-                                                v-bind:style="{ 'margin-top': index > 0 ? '-1.5rem' : '0rem' }"
+                                            <v-col
+                                                sm="10"
+                                                v-bind:style="{ marginTop: index > 0 ? '0.75rem' : '0rem' }"
                                             >
+                                                {{'Product #' + (index + 1)}}
                                                 <v-col
-                                                    sm="10"
-                                                    v-bind:style="{ 'margin-top': index > 0 ? '0.75rem' : '0rem' }"
+                                                    style="margin-bottom: -1.5rem; margin-top: -1rem"
                                                 >
-                                                <v-text-field
-                                                    rows="1"
-                                                    v-model="param.name"
-                                                    :counter="15"
-                                                    :error-messages="errors"
-                                                    label="Products to scrape"
-                                                    auto-grow
-                                                    clearable
-                                                    :persistent-hint="true"
-                                                    :hint="'Product #' + `${index + 1}`"
-                                                ></v-text-field>
+                                                    <validation-provider
+                                                        v-slot="{ errors }"
+                                                        name="Select root category"
+                                                        :rules="{
+                                                            required: !selectedFilesForm.scrape_all,
+                                                        }"
+                                                    >
+                                                        <v-select
+                                                            v-model="param.selected_root_category"
+                                                            id="scrape-everything"
+                                                            label="Select root category"
+                                                            :items="root_category"
+                                                            :error-messages="errors"
+                                                            item-text="name"
+                                                            item-value="value"
+                                                            clearable
+                                                            :open-on-clear="true"
+                                                        ></v-select>
+                                                    </validation-provider>
+                                                    <validation-provider
+                                                        v-slot="{ errors }"
+                                                        name="Subcategory"
+                                                        :rules="{
+                                                            required: !selectedFilesForm.scrape_all,
+                                                            max: 15
+                                                        }"
+                                                    >
+                                                        <v-text-field
+                                                            rows="1"
+                                                            v-model="param.subcategory"
+                                                            :counter="15"
+                                                            :error-messages="errors"
+                                                            label="Subcategory"
+                                                            auto-grow
+                                                            clearable
+                                                            :persistent-hint="true"
+                                                            hint="Subcategory must be exact same as in a website"
+                                                        ></v-text-field>
+                                                    </validation-provider>
                                                 </v-col>
-                                                <v-col
-                                                    sm="2"
-                                                    class="mt-6"
-                                                >
-                                                    <v-tooltip bottom>
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-icon 
-                                                                v-if="index === 0" 
-                                                                medium 
-                                                                v-on="on"
-                                                                v-on:click="addScraperParam"
-                                                            >fas fa-plus</v-icon>
+                                                <v-col>
+                                                    <validation-provider
+                                                        v-slot="{ errors }"
+                                                        name="Product to scrape"
+                                                        :rules="{
+                                                            required: !selectedFilesForm.scrape_all,
+                                                            max: 15
+                                                        }"
+                                                    >
+                                                        <v-text-field
+                                                            rows="1"
+                                                            v-model="param.name"
+                                                            :counter="15"
+                                                            :error-messages="errors"
+                                                            label="Product to scrape"
+                                                            auto-grow
+                                                            clearable
+                                                            :persistent-hint="true"
+                                                            hint="Product name must be exact same as in a website"
+                                                        ></v-text-field>
+                                                    </validation-provider>
+                                                </v-col>
+                                            </v-col>
+                                            <v-col
+                                                sm="2"
+                                                style="margin-top: 7rem"
+                                            >
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon 
+                                                            v-if="index === 0" 
+                                                            medium 
+                                                            v-on="on"
+                                                            v-on:click="addScraperParam"
+                                                        >fas fa-plus</v-icon>
+                                                    </template>
+                                                    <small>Add product for scraping</small>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <template v-slot:activator="{ on }">
+                                                        <v-icon 
+                                                            v-if="index > 0" 
+                                                            medium 
+                                                            v-on="on"
+                                                            v-on:click="deleteScraperParam(index)"
+                                                        >fas fa-trash</v-icon>
                                                         </template>
-                                                        <small>Add product for scraping</small>
-                                                    </v-tooltip>
-                                                    <v-tooltip bottom>
-                                                        <template v-slot:activator="{ on }">
-                                                            <v-icon 
-                                                                v-if="index > 0" 
-                                                                medium 
-                                                                v-on="on"
-                                                                v-on:click="deleteScraperParam(index)"
-                                                            >fas fa-trash</v-icon>
-                                                            </template>
-                                                        <small>Remove product from scraping</small>
-                                                    </v-tooltip>
-                                                </v-col>
-                                            </v-row>
-                                        </validation-provider>
+                                                    <small>Remove product from scraping</small>
+                                                </v-tooltip>
+                                            </v-col>
+                                            <v-divider></v-divider>
+                                        </v-row>
                                     </div>
                                 </v-col>
                                 <v-row 
                                     align="center"
-                                    v-bind:style="{ 'margin-top': selectedFilesForm.scrape_all ? '-1.5rem' : '1rem' }"
+                                    v-bind:style="{ marginTop: selectedFilesForm.scrape_all ? '-1.5rem' : '1rem' }"
                                 >
                                     <v-col cols="1">
                                         <v-checkbox
@@ -352,13 +432,38 @@
                                             color="success"
                                             :value="true"
                                             hide-details
-                                            v-on:change="selectedFilesForm.scraper_params = [{ name: '' }]"
+                                            v-on:change="
+                                                () => {
+                                                    selectedFilesForm.scraper_params = [{ name: '' }]; 
+                                                    selectedFilesForm.detailed_information_about_product = false;
+                                                }
+                                            "
                                             class="mb-5 ml-2"
                                         ></v-checkbox>
                                     </v-col>
                                     <v-col cols="6">
                                         <v-subheader>
                                             <b>Scrape everything</b>
+                                        </v-subheader>
+                                    </v-col>
+                                </v-row>
+                                <v-row 
+                                    align="center"
+                                    style="margin-top: -2.5rem"
+                                >
+                                    <v-col cols="1">
+                                        <v-checkbox
+                                            v-model="selectedFilesForm.detailed_information_about_product"
+                                            color="success"
+                                            :value="false"
+                                            hide-details
+                                            :disabled="selectedFilesForm.scrape_all"
+                                            class="mb-5 ml-2"
+                                        ></v-checkbox>
+                                    </v-col>
+                                    <v-col cols="6">
+                                        <v-subheader>
+                                            <b>Scrape detailed information about product</b>
                                         </v-subheader>
                                     </v-col>
                                     <v-col
@@ -372,7 +477,17 @@
                                         >
                                             Submit
                                         </v-btn>
-                                </v-col>
+                                    </v-col>
+                                    <v-col
+                                        cols="7"
+                                        sm="7"
+                                        style="margin-top: -2rem"
+                                    >
+                                        <v-subheader 
+                                            v-show="selectedFilesForm.scrape_all" 
+                                            style="font-size: 12px;"
+                                        >Can not scrape detailed product information if scrape everything is selected</v-subheader>
+                                    </v-col>
                                 </v-row>
                             </v-row>
                         </form>
@@ -418,9 +533,12 @@ export default {
             showDrawer: false,
             selectedFilesForm: new Form({
                 scraper_name: '',
-                scraper_params: [ { name: '' } ],
+                scraper_params: [
+                    { selected_root_category: '', subcategory: '', name: '' },
+                ],
                 selected_files: [],
                 scrape_all: true,
+                detailed_information_about_product: false,
             }),
             scrapeAll: true,
             filesForSelect: [],
@@ -428,18 +546,19 @@ export default {
                 { text: '#', align: 'start', sortable: false, value: 'hashtag' },
                 { text: 'Scraper name', value: 'scraper_name' },
                 { text: 'Selected files', value: 'selected_files', width: '250px' },
-                { text: 'Scraping status', value: 'scraping_status' },
                 { text: 'Scrape everything', value: 'scrape_all' },
-                { text: 'Products to scrape', value: 'scraping_params' },
+                { text: 'Scraped detailed product info', value: 'detailed_information_about_product' },
+                { text: 'Scraping parameters', value: 'scraping_params' },
+                { text: 'Scraping status', value: 'scraping_status' },
                 { text: 'Started scraping date', value: 'started_scraping_date' },
                 { text: 'Stopped scraping date', value: 'stopped_scraping_date' },
                 { text: 'Scraper created at', value: 'scraper_created_at' },
-                { text: 'Actions', value: 'actions', sortable: false },
+                { text: 'Actions', value: 'actions', sortable: false, width: '100px' },
             ],
             search: '',
             scrapingEverything: [
-                { name: 'True', value: 1 },
-                { name: 'False', value: 0 },
+                { name: 'Yes', value: 1 },
+                { name: 'No', value: 0 },
             ],
             scrapingStatus: [
                 { value: 'scraping_not_started', name: 'Scraping not started' },
@@ -450,6 +569,11 @@ export default {
             ],
             scrape_everything: '',
             scraping_status: '',
+            root_category: [
+                { name: 'Women', value: 'Women' },
+                { name: 'Men', value: 'Men' },
+                { name: 'Children', value: 'Children' },
+            ]
         }
     },
     mounted() {
@@ -519,6 +643,7 @@ export default {
                         progressbar: true,
                         position: 'toast-top-right',
                     });
+                    this.loading = true;
                     this.showDrawer = false;
                     this.getMyFiles();
                 }
@@ -554,7 +679,7 @@ export default {
             };
 
             axios.get('/api/selectedFilesForScraping', { params: params })
-                .then(({data}) => {
+            .then(({data}) => {
                 this.myFilesPagination = data;
                 this.myFiles = data.data;
                 this.loading = false;
@@ -564,6 +689,40 @@ export default {
         searchit: _.debounce(() => {
             Fire.$emit('searchMyFile');
         }, 500),
+        startScraping(itemUuid) {
+            axios.post(`/api/start_scraping_data/${itemUuid}`)
+            .then(({data}) => {
+                
+            });
+        },
+        deleteScraper(itemUuid, scraperName) {
+            Swal.fire({
+                title: 'Delete scraper',
+                text: `Are you sure you want to  delete scraper - ${scraperName}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.delete(`/api/selectedFilesForScraping/${itemUuid}`)
+                    .then(({data}) => {
+                        if (!data.error) {
+                            this.loading = true;
+                            this.getMyFiles();
+                            this.$toastr.Add({
+                                title: 'Success',
+                                msg: data.message,
+                                type: 'success',
+                                timeout: 3500,
+                                progressbar: true,
+                                position: 'toast-top-right',
+                            });
+                        }
+                    });
+                }
+            });
+        }
     },
 }
 </script>
