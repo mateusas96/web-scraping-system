@@ -651,7 +651,7 @@ export default {
             .catch((error) => {
                 if (error.response.status === 422) {
                     this.$refs.form.setErrors({
-                        'scraper name': error.response.data.errors.scraper_name[0],
+                        'scraper name': 'This name is already taken',
                     });
                 }
             });
