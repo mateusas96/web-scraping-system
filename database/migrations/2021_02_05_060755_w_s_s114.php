@@ -54,7 +54,8 @@ class WSS114 extends Migration
                                 FROM `scraping_params` AS `sp`
                                 WHERE
                                     `sp`.`scraper_name` = `sffs`.`scraper_name`
-                            ), 'All'
+                            ),
+                            'All'
                         )
                     ) AS `scraping_params`,
                     `sffs`.`started_scraping_date` AS `started_scraping_date`,
