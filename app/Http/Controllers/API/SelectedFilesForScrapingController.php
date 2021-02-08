@@ -66,7 +66,7 @@ class SelectedFilesForScrapingController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'scraper_name'  => 'unique:selected_files_for_scrapings',
+            'scraper_name'  => 'unique:selected_files_for_scrapings,scraper_name,NULL,id,selected_by_user_id,' . auth()->user()->id,
         ]);
 
         $scraperName = $request->get('scraper_name');
@@ -78,6 +78,7 @@ class SelectedFilesForScrapingController extends Controller
         if ($scrapeAll === null) {
             foreach($scraperParamsObj as $key => $value) {
                 SP::create([
+                    'user_id' => auth()->user()->id,
                     'scraper_name' => $scraperName,
                     'root_category' => $value['selected_root_category'],
                     'subcategory' => $value['subcategory'],

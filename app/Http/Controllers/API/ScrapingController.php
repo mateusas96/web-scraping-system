@@ -78,7 +78,7 @@ class ScrapingController extends Controller
 
         // return $selectedFiles[0]['file_name'];
         // return SCD::select('category_link')->where('category', 'Women')->where('scraper_name', 'apc json test')->get();
-        $scraper = new ScrapeData($uuid);
+        $scraper = new ScrapeData($uuid, auth()->user()->id);
         dispatch($scraper);
     }
 }

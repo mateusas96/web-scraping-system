@@ -12,6 +12,7 @@ class ScrapingParam extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'scraper_name',
         'root_category',
         'subcategory',

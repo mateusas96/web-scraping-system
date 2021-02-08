@@ -7,6 +7,7 @@ use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
 use App\Models\ScrapingCategoryDataHarvest AS SCDH;
 use App\Models\ScrapingProductScrape AS SPS;
+use App\Models\ScrapingParam as SP;
 use App\Mail\VerifyEmail;
 use Mail;
 use Weidner\Goutte\GoutteFacade AS Goutte;
@@ -30,46 +31,74 @@ class ScrapingService implements ScrapingServiceInterface
      * 
      * @param String selected file for scraping $uuid  
      */
-    public function scrape($uuid)
+    public function scrape($uuid, $active_user_id)
     {
-        $config = null;
-        $file_name = null;
-        $scraper_name = null;
-        $scrape_detailed_product_info = null;
-        $selectedFilesData = null;
-        $selectedFiles = null;
+        $config = $file_name = $scraper_name = $scrape_detailed_product_info = null;
+        $selected_files_data = $selected_files = $scrape_all = $filter_params = null;
 
-        $selectedFilesData = SFFS::findByUuid($uuid);
+        $selected_files_data = SFFS::findByUuidAndActiveUserId($uuid, $active_user_id);
 
-        $selectedFiles = File::select('file_path', 'file_name')
-            ->whereRaw('FIND_IN_SET(id, ?)', $selectedFilesData['selected_files_id'])
+        $selected_files = File::select('file_path', 'file_name')
+            ->whereRaw('FIND_IN_SET(id, ?)', $selected_files_data['selected_files_id'])
             ->get();
 
-        for($i = 0; $i < count($selectedFiles); $i++) {
-            $file_name = explode('.', $selectedFiles[$i]['file_name'])[0];
-            $scraper_name = $selectedFilesData['scraper_name'];
-            $scrape_detailed_product_info = 
-                $selectedFilesData['detailed_information_about_product'] == 1 ? 
-                true : false;
+        $scraper_name = $selected_files_data['scraper_name'];
+        $scrape_detailed_product_info = 
+            $selected_files_data['detailed_information_about_product'] == 1 ? 
+            true : false;
+        $scrape_all = $selected_files_data['scrape_all'] == 1 ?
+            true : false;
+
+        for($i = 0; $i < count($selected_files); $i++) {
+
+            $file_name = explode('.', $selected_files[$i]['file_name'])[0];
             
             $config = json_decode(
                 file_get_contents(
-                    public_path() . $selectedFiles[$i]['file_path'] . $selectedFiles[$i]['file_name']
+                    public_path() . $selected_files[$i]['file_path'] . $selected_files[$i]['file_name']
                 )
             , true);
+            
+            $filter_params = SP::selectRaw(
+                '
+                IF (
+                    root_category = \'Women\',
+                    0,
+                    IF (
+                        root_category = \'Men\',
+                        1,
+                        IF (
+                            root_category = \'Children\',
+                            2,
+                            NULL
+                        )
+                    )
+                ) AS `root_category`,
+                `subcategory`,
+                `product_name`
+                '
+            )->where(
+                'scraper_name',
+                $scraper_name
+            )->where(
+                'user_id',
+                $active_user_id
+            )->get();
 
-            // $this->categoryScrape($file_name, $config, $scraper_name);
+            $this->categoryScrape($file_name, $config, $scraper_name, $scrape_all, $filter_params, $active_user_id);
 
-            // foreach($this->main_category as $category) {
-            //     $this->categoryDataScrape($file_name, $config, $scraper_name, $category);
-            // }
+            foreach($this->main_category as $index => $category) {
+                $this->categoryDataScrape($file_name, $config, $scraper_name, $index, $category, $scrape_all, $filter_params, $active_user_id);
+            }
 
             if ($scrape_detailed_product_info) {
                 foreach($this->main_category as $category) {
-                    $this->detailedProductDataScrape($file_name, $config, $scraper_name, $category);
+                    $this->detailedProductDataScrape($file_name, $config, $scraper_name, $category, $active_user_id);
                 }
             }
         }
+
+        SCD::where('scraper_name', $scraper_name)->where('user_id', $active_user_id)->delete();
 
         $email = new VerifyEmail('success');
         Mail::to('matasxlx@gmail.com')->send($email);
@@ -81,16 +110,14 @@ class ScrapingService implements ScrapingServiceInterface
      * @param String scraping file name $file_name
      * @param Json scraper config $config
      * @param String scraper name $scraper_name
+     * @param Boolean scrape all $scrape_all
+     * @param Array data filtering params $filter_params
+     * @param Int active user id $active_user_id
      */
-    private function categoryScrape($file_name, $config, $scraper_name)
+    private function categoryScrape($file_name, $config, $scraper_name, $scrape_all, $filter_params, $active_user_id)
     {
-        $crawler = null;
-        $category_links_selector_type = null;
-        $category_names_selector_type = null;
-        $category_links_selector = null;
-        $category_names_selector = null;
-        $category_links_attribute = null;
-        $category_names_attribute = null;
+        $crawler = $category_links_selector_type = $category_names_selector_type = $category_links_selector = null;
+        $category_names_selector = $category_links_attribute = $category_names_attribute = null;
         $category_harvest = [
             0 => [
                 'links' => [],
@@ -120,6 +147,22 @@ class ScrapingService implements ScrapingServiceInterface
         ];
 
         for($i = 0; $i < count($link_array); $i++) {
+            
+            if (!$scrape_all) {
+
+                for($j = 0; $j < count($filter_params); $j++) {
+                    $root_category_exists = false;
+
+                    if ($i == $filter_params[$j]['root_category']) {
+                        $root_category_exists = true;
+                        break;
+                    }
+                }
+    
+                if (!$root_category_exists) {
+                    continue;
+                }
+            }
 
             if ($link_array[$i][0] != null || $link_array[$i][0] != '') {
 
@@ -146,16 +189,38 @@ class ScrapingService implements ScrapingServiceInterface
                             $category_harvest[$i]['names'][] = $node->extract([$category_names_attribute]);
                         });
                     }
+
+                    $crawler = null;
                 }
             }
         }
-
-        for($i = 0; $i < count($category_harvest); $i++) { 
+  
+        for($i = 0; $i < count($category_harvest); $i++) {
 
             if ($category_harvest[$i]['links'] != null || $category_harvest[$i]['links'] != '') {
 
                 for($j = 0; $j < count($category_harvest[$i]['links']); $j++) {
+
+                    if (!$scrape_all) {
+                        for($k = 0; $k < count($filter_params); $k++) {
+                            $subcategory_exists = false;
+
+                            if (
+                                stristr($category_harvest[$i]['names'][$j], $filter_params[$k]['subcategory']) &&
+                                $i == $filter_params[$k]['root_category']
+                            ) {
+                                $subcategory_exists = true;
+                                break;
+                            }
+                        }
+            
+                        if (!$subcategory_exists) {
+                            continue;
+                        }
+                    }
+
                     SCD::create([
+                        'user_id' => $active_user_id,
                         'scraper_name' => $scraper_name,
                         'category' => $this->main_category[$i],
                         'category_name' => $category_harvest[$i]['names'][$j],
@@ -172,9 +237,13 @@ class ScrapingService implements ScrapingServiceInterface
      * @param String scraping file name $file_name
      * @param Json scraper config $config
      * @param String scraper name $scraper_name
+     * @param Int category index $category_index
      * @param String category $category
+     * @param Boolean scrape all $scrape_all
+     * @param Array data filtering params $filter_params
+     * @param Int active user id $active_user_id
      */
-    private function categoryDataScrape($file_name, $config, $scraper_name, $category)
+    private function categoryDataScrape($file_name, $config, $scraper_name, $category_index, $category, $scrape_all, $filter_params, $active_user_id)
     {
         $parsed_data_from_db = [];
         $parsed_data = [
@@ -183,23 +252,16 @@ class ScrapingService implements ScrapingServiceInterface
             'normal_price' => [],
             'old_price' => [],
         ];
-        $crawler = null;
-        $data_parent_selector = null;
-        $product_name_selector = null;
-        $product_name_attribute = null;
-        $product_link_selector = null;
-        $product_link_attribute = null;
-        $normal_price_selector = null;
-        $normal_price_attribute = null;
-        $old_price_selector = null;
-        $old_price_attribute = null;
-        $selector_type = null;
+        $crawler = $data_parent_selector = $product_name_selector = $product_name_attribute = null;
+        $product_link_selector = $product_link_attribute = $normal_price_selector = $normal_price_attribute = null;
+        $old_price_selector = $old_price_attribute = $selector_type = null;
 
         $parsed_data_from_db = SCD::select(
             'category_link', 
             'category_name'
         )->where('category', $category)
-        ->where('scraper_name', $scraper_name)->get();
+        ->where('scraper_name', $scraper_name)
+        ->where('user_id', $active_user_id)->get();
 
         if (count($parsed_data_from_db) > 0) {
 
@@ -284,8 +346,27 @@ class ScrapingService implements ScrapingServiceInterface
                 }
 
                 for($j = 0; $j < count($parsed_data['product_name']); $j++) {
+
+                    if (!$scrape_all) {
+                        for($k = 0; $k < count($filter_params); $k++) {
+                            $product_name_exists = false;
+
+                            if (
+                                stristr($parsed_data['product_name'][$j], $filter_params[$k]['product_name']) &&
+                                $category_index == $filter_params[$k]['root_category']
+                            ) {
+                                $product_name_exists = true;
+                                break;
+                            }
+                        }
+            
+                        if (!$product_name_exists) {
+                            continue;
+                        }
+                    }
                     
                     SCDH::create([
+                        'user_id' => $active_user_id,
                         'scraper_name' => $scraper_name,
                         'category' => $category,
                         'category_name' => $parsed_data_from_db[$i]['category_name'],
@@ -301,7 +382,9 @@ class ScrapingService implements ScrapingServiceInterface
                     'product_link' => [],
                     'normal_price' => [],
                     'old_price' => [],
-                ]; 
+                ];
+
+                $crawler = null;
             }
         }
     }
@@ -313,8 +396,9 @@ class ScrapingService implements ScrapingServiceInterface
      * @param Json scraper config $config
      * @param String scraper name $scraper_name
      * @param String category $category
+     * @param Int active user id $active_user_id
      */
-    private function detailedProductDataScrape($file_name, $config, $scraper_name, $category)
+    private function detailedProductDataScrape($file_name, $config, $scraper_name, $category, $active_user_id)
     {
         $parsed_data_from_db = [];
         $parsed_data = [
@@ -323,25 +407,16 @@ class ScrapingService implements ScrapingServiceInterface
             'available_size' => [],
             'unavailable_size' => [],
         ];
-        $crawler = null;
-        $name_selector_type = null;
-        $name_selector = null;
-        $name_attribute = null;
-        $color_selector_type = null;
-        $color_selector = null;
-        $color_attribute = null;
-        $available_size_selector_type = null;
-        $available_size_selector = null;
-        $available_size_attribute = null;
-        $unavailable_size_selector_type = null;
-        $unavailable_size_selector = null;
-        $unavailable_size_attribute = null;
+        $crawler = $name_selector_type = $name_selector = $name_attribute = $color_selector_type = null;
+        $color_selector = $color_attribute = $available_size_selector_type = $available_size_selector = null;
+        $available_size_attribute = $unavailable_size_selector_type = $unavailable_size_selector = $unavailable_size_attribute = null;
 
         $parsed_data_from_db = SCDH::select(
             'product_link', 
             'category_name'
         )->where('category', $category)
-        ->where('scraper_name', $scraper_name)->get();
+        ->where('scraper_name', $scraper_name)
+        ->where('user_id', $active_user_id)->get();
 
         if (count($parsed_data_from_db) > 0) {
 
@@ -363,10 +438,7 @@ class ScrapingService implements ScrapingServiceInterface
 
             for($i = 0; $i < count($parsed_data_from_db); $i++) {
 
-                $name = null;
-                $color = null;
-                $available_size = null;
-                $unavailable_size = null;
+                $name = $color = $available_size = $unavailable_size = null;
 
                 $crawler = Goutte::request('GET', $parsed_data_from_db[$i]['product_link']);
 
@@ -432,6 +504,7 @@ class ScrapingService implements ScrapingServiceInterface
                 $unavailable_size = implode(', ', $parsed_data['unavailable_size']);
 
                 SPS::create([
+                    'user_id' => $active_user_id,
                     'scraper_name' => $scraper_name,
                     'category' => $category,
                     'category_name' => $parsed_data_from_db[$i]['category_name'],
@@ -447,6 +520,7 @@ class ScrapingService implements ScrapingServiceInterface
                     'available_size' => [],
                     'unavailable_size' => [],
                 ];
+                $crawler = null;
             }
         }
     }

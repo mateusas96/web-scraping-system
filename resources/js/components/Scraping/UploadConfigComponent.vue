@@ -602,8 +602,9 @@ export default {
                 text: `Are you sure you want to  delete file - ${fileName}?`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                cancelButtonColor: '#d33',
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.delete(`/api/file/${fileUuid}`)

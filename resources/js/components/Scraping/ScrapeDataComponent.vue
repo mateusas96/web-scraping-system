@@ -128,6 +128,7 @@
                     hide-default-footer
                     :loading="loading"
                     sort-by="scraper_created_at"
+                    sort-desc="false"
                     loading-text="Loading... Please wait"
                     :headers="headers"
                     :items="myFiles"
@@ -352,13 +353,13 @@
                                                         name="Subcategory"
                                                         :rules="{
                                                             required: !selectedFilesForm.scrape_all,
-                                                            max: 15
+                                                            max: 50
                                                         }"
                                                     >
                                                         <v-text-field
                                                             rows="1"
                                                             v-model="param.subcategory"
-                                                            :counter="15"
+                                                            :counter="50"
                                                             :error-messages="errors"
                                                             label="Subcategory"
                                                             auto-grow
@@ -374,13 +375,13 @@
                                                         name="Product to scrape"
                                                         :rules="{
                                                             required: !selectedFilesForm.scrape_all,
-                                                            max: 15
+                                                            max: 50
                                                         }"
                                                     >
                                                         <v-text-field
                                                             rows="1"
                                                             v-model="param.name"
-                                                            :counter="15"
+                                                            :counter="50"
                                                             :error-messages="errors"
                                                             label="Product to scrape"
                                                             auto-grow
@@ -475,7 +476,7 @@
                                             :disabled="invalid"
                                             v-on:click="submitSelectedFilesForm"
                                         >
-                                            Submit
+                                            Save
                                         </v-btn>
                                     </v-col>
                                     <v-col
@@ -651,7 +652,7 @@ export default {
             .catch((error) => {
                 if (error.response.status === 422) {
                     this.$refs.form.setErrors({
-                        'scraper name': 'This name is already taken',
+                        'scraper name': 'You have already created scraper with this name',
                     });
                 }
             });
@@ -701,8 +702,9 @@ export default {
                 text: `Are you sure you want to  delete scraper - ${scraperName}?`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Yes, delete it!',
-                cancelButtonText: 'No, cancel!',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                cancelButtonColor: '#d33',
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.delete(`/api/selectedFilesForScraping/${itemUuid}`)

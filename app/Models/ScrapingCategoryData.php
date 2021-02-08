@@ -13,6 +13,7 @@ class ScrapingCategoryData extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'scraper_name',
         'category',
         'category_name',

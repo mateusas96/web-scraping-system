@@ -59,4 +59,20 @@ class SelectedFilesForScraping extends Model
         ];
     }
 
+    /**
+     * find data by uuid and active user id
+     */
+    public static function findByUuidAndActiveUserId($uuid, $active_user_id) {
+        $file = SelectedFilesForScraping::select('*')->where('uuid', $uuid)->where('selected_by_user_id', $active_user_id)->first();
+
+        if (isset($file)) {
+            return $file;
+        }
+
+        return [
+            'error' => true,
+            'message' => 'Object not found'
+        ];
+    }
+
 }

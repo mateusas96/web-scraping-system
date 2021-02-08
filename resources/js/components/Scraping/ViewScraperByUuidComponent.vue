@@ -17,7 +17,6 @@ export default {
     },
     mounted() {
         hideScrollbar();
-        console.log('mounted');
     },
     destroyed() {
         hideScrollbar();

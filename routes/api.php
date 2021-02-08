@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
     
 });
 
-Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function() {
+Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::apiResources([
         'user' => 'API\UserController',
         'file' => 'API\FileController',
