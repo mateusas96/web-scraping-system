@@ -13,6 +13,7 @@ class ScrapingProductScrape extends Model
      * @var array
      */
     protected $fillable = [
+        'scdh_table_id',
         'user_id',
         'scraper_name',
         'category',

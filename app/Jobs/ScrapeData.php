@@ -14,17 +14,17 @@ class ScrapeData implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $sffs_uuid;
-    protected $active_user_id;
+    protected $user_id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sffs_uuid, $active_user_id)
+    public function __construct($sffs_uuid, $user_id)
     {
         $this->sffs_uuid = $sffs_uuid;
-        $this->active_user_id = $active_user_id;
+        $this->user_id = $user_id;
     }
 
     /**
@@ -35,6 +35,6 @@ class ScrapeData implements ShouldQueue
     public function handle()
     {
         $scrapingService = new ScrapingService();
-        $scrapingService->scrape($this->sffs_uuid, $this->active_user_id);
+        $scrapingService->scrape($this->sffs_uuid, $this->user_id);
     }
 }

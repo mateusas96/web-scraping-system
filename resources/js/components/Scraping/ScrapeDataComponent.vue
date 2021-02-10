@@ -128,7 +128,7 @@
                     hide-default-footer
                     :loading="loading"
                     sort-by="scraper_created_at"
-                    sort-desc="false"
+                    :sort-desc="true"
                     loading-text="Loading... Please wait"
                     :headers="headers"
                     :items="myFiles"
@@ -150,11 +150,17 @@
                     </template>
 
                     <template v-slot:[`item.actions`]="{ item }">
-                        <v-row>
+                        <v-progress-circular
+                            :size="30"
+                            color="primary"
+                            indeterminate
+                            v-show="scraping"
+                        ></v-progress-circular>
+                        <v-row v-show="!scraping">
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <a 
-                                        :href="'/scrape-data/view-scraper/' + item.uuid"
+                                        :href="`/scrape-data/view-scraper/${item.scraper_name}`"
                                         target="_blank"
                                         v-on="on"
                                     >
@@ -176,7 +182,7 @@
                                         fas fa-play-circle
                                     </v-icon>
                                 </template>
-                                <small>Start scraper</small>
+                                <small>Run scraper ONCE</small>
                             </v-tooltip>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -574,7 +580,8 @@ export default {
                 { name: 'Women', value: 'Women' },
                 { name: 'Men', value: 'Men' },
                 { name: 'Children', value: 'Children' },
-            ]
+            ],
+            scraping: false,
         }
     },
     mounted() {
@@ -691,9 +698,19 @@ export default {
             Fire.$emit('searchMyFile');
         }, 500),
         startScraping(itemUuid) {
-            axios.post(`/api/start_scraping_data/${itemUuid}`)
+            this.scraping = true;
+            
+            axios.post(`/api/scrape_data_once/${itemUuid}`)
             .then(({data}) => {
-                
+                this.scraping = false;
+                this.$toastr.Add({
+                    title: 'Success',
+                    msg: data.message,
+                    type: 'success',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
             });
         },
         deleteScraper(itemUuid, scraperName) {

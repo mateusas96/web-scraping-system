@@ -13,6 +13,7 @@ class ScrapingCategoryDataHarvest extends Model
      * @var array
      */
     protected $fillable = [
+        'scraped_detail_info',
         'user_id',
         'scraper_name',
         'category',
