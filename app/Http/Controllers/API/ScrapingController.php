@@ -33,6 +33,7 @@ class ScrapingController extends Controller
             'scraping_category_data_harvests.product_link',
             'scraping_category_data_harvests.normal_price',
             'scraping_category_data_harvests.old_price',
+            'scraping_category_data_harvests.currency',
             'scraping_category_data_harvests.created_at',
             'scraping_product_scrapes.color',
             'scraping_product_scrapes.available_size',
@@ -46,7 +47,7 @@ class ScrapingController extends Controller
             'scraping_category_data_harvests.scraper_name', '=', $scraper_name
         )->where(
             'scraping_category_data_harvests.user_id', '=', auth()->user()->id
-        )->distinct()->paginate(10);
+        )->orderBy('scraping_category_data_harvests.created_at', 'DESC')->paginate(10);
 
         return $data;       
     }
@@ -97,14 +98,14 @@ class ScrapingController extends Controller
     }
 
     public function runScraperOnce($uuid) {
-        // $scraping_service = new ScrapingService();
-        // $response = $scraping_service->scrape($uuid, auth()->user()->id);
+        $scraping_service = new ScrapingService();
+        $response = $scraping_service->scrape($uuid, auth()->user()->id);
 
-        // return response()->json([
-        //     'finished_scraping' => true,
-        //     'message' => 'Scraping was successful',
-        // ], 200);
-        $scraper = new ScrapeData($uuid, auth()->user()->id);
-        dispatch($scraper);
+        return response()->json([
+            'finished_scraping' => true,
+            'message' => 'Scraping was successful',
+        ], 200);
+        // $scraper = new ScrapeData($uuid, auth()->user()->id);
+        // dispatch($scraper);
     }
 }

@@ -177,7 +177,7 @@
                                         v-on="on"
                                         class="ml-2"
                                         v-if="item.scraping_status == 'scraping_not_started'"
-                                        v-on:click="startScraping(item.uuid)"
+                                        v-on:click="startScraping(item.uuid, item.scrape_all)"
                                     >
                                         fas fa-play-circle
                                     </v-icon>
@@ -344,7 +344,7 @@
                                                     >
                                                         <v-select
                                                             v-model="param.selected_root_category"
-                                                            id="scrape-everything"
+                                                            id="select-root-category"
                                                             label="Select root category"
                                                             :items="root_category"
                                                             :error-messages="errors"
@@ -697,8 +697,19 @@ export default {
         searchit: _.debounce(() => {
             Fire.$emit('searchMyFile');
         }, 500),
-        startScraping(itemUuid) {
+        startScraping(itemUuid, scrapeAll) {
             this.scraping = true;
+
+            if (scrapeAll == 'Yes') {
+                this.$toastr.Add({
+                    title: 'Info',
+                    msg: 'Might take some time to scrape all data',
+                    type: 'info',
+                    timeout: 10000,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
+            }
             
             axios.post(`/api/scrape_data_once/${itemUuid}`)
             .then(({data}) => {

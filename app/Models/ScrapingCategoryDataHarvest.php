@@ -22,6 +22,7 @@ class ScrapingCategoryDataHarvest extends Model
         'product_link',
         'normal_price',
         'old_price',
+        'currency',
     ];
 
     /**

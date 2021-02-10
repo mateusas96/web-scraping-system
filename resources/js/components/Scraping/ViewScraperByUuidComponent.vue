@@ -6,6 +6,8 @@
             >
                 <v-card-title>
                     Scraper ({{ this.$route.params.scraperName }}) scraped data
+                    <v-spacer></v-spacer>
+                    Total records: {{ this.scrapedDataPagination.total }}
                 </v-card-title>
 
                 <v-data-table
@@ -74,6 +76,7 @@ export default {
                 { text: 'Product name', value: 'product_name' },
                 { text: 'Current price', value: 'normal_price' },
                 { text: 'Old price', value: 'old_price' },
+                { text: 'Currency', value: 'currency' },
                 { text: 'Scraped at', value: 'created_at' },
                 { text: '', value: 'data-table-expand' },
             ],

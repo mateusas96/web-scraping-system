@@ -22,6 +22,7 @@ class ScrapingProductScrape extends Model
         'color',
         'available_size',
         'unavailable_size',
+        'currency',
     ];
 
     /**

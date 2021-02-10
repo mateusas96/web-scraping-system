@@ -7,8 +7,16 @@
 				"men_clothes": ["https://www.apc.fr/wwuk/men.html"],
 				"children_clothes": [""]
 			},
-			"category_links": ["xpath", "//div/div/div/ul/li[@class='category-item']/a/@href", ""],
-			"category_names": ["xpath", "//div/div/div/ul/li/a/img/@alt", ""],
+			"category_links": {
+				"women_clothes": ["xpath", "//div/div/div/ul/li[@class='category-item']/a/@href", ""],
+				"men_clothes": ["xpath", "//div/div/div/ul/li[@class='category-item']/a/@href", ""],
+				"children_clothes": ["", "", ""]
+			},
+			"category_names": {
+				"women_clothes": ["xpath", "//div/div/div/ul/li/a/img/@alt", ""],
+				"men_clothes": ["xpath", "//div/div/div/ul/li/a/img/@alt", ""],
+				"children_clothes": ["", "", ""]
+			},
 			"category_pagination": ["", "", "", ""],
 			"pagination_parameters": {
 				"calculate_page_number": "", 
@@ -31,6 +39,7 @@
 			"color": ["class", ".product-colors .color-link:not(.all)", "title"],
 			"available_size": ["xpath", "//div/div/div/select/option[not(contains(., '(Unavailable)'))][not(contains(., 'Select size'))]/text()", ""],
 			"unavailable_size": ["xpath", "//div/div/div/select/option[contains(., '(Unavailable)')][not(contains(., 'Select size'))]/text()", ""]
-		}
+		},
+		"currency": "GBP"
 	}
 }

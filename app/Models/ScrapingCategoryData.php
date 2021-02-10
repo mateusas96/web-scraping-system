@@ -18,6 +18,7 @@ class ScrapingCategoryData extends Model
         'category',
         'category_name',
         'category_link',
+        'currency',
     ];
 
     /**

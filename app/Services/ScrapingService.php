@@ -33,6 +33,7 @@ class ScrapingService implements ScrapingServiceInterface
      */
     public function scrape($uuid, $user_id)
     {
+        set_time_limit(0);
         $config = $file_name = $scraper_name = $scrape_detailed_product_info = null;
         $selected_files_data = $selected_files = $scrape_all = $filter_params = null;
 
@@ -161,12 +162,22 @@ class ScrapingService implements ScrapingServiceInterface
 
             if ($link_array[$i][0] != null || $link_array[$i][0] != '') {
 
-                $category_links_selector_type = $config[$file_name]['category_scrape']['category_links'][$main_category[$i]][0];
-                $category_names_selector_type = $config[$file_name]['category_scrape']['category_names'][$main_category[$i]][0];
-                $category_links_selector = $config[$file_name]['category_scrape']['category_links'][$main_category[$i]][1];
-                $category_names_selector = $config[$file_name]['category_scrape']['category_names'][$main_category[$i]][1];
-                $category_links_attribute = $config[$file_name]['category_scrape']['category_links'][$main_category[$i]][2];
-                $category_names_attribute = $config[$file_name]['category_scrape']['category_names'][$main_category[$i]][2];
+                $temp_category = null;
+
+                if ($i == 0) {
+                    $temp_category = 'women_clothes';
+                } else if ($i == 1) {
+                    $temp_category = 'men_clothes';
+                } else if ($i == 2) {
+                    $temp_category = 'children_clothes';
+                }
+
+                $category_links_selector_type = $config[$file_name]['category_scrape']['category_links'][$temp_category][0];
+                $category_names_selector_type = $config[$file_name]['category_scrape']['category_names'][$temp_category][0];
+                $category_links_selector = $config[$file_name]['category_scrape']['category_links'][$temp_category][1];
+                $category_names_selector = $config[$file_name]['category_scrape']['category_names'][$temp_category][1];
+                $category_links_attribute = $config[$file_name]['category_scrape']['category_links'][$temp_category][2];
+                $category_names_attribute = $config[$file_name]['category_scrape']['category_names'][$temp_category][2];
 
                 for($j = 0; $j < count($link_array[$i]); $j++) {
 
@@ -227,6 +238,7 @@ class ScrapingService implements ScrapingServiceInterface
                         'category' => $this->main_category[$i],
                         'category_name' => $category_harvest[$i]['names'][$j],
                         'category_link' => $category_harvest[$i]['links'][$j],
+                        'currency' => $config[$file_name]['currency'],
                     ]);
                 }
             }
@@ -257,7 +269,7 @@ class ScrapingService implements ScrapingServiceInterface
         $crawler = $data_parent_selector = $product_name_selector = $product_name_attribute = null;
         $product_link_selector = $product_link_attribute = $normal_price_selector = $normal_price_attribute = null;
         $old_price_selector = $old_price_attribute = $selector_type = $pagination_selector_type = null;
-        $pagination_selector = $pagination_selector_attribute = null;
+        $pagination_selector = $pagination_selector_attribute = $pagination = null;
 
         $parsed_data_from_db = SCD::select(
             'category_link', 
@@ -284,35 +296,43 @@ class ScrapingService implements ScrapingServiceInterface
 
             $selector_type = $config[$file_name]['category_scrape']['category_harvest_data']['all_selectors_type'];
 
-            $pagination_selector_type = $config[$file_name]['category_pagination'][0];
+            $pagination_selector_type = $config[$file_name]['category_scrape']['category_pagination'][0];
 
             if ($pagination_selector_type != '' || $pagination_selector_type != null) {
 
-                $pagination_selector = $config[$file_name]['category_pagination'][1];
-                $pagination_selector_attribute = $config[$file_name]['category_pagination'][2];
+                $pagination_selector = $config[$file_name]['category_scrape']['category_pagination'][1];
+                $pagination_selector_attribute = $config[$file_name]['category_scrape']['category_pagination'][2];
+                $pagination = $config[$file_name]['category_scrape']['category_pagination'][3];
 
-                for($i = 0; $i < count($parsed_data_from_db); $i++) {
-dd($parsed_data_from_db[$i]);
+                $temp_parsed_data_count = count($parsed_data_from_db);
+
+                for($i = 0; $i < $temp_parsed_data_count; $i++) {
+
                     $crawler = Goutte::request('GET', $parsed_data_from_db[$i]['category_link']);
 
-                    $page_size = null;
+                    $temp_page_size = null;
 
                     if ($pagination_selector_type == 'xpath') {
-                        $crawler->filterXpath($pagination_selector)->each(function ($node) use (&$i, &$page_size) {
-                            $page_size = $node->text();
+                        $crawler->filterXpath($pagination_selector)->each(function ($node) use (&$i, &$temp_page_size) {
+                            $temp_page_size = $node->text();
                         });
                     } else {
-                        $crawler->filter($pagination_selector)->each(function ($node) use (&$i, &$pagination_selector_attribute, &$page_size) {
-                            $page_size = $node->extract([$pagination_selector_attribute]);
+                        $crawler->filter($pagination_selector)->each(function ($node) use (&$i, &$pagination_selector_attribute, &$temp_page_size) {
+                            $temp_page_size = $node->extract([$pagination_selector_attribute]);
                         });
                     }
 
-                    for(
-                        $j = $config[$file_name]['pagination_parameters']['start_index']; 
-                        $j < ($page_size + $config[$file_name]['pagination_parameters']['last_page']);
-                        $j += $config[$file_name]['pagination_parameters']['step_size']
-                    ) {
+                    $page_size = $temp_page_size[0];
 
+                    for(
+                        $j = $config[$file_name]['category_scrape']['pagination_parameters']['start_index']; 
+                        $j <= ($page_size + $config[$file_name]['category_scrape']['pagination_parameters']['last_page']);
+                        $j += $config[$file_name]['category_scrape']['pagination_parameters']['step_size']
+                    ) {
+                        $parsed_data_from_db[] = [
+                            'category_link' => $parsed_data_from_db[$i]['category_link'] . $pagination . $j,
+                            'category_name' => $parsed_data_from_db[$i]['category_name']
+                        ];
                     }
                 }
             }
@@ -411,6 +431,7 @@ dd($parsed_data_from_db[$i]);
                         'product_link' => $parsed_data['product_link'][$j],
                         'normal_price' => $parsed_data['normal_price'][$j],
                         'old_price' => $parsed_data['old_price'][$j],
+                        'currency' => $config[$file_name]['currency'],
                     ]);
                 }
 
@@ -553,6 +574,7 @@ dd($parsed_data_from_db[$i]);
                     'color' => $color,
                     'available_size' => $available_size,
                     'unavailable_size' => $unavailable_size,
+                    'currency' => $config[$file_name]['currency'],
                 ]);
 
                 $parsed_data = [

@@ -411,7 +411,7 @@ export default {
                 return;
             } else if (this.fileReuploadForm.file.name !== this.fileReuploadForm.file_name) {
                 this.fileReuploadError = [
-                    'Uploaded file should be with the same name: ' + this.fileReuploadForm.file_name,
+                    'Selected file should be with the same name: ' + this.fileReuploadForm.file_name,
                 ];
                 return;
             } else {

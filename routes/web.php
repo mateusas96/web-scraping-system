@@ -32,10 +32,15 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
 
 Route::get('/testscraper', function() {
 
-    $crawler = Goutte::request('GET', 'https://www.closed.com/en/women/new-in/c95858-444-22-561.html');
+    $crawler = Goutte::request('GET', 'https://www.closed.com/en/women/jeans/');
 
-    $crawler->filterXpath('//*[@id]/div/div/ul/li[not(contains(@class, "productdetails__size-link"))]/a/text()')->each(function ($node) {
-        dump($node->text());
+    $crawler->filterXpath('//*[@id]/li/form/div')->each(function ($node) {
+        // echo $node->html();
+        // dump($node->filterXpath('//h2/span[last()]/text()')->text());
+        // dump($node->filterXpath('//a/@href')->text());
+        dump($node->filterXpath('//div/span[1]/meta[1]/@content')->text());
+        // dump($node->filterXpath('//span[last()]/del/text()')->text());
+        die;
     });
 
 });
