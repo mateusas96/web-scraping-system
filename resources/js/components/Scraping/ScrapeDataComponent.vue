@@ -161,7 +161,6 @@
                                 <template v-slot:activator="{ on }">
                                     <a 
                                         :href="`/scrape-data/view-scraper/${item.scraper_name}`"
-                                        target="_blank"
                                         v-on="on"
                                     >
                                         <v-icon>
@@ -710,7 +709,7 @@ export default {
                     position: 'toast-top-right',
                 });
             }
-            
+
             axios.post(`/api/scrape_data_once/${itemUuid}`)
             .then(({data}) => {
                 this.scraping = false;

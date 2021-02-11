@@ -97,6 +97,12 @@ class ScrapingController extends Controller
         //
     }
 
+    /**
+     * Run scraper once
+     *
+     * @param  String selected files for scraping uuid $uuid
+     * @return \Illuminate\Http\Response
+     */
     public function runScraperOnce($uuid) {
         $scraping_service = new ScrapingService();
         $response = $scraping_service->scrape($uuid, auth()->user()->id);
@@ -107,5 +113,53 @@ class ScrapingController extends Controller
         ], 200);
         // $scraper = new ScrapeData($uuid, auth()->user()->id);
         // dispatch($scraper);
+    }
+
+    /**
+     * Gets data for chart
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getDataForChart(Request $request) {
+
+        $product_link = $request->get('product_link');
+
+        $price_array = SCDH::select(
+            'normal_price',
+        )->where(
+            'product_link',
+            $product_link
+        )->orderBy('created_at', 'ASC')->get();
+
+        $normal_price = [];
+
+        foreach($price_array as $value) {
+            if (is_numeric($value['normal_price'])) {
+                $normal_price[] = $value['normal_price'];
+            } else {
+                $normal_price[] = preg_split('/\D+/', $value['normal_price'])[1];
+            }
+        }
+        
+        $time_array = SCDH::select(
+            'created_at'
+        )->where(
+            'product_link',
+            $product_link
+        )->distinct()->orderBy('created_at', 'ASC')->get();
+
+        $created_at = [];
+
+        foreach($time_array as $value) {
+            $created_at[] = \date_format($value['created_at'], 'Y-m-d H:i:s');
+        }
+
+        $data = [
+            'normal_price' => $normal_price,
+            'created_at' => $created_at,
+        ];
+
+        return $data;
     }
 }

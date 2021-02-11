@@ -26,6 +26,28 @@
                     <template v-slot:[`item.hashtag`]="{}">
                         #
                     </template>
+
+                    <template v-slot:[`item.actions`]="{ item }">
+                        <v-progress-circular
+                            :size="30"
+                            color="primary"
+                            indeterminate
+                            v-show="loadingChart"
+                        ></v-progress-circular>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon
+                                    v-on="on"
+                                    class="ml-2"
+                                    v-on:click="displayDataInChart(item.product_link, item.product_name, item.currency);"
+                                    v-show="!loadingChart"
+                                >
+                                    fas fa-chart-line
+                                </v-icon>
+                            </template>
+                            <small>Display in chart</small>
+                        </v-tooltip>
+                    </template>
                     <template v-slot:expanded-item="{ headers, item }">
                         <td :colspan="headers.length">
                             <div class="mt-4" v-if="item.scraped_detail_info == true">
@@ -59,14 +81,45 @@
                     :total-visible="7"
                 ></v-pagination>
             </v-card>
+
+            <v-card 
+                class="mt-16" 
+                v-show="showChart"
+                width="75rem"
+            >
+                <v-card-title>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-icon 
+                                medium
+                                v-on="on"
+                                v-on:click="showChart = false;"
+                            >fas fa-times</v-icon>
+                        </template>
+                        <small>Close chart</small>
+                    </v-tooltip>
+                </v-card-title>
+                <v-card-text>
+                    <line-chart 
+                        :chart-data="chartData"
+                        :options="chartOptions"
+                        :height="500"
+                        :width="1000"
+                    ></line-chart>
+                </v-card-text>
+            </v-card>
         </div>
     </div>
 </template>
 
 <script>
 import {showScrollbar ,hideScrollbar} from '../../app';
+import LineChart from '../../LineChart.js'
 
 export default {
+    components: {
+        LineChart
+    },
     data: () => {
         return {
             headers: [
@@ -78,12 +131,28 @@ export default {
                 { text: 'Old price', value: 'old_price' },
                 { text: 'Currency', value: 'currency' },
                 { text: 'Scraped at', value: 'created_at' },
+                { text: 'Actions', value: 'actions' },
                 { text: '', value: 'data-table-expand' },
             ],
             loading: false,
             scrapedDataPagination: [],
             scrapedData: [],
-            expanded: []
+            expanded: [],
+            tempChartData: [],
+            chartData: null,
+            showChart: false,
+            loadingChart: false,
+            chartOptions: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales:{
+                    yAxes:[{
+                        ticks:{
+                            beginAtZero: true,
+                        }
+                    }]
+                }
+            },
         }
     },
     mounted() {
@@ -94,7 +163,21 @@ export default {
         hideScrollbar();
     },
     watch: {
-        
+        expanded: {
+            handler: function() {
+                this.handleScrollbar();
+            }
+        },
+        scrapedData: {
+            handler: function() {
+                this.handleScrollbar();
+            }
+        },
+        showChart: {
+            handler: function() {
+                this.handleScrollbar();
+            }
+        }
     },
     methods: {
         getScrapedData(page = 1) {
@@ -110,6 +193,40 @@ export default {
                 this.scrapedDataPagination = data;
                 this.loading = false;
             });
+        },
+        async displayDataInChart (productLink, productName, currency) {
+            this.loadingChart = true;
+
+            let params = {
+                'product_link': productLink,
+            }
+
+            await axios.get(`${window.location.origin}/api/get_chart_data/`, { params: params })
+            .then(({data}) => {
+                this.loadingChart = false;
+                this.tempChartData = data;
+            });
+
+            this.chartData = {
+                labels: this.tempChartData['created_at'],
+                datasets: [
+                    {
+                        label: `${productName}, Currency: ${currency}`,
+                        backgroundColor: '#1976d2',
+                        data: this.tempChartData['normal_price'],
+                        fill: true,
+                    },
+                ]
+            };
+
+            this.showChart = true;
+        },
+        handleScrollbar() {
+            setTimeout(() => {
+                $(window).height() < 950 &&
+                $('.container.component').height() > $(window).height() - 100 ?
+                showScrollbar() : hideScrollbar();
+            }, 300);
         }
     }
 }

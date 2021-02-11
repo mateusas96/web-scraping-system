@@ -39,4 +39,6 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::get('get_files_for_select', 'API\FileController@getFilesForSelect')->name('get.files.for.select');
 
     Route::post('scrape_data_once/{uuid}', 'API\ScrapingController@runScraperOnce')->name('scrape.data.once');
+
+    Route::get('get_chart_data', 'API\ScrapingController@getDataForChart')->name('get.chart.data');
 });
