@@ -151,7 +151,7 @@ export default {
                             beginAtZero: true,
                         }
                     }]
-                }
+                },
             },
         }
     },
@@ -199,6 +199,7 @@ export default {
 
             let params = {
                 'product_link': productLink,
+                'scraper_name': this.$route.params.scraperName,
             }
 
             await axios.get(`${window.location.origin}/api/get_chart_data/`, { params: params })
@@ -211,9 +212,19 @@ export default {
                 labels: this.tempChartData['created_at'],
                 datasets: [
                     {
-                        label: `${productName}, Currency: ${currency}`,
+                        label: `${productName}, Currency: ${currency}, Current price`,
                         backgroundColor: '#1976d2',
                         data: this.tempChartData['normal_price'],
+                        pointRadius:4.5,
+                        pointHoverRadius: 7,
+                        fill: true,
+                    },
+                    {
+                        label: `${productName}, Currency: ${currency}, Old price`,
+                        backgroundColor: '#f87979',
+                        data: this.tempChartData['old_price'],
+                        pointRadius:4.5,
+                        pointHoverRadius: 7,
                         fill: true,
                     },
                 ]

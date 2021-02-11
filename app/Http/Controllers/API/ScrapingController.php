@@ -122,23 +122,35 @@ class ScrapingController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function getDataForChart(Request $request) {
+        $normal_price = $old_price = $created_at = [];
 
         $product_link = $request->get('product_link');
+        $scraper_name = $request->get('scraper_name');
 
         $price_array = SCDH::select(
             'normal_price',
+            'old_price'
         )->where(
             'product_link',
             $product_link
+        )->where(
+            'scraper_name',
+            $scraper_name
         )->orderBy('created_at', 'ASC')->get();
-
-        $normal_price = [];
 
         foreach($price_array as $value) {
             if (is_numeric($value['normal_price'])) {
                 $normal_price[] = $value['normal_price'];
             } else {
                 $normal_price[] = preg_split('/\D+/', $value['normal_price'])[1];
+            }
+
+            if (($value['old_price'] != '' || $value['old_price'] != null) && is_numeric($value['old_price'])) {
+                $old_price[] = $value['old_price'];
+            } else if ($value['old_price'] != '' || $value['old_price'] != null) {
+                $old_price[] = preg_split('/\D+/', $value['old_price'])[1];
+            } else {
+                $old_price[] = '';
             }
         }
         
@@ -147,9 +159,10 @@ class ScrapingController extends Controller
         )->where(
             'product_link',
             $product_link
+        )->where(
+            'scraper_name',
+            $scraper_name
         )->distinct()->orderBy('created_at', 'ASC')->get();
-
-        $created_at = [];
 
         foreach($time_array as $value) {
             $created_at[] = \date_format($value['created_at'], 'Y-m-d H:i:s');
@@ -157,6 +170,7 @@ class ScrapingController extends Controller
 
         $data = [
             'normal_price' => $normal_price,
+            'old_price' => $old_price,
             'created_at' => $created_at,
         ];
 
