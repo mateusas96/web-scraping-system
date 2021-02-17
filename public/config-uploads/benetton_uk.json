@@ -1,0 +1,43 @@
+{
+	"benetton_uk":{
+		"category_scrape": {
+			"allowed_domains": ["https://gb.benetton.com"],
+			"category_start_urls": {
+				"women_clothes": ["https://gb.benetton.com/women/"],
+				"men_clothes": ["https://gb.benetton.com/men/"],
+				"children_clothes": ["https://gb.benetton.com/kids/"]
+			},
+			"category_links": {
+				"women_clothes": ["xpath", "//*[contains(@id, 'women')]/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors'))]/@href", ""],
+				"men_clothes": ["xpath", "//*[@id='men-menu-target']/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors'))]/@href", ""],
+				"children_clothes": ["xpath", "//*[contains(@id, 'kid') or contains(@id, 'junior') or contains(@id, 'new')]/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors')) and not(contains(@role, 'menuitem'))]/@href", ""]
+			},
+			"category_names": {
+				"women_clothes": ["xpath", "//*[contains(@id, 'women')]/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors'))]/text()", ""],
+				"men_clothes": ["xpath", "//*[@id='men-menu-target']/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors'))]/text()", ""],
+				"children_clothes": ["xpath", "//*[contains(@id, 'kid') or contains(@id, 'junior') or contains(@id, 'new')]/div/div/div/div/div/div/div[1]/div/div/div/a[not(contains(@href, 'colors')) and not(contains(@role, 'menuitem'))]/text()", ""]
+			},
+			"category_pagination": ["one-load", "", "", "", "?sz=2000"],
+			"pagination_parameters": {
+				"step_size": 0, 
+				"start_index": 0, 
+				"last_page": 0
+			},
+			"category_harvest_data": {
+				"all_selectors_type": "class",
+				"data_parent": [".product .product-card"],
+				"product_name": [".js-product-link.link", "_text"],
+				"product_link": [".js-product-link.link", "href"],
+				"normal_price": [".sales > .value", "content"],
+				"old_price": [".strike-through span", "content"]
+			}
+		},
+		"product_scrape": {
+			"name": ["xpath", "//h1/text()", ""],
+			"color": ["xpath", "//div/div/div/div/div/div[4]/div[2]/div[1]/div/text()", ""],
+			"available_size": ["class", "#size-1-pdp .btn-outline-secondary:not([disabled])", "_text"],
+			"unavailable_size": ["class", "#size-1-pdp .btn-outline-secondary[disabled]", "_text"]
+		},
+		"currency": "GBP"
+	}
+}

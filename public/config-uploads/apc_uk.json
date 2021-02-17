@@ -1,10 +1,10 @@
 {
 	"apc_uk": {
 		"category_scrape": {
-			"allowed_domains": ["www.apc.fr"],
+			"allowed_domains": ["www.apcstore.co.uk"],
 			"category_start_urls": {
-				"women_clothes": ["https://www.apc.fr/wwuk/women.html"],
-				"men_clothes": ["https://www.apc.fr/wwuk/men.html"],
+				"women_clothes": ["https://www.apcstore.co.uk/women.html"],
+				"men_clothes": ["https://www.apcstore.co.uk/men.html"],
 				"children_clothes": [""]
 			},
 			"category_links": {
@@ -17,10 +17,8 @@
 				"men_clothes": ["xpath", "//div/div/div/ul/li/a/img/@alt", ""],
 				"children_clothes": ["", "", ""]
 			},
-			"category_pagination": ["", "", "", ""],
+			"category_pagination": ["", "", "", "", ""],
 			"pagination_parameters": {
-				"calculate_page_number": "", 
-				"items_per_page": "", 
 				"step_size": "", 
 				"start_index": "", 
 				"default_page": ""

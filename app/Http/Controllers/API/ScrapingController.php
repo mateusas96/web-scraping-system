@@ -126,6 +126,8 @@ class ScrapingController extends Controller
 
         $product_link = $request->get('product_link');
         $scraper_name = $request->get('scraper_name');
+        $from_date = $request->get('from_date') . ' 00:00:00';
+        $to_date = $request->get('to_date') . ' 23:59:59';
 
         $price_array = SCDH::select(
             'normal_price',
@@ -136,6 +138,14 @@ class ScrapingController extends Controller
         )->where(
             'scraper_name',
             $scraper_name
+        )->where(
+            'created_at',
+            '>=',
+            $from_date
+        )->where(
+            'created_at',
+            '<=',
+            $to_date
         )->orderBy('created_at', 'ASC')->get();
 
         foreach($price_array as $value) {
@@ -162,6 +172,14 @@ class ScrapingController extends Controller
         )->where(
             'scraper_name',
             $scraper_name
+        )->where(
+            'created_at',
+            '>=',
+            $from_date
+        )->where(
+            'created_at',
+            '<=',
+            $to_date
         )->distinct()->orderBy('created_at', 'ASC')->get();
 
         foreach($time_array as $value) {

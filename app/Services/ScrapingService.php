@@ -120,7 +120,7 @@ class ScrapingService implements ScrapingServiceInterface
     private function categoryScrape($file_name, $config, $scraper_name, $scrape_all, $filter_params, $user_id)
     {
         $crawler = $category_links_selector_type = $category_names_selector_type = $category_links_selector = null;
-        $category_names_selector = $category_links_attribute = $category_names_attribute = null;
+        $category_names_selector = $category_links_attribute = $category_names_attribute = $domain_url = null;
         $category_harvest = [
             0 => [
                 'links' => [],
@@ -135,6 +135,8 @@ class ScrapingService implements ScrapingServiceInterface
                 'names' => [],
             ],
         ];
+
+        $domain_url = $config[$file_name]['category_scrape']['allowed_domains'][0];
 
         $link_array = [
             0 => $config[$file_name]['category_scrape']['category_start_urls']['women_clothes'],
@@ -184,12 +186,20 @@ class ScrapingService implements ScrapingServiceInterface
                     $crawler = Goutte::request('GET', $link_array[$i][$j]);
 
                     if ($category_links_selector_type == 'xpath') {
-                        $crawler->filterXpath($category_links_selector)->each(function ($node) use (&$category_harvest, &$i) {
-                            $category_harvest[$i]['links'][] = $node->text();
+                        $crawler->filterXpath($category_links_selector)->each(function ($node) use (&$category_harvest, &$i, &$domain_url) {
+                            if (stristr($node->text(), $domain_url)) {
+                                $category_harvest[$i]['links'][] = $node->text();
+                            } else {
+                                $category_harvest[$i]['links'][] = $domain_url . $node->text();
+                            }
                         });
                     } else {
-                        $crawler->filter($category_links_selector)->each(function ($node) use (&$category_harvest, &$i, &$category_links_attribute) {
-                            $category_harvest[$i]['links'][] = $node->extract([$category_links_attribute]);
+                        $crawler->filter($category_links_selector)->each(function ($node) use (&$category_harvest, &$i, &$category_links_attribute, &$domain_url) {
+                            if (stristr($node->extract([$category_links_attribute]), $domain_url)) {
+                                $category_harvest[$i]['links'][] = $node->extract([$category_links_attribute]);
+                            } else {
+                                $category_harvest[$i]['links'][] = $domain_url . $node->extract([$category_links_attribute]);
+                            }
                         });
                     }
 
@@ -269,7 +279,7 @@ class ScrapingService implements ScrapingServiceInterface
         $crawler = $data_parent_selector = $product_name_selector = $product_name_attribute = null;
         $product_link_selector = $product_link_attribute = $normal_price_selector = $normal_price_attribute = null;
         $old_price_selector = $old_price_attribute = $selector_type = $pagination_selector_type = null;
-        $pagination_selector = $pagination_selector_attribute = $pagination = null;
+        $pagination_selector = $pagination_selector_attribute = $pagination = $domain_url = $pagination_method = null;
 
         $parsed_data_from_db = SCD::select(
             'category_link', 
@@ -296,13 +306,17 @@ class ScrapingService implements ScrapingServiceInterface
 
             $selector_type = $config[$file_name]['category_scrape']['category_harvest_data']['all_selectors_type'];
 
-            $pagination_selector_type = $config[$file_name]['category_scrape']['category_pagination'][0];
+            $pagination_method = $config[$file_name]['category_scrape']['category_pagination'][0];
 
-            if ($pagination_selector_type != '' || $pagination_selector_type != null) {
+            $pagination_selector_type = $config[$file_name]['category_scrape']['category_pagination'][1];
 
-                $pagination_selector = $config[$file_name]['category_scrape']['category_pagination'][1];
-                $pagination_selector_attribute = $config[$file_name]['category_scrape']['category_pagination'][2];
-                $pagination = $config[$file_name]['category_scrape']['category_pagination'][3];
+            $domain_url = $config[$file_name]['category_scrape']['allowed_domains'][0];
+
+            if ($pagination_method == 'multi-load' && ($pagination_selector_type != '' || $pagination_selector_type != null)) {
+
+                $pagination_selector = $config[$file_name]['category_scrape']['category_pagination'][2];
+                $pagination_selector_attribute = $config[$file_name]['category_scrape']['category_pagination'][3];
+                $pagination = $config[$file_name]['category_scrape']['category_pagination'][4];
 
                 $temp_parsed_data_count = count($parsed_data_from_db);
 
@@ -335,6 +349,12 @@ class ScrapingService implements ScrapingServiceInterface
                         ];
                     }
                 }
+            } else if ($pagination_method == 'one-load') {
+                $pagination = $config[$file_name]['category_scrape']['category_pagination'][4];
+
+                for($i = 0; $i < count($parsed_data_from_db); $i++) {
+                    $parsed_data_from_db[$i]['category_link'] .= $pagination;
+                }
             }
 
             for($i = 0; $i < count($parsed_data_from_db); $i++) {
@@ -354,10 +374,17 @@ class ScrapingService implements ScrapingServiceInterface
                         &$product_name_selector,
                         &$product_link_selector,
                         &$normal_price_selector,
-                        &$old_price_selector) {
+                        &$old_price_selector,
+                        &$domain_url) {
 
                             $parsed_data['product_name'][] = $node->filterXpath($product_name_selector)->text();
-                            $parsed_data['product_link'][] = $node->filterXpath($product_link_selector)->text();
+
+                            if (stristr($node->filterXpath($product_link_selector)->text(), $domain_url)) {
+                                $parsed_data['product_link'][] = $node->filterXpath($product_link_selector)->text();
+                            } else {
+                                $parsed_data['product_link'][] = $domain_url . $node->filterXpath($product_link_selector)->text();
+                            }
+
                             $parsed_data['normal_price'][] = 
                                 $node->filterXpath($normal_price_selector)->count() > 0 ? 
                                 $node->filterXpath($normal_price_selector)->text() : null;
@@ -383,9 +410,17 @@ class ScrapingService implements ScrapingServiceInterface
                         &$normal_price_selector,
                         &$normal_price_attribute,
                         &$old_price_selector,
-                        &$old_price_attribute) {
+                        &$old_price_attribute,
+                        &$domain_url) {
 
                             $parsed_data['product_name'][] = $node->filter($product_name_selector)->extract([$product_name_attribute])[0];
+
+                            if (stristr($node->filter($product_link_selector)->extract([$product_link_attribute])[0], $domain_url)) {
+                                $parsed_data['product_link'][] = $node->filter($product_link_selector)->extract([$product_link_attribute])[0];
+                            } else {
+                                $parsed_data['product_link'][] = $domain_url . $node->filter($product_link_selector)->extract([$product_link_attribute])[0];
+                            }
+
                             $parsed_data['product_link'][] = $node->filter($product_link_selector)->extract([$product_link_attribute])[0];
                             $parsed_data['normal_price'][] = 
                                 (

@@ -39,7 +39,17 @@
                                 <v-icon
                                     v-on="on"
                                     class="ml-2"
-                                    v-on:click="displayDataInChart(item.product_link, item.product_name, item.currency);"
+                                    v-on:click="
+                                        () => {
+                                            productLink = item.product_link;
+                                            productName = item.product_name;
+                                            productCurrency = item.currency;
+                                            fromDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10);
+                                            toDate = new Date().toISOString().substr(0, 10);
+                                            loadingChart = true;
+                                            displayDataInChart();
+                                        }
+                                    "
                                     v-show="!loadingChart"
                                 >
                                     fas fa-chart-line
@@ -87,7 +97,9 @@
                 v-show="showChart"
                 width="75rem"
             >
-                <v-card-title>
+                <div
+                    class="pt-6 pl-6"
+                >
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
                             <v-icon 
@@ -98,8 +110,89 @@
                         </template>
                         <small>Close chart</small>
                     </v-tooltip>
+                </div>
+                <v-card-title class="d-flex justify-center">
+                    <p>Select date to view product info</p>
+                    <v-col
+                        cols="12"
+                        md="3"
+                    >
+                        <v-menu
+                            v-model="fromDateMenu"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="auto"
+                        >
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field
+                                    v-model="fromDate"
+                                    label="From date"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    v-bind="attrs"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="fromDate"
+                                v-on:input="fromDateMenu = false"
+                                :first-day-of-week="1"
+                                :max="toDate"
+                                v-on:change="
+                                    () => {
+                                        newChartDateLoading = true;
+                                        displayDataInChart();
+                                    }
+                                "
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-col>
+                    -
+                    <v-col
+                        cols="12"
+                        md="3"
+                    >
+                        <v-menu
+                            v-model="toDateMenu"
+                            :close-on-content-click="false"
+                            :nudge-right="40"
+                            transition="scale-transition"
+                            offset-y
+                            min-width="auto"
+                        >
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-text-field
+                                    v-model="toDate"
+                                    label="To date"
+                                    prepend-icon="mdi-calendar"
+                                    readonly
+                                    v-bind="attrs"
+                                    v-on="on"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker
+                                v-model="toDate"
+                                v-on:input="toDateMenu = false"
+                                :first-day-of-week="1"
+                                :max="maxDate"
+                                v-on:change="
+                                    () => {
+                                        newChartDateLoading = true;
+                                        displayDataInChart();
+                                    }
+                                "
+                            ></v-date-picker>
+                        </v-menu>
+                    </v-col>
                 </v-card-title>
                 <v-card-text>
+                    <v-progress-linear
+                        indeterminate
+                        color="primary"
+                        v-show="newChartDateLoading"
+                    ></v-progress-linear>
                     <line-chart 
                         :chart-data="chartData"
                         :options="chartOptions"
@@ -153,6 +246,15 @@ export default {
                     }]
                 },
             },
+            fromDateMenu: false,
+            toDateMenu: false,
+            fromDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10),
+            toDate: new Date().toISOString().substr(0, 10),
+            maxDate: new Date().toISOString().substr(0, 10),
+            productLink: null,
+            productName: null,
+            productCurrency: null,
+            newChartDateLoading: false,
         }
     },
     mounted() {
@@ -176,6 +278,8 @@ export default {
         showChart: {
             handler: function() {
                 this.handleScrollbar();
+                this.fromDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().substr(0, 10);
+                this.toDate = new Date().toISOString().substr(0, 10);
             }
         }
     },
@@ -194,17 +298,19 @@ export default {
                 this.loading = false;
             });
         },
-        async displayDataInChart (productLink, productName, currency) {
-            this.loadingChart = true;
+        async displayDataInChart () {
 
             let params = {
-                'product_link': productLink,
+                'product_link': this.productLink,
                 'scraper_name': this.$route.params.scraperName,
-            }
+                'from_date': this.fromDate,
+                'to_date': this.toDate,
+            };
 
             await axios.get(`${window.location.origin}/api/get_chart_data/`, { params: params })
             .then(({data}) => {
                 this.loadingChart = false;
+                this.newChartDateLoading = false;
                 this.tempChartData = data;
             });
 
@@ -212,7 +318,7 @@ export default {
                 labels: this.tempChartData['created_at'],
                 datasets: [
                     {
-                        label: `${productName}, Currency: ${currency}, Current price`,
+                        label: `${this.productName}, Currency: ${this.productCurrency}, Current price`,
                         backgroundColor: '#1976d2',
                         data: this.tempChartData['normal_price'],
                         pointRadius:4.5,
@@ -220,7 +326,7 @@ export default {
                         fill: true,
                     },
                     {
-                        label: `${productName}, Currency: ${currency}, Old price`,
+                        label: `${this.productName}, Currency: ${this.productCurrency}, Old price`,
                         backgroundColor: '#f87979',
                         data: this.tempChartData['old_price'],
                         pointRadius:4.5,

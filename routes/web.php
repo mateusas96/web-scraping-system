@@ -32,15 +32,19 @@ Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], fu
 
 Route::get('/testscraper', function() {
 
-    $crawler = Goutte::request('GET', 'https://www.closed.com/en/women/jeans/');
+    $crawler = Goutte::request('GET', 'https://gb.benetton.com/sweater-in-shetland-wool-dark-green-103MK1N24_570.html');
 
-    $crawler->filterXpath('//*[@id]/li/form/div')->each(function ($node) {
-        // echo $node->html();
-        // dump($node->filterXpath('//h2/span[last()]/text()')->text());
-        // dump($node->filterXpath('//a/@href')->text());
-        dump($node->filterXpath('//div/span[1]/meta[1]/@content')->text());
-        // dump($node->filterXpath('//span[last()]/del/text()')->text());
-        die;
+    // dump($crawler->html());
+
+    $crawler->filter("#size-1-pdp .btn-outline-secondary:not([disabled])")->each(function ($node) {
+
+        dump($node->text());
+    //     // echo $node->html();
+        // dump($node->filterXpath('//div/div/div/div/div/div[4]/div[2]/div[1]/div/text()')->text());
+        // dump($node->filterXpath('//div[4]/div[3]/div/ul/li/button/text()')->attr('href'));
+    //     dump($node->filter('.sales > .value')->text());
+    //     dump($node->filter('.strike-through span')->attr('content'));
+    //     // die;
     });
 
 });
