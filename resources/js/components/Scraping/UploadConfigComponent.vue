@@ -325,6 +325,7 @@ export default {
                 { text: 'File version', value: 'version' },
                 { text: 'Uploaded by', value: 'uploaded_by_user_username' },
                 { text: 'File size', value: 'file_size' },
+                { text: 'Error message', value: 'error_msg' },
                 { text: 'Uploaded at', value: 'updated_at' },
                 { text: 'Actions', value: 'actions' , sortable: false},
             ],
@@ -391,7 +392,7 @@ export default {
             handler: function() {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() - 100 ?
+                    $('.container.component').height() > $(window).height() - 110 ?
                     showScrollbar() : hideScrollbar();
                 }, 300);
             }

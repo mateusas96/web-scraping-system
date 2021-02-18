@@ -8,7 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Storage;
 use File as StorageFile;
-use Carbon\Carbon;
+use App\Models\SelectedFilesForScraping as SFFS;
+use DB;
 
 class FileController extends Controller
 {
@@ -26,6 +27,7 @@ class FileController extends Controller
             'file_name',
             'file_size',
             'file_path',
+            'error_msg',
             'updated_at',
         )->latest()->paginate(10);
     }
@@ -41,6 +43,8 @@ class FileController extends Controller
             'id',
             'uuid',
             'file_name'
+        )->whereRaw(
+            'error_msg IS NULL'
         )->get();
     }
 
@@ -142,6 +146,7 @@ class FileController extends Controller
     public function updateFile(Request $request, $uuid)
     {
         $file = File::findByUuid($uuid);
+        $file_id = $file['id'];
 
         if (array_key_exists('error', $file)) {
             return $file;
@@ -158,7 +163,22 @@ class FileController extends Controller
 
         $file->version = $file['version'] + 1;
         $file->file_size = $reuploadedFile->getSize() === 0 ? '0 KB' : round($reuploadedFile->getSize() / 1024, 3) . ' KB';
+        $file->error_msg = null;
         $file->save();
+
+        $stopped_for_a_reason_status_id = collect(
+            DB::select('SELECT get_status_id_by_code("scraping_stopped_for_a_reason") AS statusId')
+        )->first()->statusId;
+
+        $not_started_status_id = collect(
+            DB::select('SELECT get_status_id_by_code("scraping_not_started") AS statusId')
+        )->first()->statusId;
+
+        SFFS::where('selected_files_id', 'LIKE', "%$file_id%")
+            ->where('status_id', $stopped_for_a_reason_status_id)
+            ->update([
+                'status_id' => $not_started_status_id
+            ]);
 
         return response([
             'error' => false,
@@ -200,6 +220,7 @@ class FileController extends Controller
                 'file_name',
                 'file_size',
                 'file_path',
+                'error_msg',
                 'updated_at',
             )->where(function($query) use ($search){
                 $query
@@ -216,7 +237,33 @@ class FileController extends Controller
             'file_name',
             'file_size',
             'file_path',
+            'error_msg',
             'updated_at',
         )->latest()->paginate(10);
+    }
+
+    /**
+     * Update file with error message from scraper
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateFileWithErrorMessageFromScraper(Request $request)
+    {
+        $error_msg = $request->get('error_message');
+        $uuid = $request->get('uuid');
+
+        $selected_files_data = SFFS::findByUuidAndActiveUserId($uuid, auth()->user()->id);
+
+        File::whereRaw('FIND_IN_SET(id, ?)', $selected_files_data['selected_files_id'])
+            ->update([
+                'error_msg' => $error_msg
+            ]);
+        
+
+        return response([
+            'error' => false,
+            'message' => 'Error message sent',
+        ], 200);
     }
 }

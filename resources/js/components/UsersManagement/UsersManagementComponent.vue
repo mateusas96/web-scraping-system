@@ -244,7 +244,7 @@ export default {
             handler: function() {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() - 100 ?
+                    $('.container.component').height() > $(window).height() - 110 ?
                     showScrollbar() : hideScrollbar();
                 }, 300);
             }

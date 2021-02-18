@@ -20,6 +20,7 @@ class File extends Model
         'file_path',
         'uploaded_by_user_username',
         'version',
+        'error_msg',
     ];
 
     /**

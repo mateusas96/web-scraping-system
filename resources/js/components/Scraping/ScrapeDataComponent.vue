@@ -157,79 +157,137 @@
                             v-show="scraping"
                         ></v-progress-circular>
                         <v-row v-show="!scraping">
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <a 
-                                        :href="`/scrape-data/view-scraper/${item.scraper_name}`"
-                                        v-on="on"
+                            <v-speed-dial
+                                :top="false"
+                                direction="left"
+                                :open-on-hover="false"
+                                transition="slide-x-reverse-transition"
+                            >
+                                <template v-slot:activator>
+                                    <v-btn
+                                        v-model="fab"
+                                        color="blue darken-2"
+                                        dark
+                                        fab
+                                        small
                                     >
-                                        <v-icon>
-                                            fas fa-external-link-alt
+                                        <v-icon v-if="fab">
+                                            mdi-close
                                         </v-icon>
-                                    </a>
+                                        <v-icon v-else>
+                                            fas fa-cog
+                                        </v-icon>
+                                    </v-btn>
                                 </template>
-                                <small>Open scraper</small>
-                            </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            class="ml-2"
+                                            v-on:click="deleteScraper(item.uuid, item.scraper_name)"
+                                            fab
+                                            dark
+                                            color="purple"
+                                            small
+                                        >
+                                            <v-icon small>
+                                                fas fa-trash
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Delete scraper</small>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            class="ml-2"
+                                            v-show="item.scraping_status == 'scraping_initiated'"
+                                            fab
+                                            dark
+                                            color="pink"
+                                            small
+                                        >
+                                            <v-icon small>
+                                                fas fa-ban
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Stop scraper</small>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            class="ml-2"
+                                            v-show="
+                                                (
+                                                    item.scraping_status == 'scraping_stopped_manually' ||
+                                                    item.scraping_status == 'scraping_not_started'
+                                                ) &&
+                                                item.selected_files_error_messages == null
+                                            "
+                                            fab
+                                            dark
+                                            color="green"
+                                            small
+                                        >
+                                            <v-icon small>
+                                                fas fa-play-circle
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Start scraper</small>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            class="ml-2"
+                                            v-on:click="scrapeOnce(item.uuid, item.scrape_all)"
+                                            fab
+                                            dark
+                                            color="teal"
+                                            small
+                                            v-show="item.selected_files_error_messages == null"
+                                        >
+                                            <v-icon small>
+                                                fas fa-chevron-circle-right
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Run scraper ONCE</small>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on }">
+                                        <v-btn
+                                            v-on="on"
+                                            v-on:click="openScraperInfo(item.scraper_name)"
+                                            fab
+                                            dark
+                                            color="cyan"
+                                            small
+                                        >
+                                            <v-icon small>
+                                                fas fa-external-link-alt
+                                            </v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <small>Open scraper</small>
+                                </v-tooltip>
+                            </v-speed-dial>
+                            
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-icon
                                         v-on="on"
                                         class="ml-2"
-                                        v-if="item.scraping_status == 'scraping_not_started'"
-                                        v-on:click="startScraping(item.uuid, item.scrape_all)"
-                                    >
-                                        fas fa-play-circle
-                                    </v-icon>
-                                </template>
-                                <small>Run scraper ONCE</small>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon
-                                        v-on="on"
-                                        class="ml-2"
-                                        v-if="item.scraping_status == 'scraping_initiated'"
-                                    >
-                                        fas fa-ban
-                                    </v-icon>
-                                </template>
-                                <small>Stop scraper</small>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon
-                                        v-on="on"
-                                        class="ml-2"
-                                        v-if="item.scraping_status == 'scraping_stopped_manually'"
-                                    >
-                                        fas fa-play-circle
-                                    </v-icon>
-                                </template>
-                                <small>Start scraper</small>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon
-                                        v-on="on"
-                                        class="ml-2"
-                                        v-if="item.scraping_status == 'scraping_stopped_for_a_reason'"
+                                        v-show="item.selected_files_error_messages != null"
                                     >
                                         fas fa-exclamation-triangle
                                     </v-icon>
                                 </template>
-                                <small>Will be fixed by administration</small>
-                            </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon
-                                        v-on="on"
-                                        class="ml-2"
-                                        v-on:click="deleteScraper(item.uuid, item.scraper_name)"
-                                    >
-                                        fas fa-trash
-                                    </v-icon>
-                                </template>
-                                <small>Delete scraper</small>
+                                <small>Error in config will be fixed by administration</small>
                             </v-tooltip>
                         </v-row>
                     </template>
@@ -581,12 +639,13 @@ export default {
                 { name: 'Children', value: 'Children' },
             ],
             scraping: false,
+            fab: false,
         }
     },
     mounted() {
-        this.getFilesForSelect();
         this.loading = true;
         this.getMyFiles();
+        this.getFilesForSelect();
         Fire.$on('searchMyFile', () => {
             this.getMyFiles();
         });
@@ -615,21 +674,21 @@ export default {
             handler: function(newVal, oldVal) {
                 setTimeout(() => {
                     $(window).height() < 950 &&
-                    $('.container.component').height() > $(window).height() - 100 ?
+                    $('.container.component').height() > $(window).height() - 110 ?
                     showScrollbar() : hideScrollbar();
                 }, 300);        
             }
         }
     },
     methods: {
-        getMyFiles() {
+        async getMyFiles() {
             let params = {
                 'query': (this.search === null ? '' : this.search),
                 'scrape_everything': this.scrape_everything,
                 'scraping_status': this.scraping_status,
             };
 
-            axios.get('/api/selectedFilesForScraping', { params: params })
+            await axios.get('/api/selectedFilesForScraping', { params: params })
             .then(({data}) => {
                 this.myFilesPagination = data;
                 this.myFiles = data.data;
@@ -696,7 +755,7 @@ export default {
         searchit: _.debounce(() => {
             Fire.$emit('searchMyFile');
         }, 500),
-        startScraping(itemUuid, scrapeAll) {
+        scrapeOnce(itemUuid, scrapeAll) {
             this.scraping = true;
 
             if (scrapeAll == 'Yes') {
@@ -721,12 +780,43 @@ export default {
                     progressbar: true,
                     position: 'toast-top-right',
                 });
+            })
+            .catch(error => {
+                this.scraping = false;
+
+                this.$toastr.Add({
+                    title: 'Error',
+                    msg: 'Something went wrong, we will fix it soon',
+                    type: 'error',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
+
+                let error_params = {
+                    'error_message': error.response.data.message,
+                    'uuid': itemUuid,
+                };
+
+                axios.put('/api/update_file_with_error_message_from_scraper', error_params);
+                
+                let status_params = {
+                    'uuid': itemUuid,
+                    'status_code': 'scraping_stopped_for_a_reason',
+                    'system': false,
+                };
+
+                axios.put('/api/update_scraper_status', status_params)
+                .then(() => {
+                    this.getMyFiles();
+                });
+                
             });
         },
         deleteScraper(itemUuid, scraperName) {
             Swal.fire({
                 title: 'Delete scraper',
-                text: `Are you sure you want to  delete scraper - ${scraperName}?`,
+                text: `Are you sure you want to delete scraper - ${scraperName}?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Delete',
@@ -751,6 +841,9 @@ export default {
                     });
                 }
             });
+        },
+        openScraperInfo(scraperName) {
+            window.location.href = `/scrape-data/view-scraper/${scraperName}`;
         }
     },
 }

@@ -59,12 +59,12 @@ class UserController extends Controller
      */
     public function update(Request $request, $email)
     {
-        $user = User::where('email', $email)->firstOrFail();
-
         $this->validate($request,[
             'is_admin'      => 'required|int',
             'is_disabled'   => 'required|int',
         ]);
+
+        $user = User::where('email', $email)->firstOrFail();
 
         $user->update($request->all());
 

@@ -41,4 +41,8 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::post('scrape_data_once/{uuid}', 'API\ScrapingController@runScraperOnce')->name('scrape.data.once');
 
     Route::get('get_chart_data', 'API\ScrapingController@getDataForChart')->name('get.chart.data');
+
+    Route::put('update_file_with_error_message_from_scraper', 'API\FileController@updateFileWithErrorMessageFromScraper')->name('set.error.msg.for.file');
+
+    Route::put('update_scraper_status', 'API\SelectedFilesForScrapingController@updateStatus')->name('update.scraper.status');
 });
