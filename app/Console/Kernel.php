@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\RunScraperDaily::class,
+        Commands\RunScraperWeekly::class,
     ];
 
     /**
@@ -24,7 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('run-scraper:daily')->dailyAt('6:00');
+        $schedule->command('run-scraper:weekly')->weeklyOn(1, '6:00');
     }
 
     /**

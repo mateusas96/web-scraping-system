@@ -175,7 +175,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     {{ __('Scrape anything you want') }}
                 </div>
                 <!-- Default to the left -->
-                <strong>Copyright &copy; 2020 <a
+                <strong>Copyright &copy; 2021 <a
                         href="{{ config('app.contentUrl') }}">{{ config('app.creator') }}</a>.</strong>
             </footer>
         <!-- </v-app> -->

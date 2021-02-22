@@ -142,6 +142,11 @@
                             {{ status.value == item.scraping_status ? status.name : null }}
                         </div>
                     </template>
+                    <template v-slot:[`item.schedule`]="{ item }">
+                        <div v-for="schedule in scraping_schedule" :key="schedule.value">
+                            {{ schedule.value == item.schedule ? schedule.name : '' }}
+                        </div>
+                    </template>
                     <template v-slot:[`item.started_scraping_date`]="{ item }">
                         {{item.started_scraping_date === null ? '-' : item.started_scraping_date}}
                     </template>
@@ -202,7 +207,10 @@
                                         <v-btn
                                             v-on="on"
                                             class="ml-2"
-                                            v-show="item.scraping_status == 'scraping_initiated'"
+                                            v-show="
+                                                item.scraping_status == 'scraping_initiated' ||
+                                                item.scraping_status == 'scraping_finished'
+                                            "
                                             fab
                                             dark
                                             color="pink"
@@ -249,7 +257,12 @@
                                             dark
                                             color="teal"
                                             small
-                                            v-show="item.selected_files_error_messages == null"
+                                            v-show="
+                                                (
+                                                    item.scraping_status == 'scraping_finished' ||
+                                                    item.selected_files_error_messages == null
+                                                ) && item.scraping_status != 'scraping_initiated'
+                                            "
                                         >
                                             <v-icon small>
                                                 fas fa-chevron-circle-right
@@ -356,7 +369,7 @@
                                 >
                                     <validation-provider
                                         v-slot="{ errors }"
-                                        name="scraper select"
+                                        name="scraper files"
                                         :rules="{
                                             required: true,
                                         }"
@@ -394,7 +407,7 @@
                                                 >
                                                     <validation-provider
                                                         v-slot="{ errors }"
-                                                        name="Select root category"
+                                                        name="root category"
                                                         :rules="{
                                                             required: !selectedFilesForm.scrape_all,
                                                         }"
@@ -413,7 +426,7 @@
                                                     </validation-provider>
                                                     <validation-provider
                                                         v-slot="{ errors }"
-                                                        name="Subcategory"
+                                                        name="subcategory"
                                                         :rules="{
                                                             required: !selectedFilesForm.scrape_all,
                                                             max: 50
@@ -435,7 +448,7 @@
                                                 <v-col>
                                                     <validation-provider
                                                         v-slot="{ errors }"
-                                                        name="Product to scrape"
+                                                        name="product to scrape"
                                                         :rules="{
                                                             required: !selectedFilesForm.scrape_all,
                                                             max: 50
@@ -485,6 +498,31 @@
                                             <v-divider></v-divider>
                                         </v-row>
                                     </div>
+                                </v-col>
+                                <v-col
+                                    cols="12"
+                                    sm="11"
+                                    style="margin-top: -1.5rem;"
+                                >
+                                    <validation-provider
+                                        v-slot="{ errors }"
+                                        name="schedule"
+                                        :rules="{
+                                            required: true,
+                                        }"
+                                    >
+                                        <v-select
+                                            v-model="selectedFilesForm.schedule"
+                                            id="select-root-category"
+                                            label="Select schedule"
+                                            :items="scraping_schedule"
+                                            :error-messages="errors"
+                                            item-text="name"
+                                            item-value="value"
+                                            clearable
+                                            :open-on-clear="true"
+                                        ></v-select>
+                                    </validation-provider>
                                 </v-col>
                                 <v-row 
                                     align="center"
@@ -603,6 +641,7 @@ export default {
                 selected_files: [],
                 scrape_all: true,
                 detailed_information_about_product: false,
+                schedule: '',
             }),
             scrapeAll: true,
             filesForSelect: [],
@@ -614,6 +653,7 @@ export default {
                 { text: 'Scraped detailed product info', value: 'detailed_information_about_product' },
                 { text: 'Scraping parameters', value: 'scraping_params' },
                 { text: 'Scraping status', value: 'scraping_status' },
+                { text: 'Schedule', value: 'schedule' },
                 { text: 'Started scraping date', value: 'started_scraping_date' },
                 { text: 'Stopped scraping date', value: 'stopped_scraping_date' },
                 { text: 'Scraper created at', value: 'scraper_created_at' },
@@ -640,6 +680,10 @@ export default {
             ],
             scraping: false,
             fab: false,
+            scraping_schedule: [
+                { name: 'Daily (at 6AM)', value: 'daily' },
+                { name: 'Weekly (every Monday at 6AM)', value: 'weekly' },
+            ],
         }
     },
     mounted() {

@@ -11,6 +11,7 @@ use App\Models\ScrapingParam as SP;
 use App\Mail\VerifyEmail;
 use Mail;
 use Weidner\Goutte\GoutteFacade AS Goutte;
+use App\Services\SelectedFilesForScrapingService as SFFSS;
 
 class ScrapingService implements ScrapingServiceInterface
 {
@@ -101,6 +102,8 @@ class ScrapingService implements ScrapingServiceInterface
                     ->update(['scraped_detail_info' => 1]);
             }
         }
+        $sffsService = new SFFSS();
+        $sffsService->updateScraperStatus($uuid, 'scraping_finished', true);
 
         SCD::where('scraper_name', $scraper_name)->where('user_id', '=', $user_id)->delete();
 
