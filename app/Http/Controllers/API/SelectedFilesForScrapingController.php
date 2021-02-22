@@ -175,4 +175,40 @@ class SelectedFilesForScrapingController extends Controller
             'message' => 'Scraper status updated',
         ]);
     }
+
+    /**
+     * Stop scraper and update it's status
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changeScraperStoppedStatus(Request $request)
+    {
+        $uuid = $request->get('uuid');
+        $status_code = $request->get('status_code');
+
+        if ($status_code == 'scraping_not_started' || $status_code == 'scraping_stopped_manually') {
+
+            $status_id = collect(
+                DB::select('SELECT get_status_id_by_code("' . $status_code . '") AS statusId')
+            )->first()->statusId;
+
+            SFFS::where('uuid', $uuid)
+                ->update([
+                    'status_id' => $status_id,
+                    'scraper_stopped' => $status_code == 'scraping_stopped_manually' ? 1 : 0
+                ]);
+            
+            return response()->json([
+                'error' => false,
+                'message' => 'Scraper stopped',
+            ]);
+
+        }
+        
+        return response([
+            'error' => false,
+            'message' => 'Wrong status code',
+        ], 400); 
+    }
 }

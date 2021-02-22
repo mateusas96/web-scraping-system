@@ -20,6 +20,7 @@ class SelectedFilesForScraping extends Model
         'scrape_all',
         'detailed_information_about_product',
         'schedule',
+        'scraper_stopped',
         'started_scraping_date',
         'stopped_scraping_date',
     ];

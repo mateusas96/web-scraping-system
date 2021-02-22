@@ -45,4 +45,6 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::put('update_file_with_error_message_from_scraper', 'API\FileController@updateFileWithErrorMessageFromScraper')->name('set.error.msg.for.file');
 
     Route::put('update_scraper_status', 'API\SelectedFilesForScrapingController@updateStatus')->name('update.scraper.status');
+
+    Route::put('change_scraper_stopped_status', 'API\SelectedFilesForScrapingController@changeScraperStoppedStatus')->name('change.scraper.stopped.status');
 });

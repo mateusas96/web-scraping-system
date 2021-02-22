@@ -176,10 +176,7 @@
                                         fab
                                         small
                                     >
-                                        <v-icon v-if="fab">
-                                            mdi-close
-                                        </v-icon>
-                                        <v-icon v-else>
+                                        <v-icon>
                                             fas fa-cog
                                         </v-icon>
                                     </v-btn>
@@ -208,13 +205,14 @@
                                             v-on="on"
                                             class="ml-2"
                                             v-show="
-                                                item.scraping_status == 'scraping_initiated' ||
-                                                item.scraping_status == 'scraping_finished'
+                                                item.scraping_status != 'scraping_not_started' ||
+                                                item.scraping_status != 'scraping_stopped_manually'
                                             "
                                             fab
                                             dark
                                             color="pink"
                                             small
+                                            v-on:click="changeScraperStoppedStatus(item.uuid, 'scraping_stopped_manually')"
                                         >
                                             <v-icon small>
                                                 fas fa-ban
@@ -239,6 +237,7 @@
                                             dark
                                             color="green"
                                             small
+                                            v-on:click="changeScraperStoppedStatus(item.uuid, 'scraping_not_started')"
                                         >
                                             <v-icon small>
                                                 fas fa-play-circle
@@ -654,6 +653,7 @@ export default {
                 { text: 'Scraping parameters', value: 'scraping_params' },
                 { text: 'Scraping status', value: 'scraping_status' },
                 { text: 'Schedule', value: 'schedule' },
+                { text: 'Scraper stopped', value: 'scraper_stopped' },
                 { text: 'Started scraping date', value: 'started_scraping_date' },
                 { text: 'Stopped scraping date', value: 'stopped_scraping_date' },
                 { text: 'Scraper created at', value: 'scraper_created_at' },
@@ -888,6 +888,28 @@ export default {
         },
         openScraperInfo(scraperName) {
             window.location.href = `/scrape-data/view-scraper/${scraperName}`;
+        },
+        changeScraperStoppedStatus(scraperUuid, statusCode) {
+            let params = {
+                'status_code': statusCode,
+                'uuid': scraperUuid,
+            };
+
+            if (statusCode == 'scraping_not_started') {
+                this.$toastr.Add({
+                    title: 'Info',
+                    msg: 'Scraper will start as it is scheduled',
+                    type: 'info',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
+            }
+
+            axios.put('/api/change_scraper_stopped_status', params)
+            .then(() => {
+                this.getMyFiles();
+            });
         }
     },
 }

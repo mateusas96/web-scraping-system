@@ -54,6 +54,9 @@ class RunScraperDaily extends Command
                 status.code = "scraping_finished"
             )
             '
+        )->where(
+            'scraper_stopped',
+            0
         )->get();
 
         $sffsService = new SFFSS();
