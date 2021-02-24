@@ -18,16 +18,20 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::group(['middleware' => 'auth', 'middleware' => 'validateBackHistory'], function(){
+Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
     Route::get('/home', 'HomeController@index')->name('home');
-
-    Route::get('/users/management', 'HomeController@index')->name('users.management');
 
     Route::get('/upload-configs', 'HomeController@index')->name('config.upload');
 
     Route::get('/scrape-data', 'HomeController@index')->name('scrape.data');
 
     Route::get('/scrape-data/view-scraper/{scarperName}', 'HomeController@index')->name('scrape.data');
+
+    Route::get('/403', 'HomeController@index')->name('scrape.data');
+});
+
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function(){
+    Route::get('/users/management', 'HomeController@index')->name('users.management');
 });
 
 Route::get('/testscraper', function() {

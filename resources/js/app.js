@@ -7,6 +7,7 @@ import 'vue-material/dist/vue-material.min.css';
 import 'vue-material/dist/theme/default.css';
 import Vuetify from 'vuetify';
 import VueToastr from 'vue-toastr';
+import { template } from 'lodash';
 
 require('./bootstrap');
 
@@ -34,6 +35,7 @@ let routes = [
     { path: '/upload-configs', component: require('./components/Scraping/UploadConfigComponent.vue').default },
     { path: '/scrape-data', component: require('./components/Scraping/ScrapeDataComponent.vue').default },
     { path: '/scrape-data/view-scraper/:scraperName', component: require('./components/Scraping/ViewScraperByUuidComponent.vue').default },
+    { path: '/403', component: require('./components/Errors/403.vue').default },
 ];
 
 // hide scrollbar if needed
@@ -55,6 +57,19 @@ export function hideScrollbar() {
 export function showScrollbar() {
     let elHtml = document.getElementsByTagName('html')[0];
     elHtml.style.overflowY = null;
+}
+
+/**
+ * get current user anywhere if needed,
+ * user is initialized on login or on every page refresh
+ */
+export var current_user = axios.get(`${window.location.origin}/api/current`);
+
+/**
+ * reinitialize current user when user self-updates
+ */
+export function updateCurrentUser() {
+    current_user = axios.get(`${window.location.origin}/api/current`);
 }
 
 const router = new VueRouter({

@@ -22,9 +22,9 @@ class UserController extends Controller
             'username',
             'is_admin',
             'is_disabled',
+            'can_upload_files',
             'created_at',
             'updated_at',
-            'email_verified_at',
         )->paginate(10);
     }
 
@@ -96,17 +96,16 @@ class UserController extends Controller
                 'email',
                 'is_admin',
                 'is_disabled',
+                'can_upload_files',
                 'created_at',
                 'updated_at',
-                'email_verified_at',
             )->where(function($query) use ($search){
                 $query
                     ->where('first_name', 'LIKE', "%$search%")
                     ->orWhere('last_name', 'LIKE', "%$search%")
                     ->orWhere('username', 'LIKE', "%$search%")
                     ->orWhere('email', 'LIKE', "%$search%")
-                    ->orWhere('created_at', 'LIKE', "%$search%")
-                    ->orWhere('email_verified_at', 'LIKE', "%$search%");
+                    ->orWhere('created_at', 'LIKE', "%$search%");
             })->paginate(10);
             return $users;
         }
@@ -118,9 +117,14 @@ class UserController extends Controller
             'email',
             'is_admin',
             'is_disabled',
+            'can_upload_files',
             'created_at',
             'updated_at',
-            'email_verified_at',
         )->paginate(10);
+    }
+
+    // returns all current (logged in) user's information
+    public function getCurrentUser() {
+        return User::where('email', auth()->user()->email)->first();
     }
 }

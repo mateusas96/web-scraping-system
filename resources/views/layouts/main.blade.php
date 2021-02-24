@@ -103,7 +103,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <li class="nav-item">
                                 <router-link to="/upload-configs" class="nav-link">
                                     <i class="nav-icon fas fa-file-upload orange"></i>
-                                    <p>{{__('Scraping config upload')}}</p>
+                                    <p>{{__('Scraping config files')}}</p>
                                 </router-link>
                             </li>
                             <li class="nav-item">
@@ -136,9 +136,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
-                @if (session('message'))
-                    <div class="alert alert-danger">{{ session('message') }}</div>
-                @endif
             <!-- Content Header (Page header) -->
                 <!-- <div class="content-header">
                 <div class="container-fluid">
@@ -190,3 +187,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 </body>
 
 </html>
+@auth
+<script>
+    window.user = @json(auth()->user());
+</script>
+@endauth

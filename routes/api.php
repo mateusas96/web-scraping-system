@@ -18,8 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
-    
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function(){
+    Route::get('user', 'API\UserController@index')->name('user.index');
 });
 
 Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
@@ -47,4 +47,6 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::put('update_scraper_status', 'API\SelectedFilesForScrapingController@updateStatus')->name('update.scraper.status');
 
     Route::put('change_scraper_stopped_status', 'API\SelectedFilesForScrapingController@changeScraperStoppedStatus')->name('change.scraper.stopped.status');
+
+    Route::get('current', 'API\UserController@getCurrentUser')->name('get.current.user');
 });

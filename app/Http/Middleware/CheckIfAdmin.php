@@ -17,10 +17,7 @@ class CheckIfAdmin
     {
         if ($request->user() !== null) {
             if (!!auth()->user()->is_admin === false) {
-                return response()->json([
-                    'error' => true,
-                    'message' => 'You do not have rights to access this page',
-                ], 403);
+                return redirect()->to('/403');
             }
         } else {
             \Auth::logout();

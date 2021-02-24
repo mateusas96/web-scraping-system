@@ -274,13 +274,13 @@
                                     <template v-slot:activator="{ on }">
                                         <v-btn
                                             v-on="on"
-                                            v-on:click="openScraperInfo(item.scraper_name)"
+                                            :to="`/scrape-data/view-scraper/${item.scraper_name}`"
                                             fab
                                             dark
                                             color="cyan"
                                             small
                                         >
-                                            <v-icon small>
+                                            <v-icon small color="white">
                                                 fas fa-external-link-alt
                                             </v-icon>
                                         </v-btn>
@@ -512,7 +512,7 @@
                                     >
                                         <v-select
                                             v-model="selectedFilesForm.schedule"
-                                            id="select-root-category"
+                                            id="select-schedule"
                                             label="Select schedule"
                                             :items="scraping_schedule"
                                             :error-messages="errors"

@@ -65,6 +65,10 @@
                             <span v-if="item.is_disabled" style="color: red;">True</span>
                             <span v-else style="color: green;">False</span>
                         </template>
+                        <template v-slot:[`item.can_upload_files`]="{ item }">
+                            <span v-if="item.can_upload_files" style="color: green;">True</span>
+                            <span v-else style="color: red;">False</span>
+                        </template>
                         <template v-slot:[`item.email_verified_at`]="{ item }">
                             <span v-if="item.email_verified_at !== null">{{item.email_verified_at}}</span>
                             <span v-else class="d-flex justify-center">-</span>
@@ -151,6 +155,21 @@
                                             ></v-select>
                                         </v-col>
                                     </v-row>
+                                    <v-row>
+                                        <v-col
+                                            class="d-flex"
+                                            cols="12"
+                                        >
+                                            <v-select
+                                                v-model="userForm.can_upload_files"
+                                                label="Can upload files"
+                                                :items="selectOptions"
+                                                item-text="name"
+                                                item-value="value"
+                                                v-on:change="handleSelectChange"
+                                            ></v-select>
+                                        </v-col>
+                                    </v-row>
                                     </v-container>
                                 </v-card-text>
                     
@@ -190,7 +209,7 @@
 </template>
 
 <script>
-import {showScrollbar, hideScrollbar} from '../../app';
+import {showScrollbar, hideScrollbar, updateCurrentUser, current_user} from '../../app';
 
 export default {
     data: () => ({
@@ -209,6 +228,7 @@ export default {
             email: '',
             is_admin: '',
             is_disabled: '',
+            can_upload_files: '',
         }),
         search: '',
         headers: [
@@ -219,10 +239,10 @@ export default {
             { text: 'Email', value: 'email' },
             { text: 'Is admin', value: 'is_admin' }, 
             { text: 'Is disabled', value: 'is_disabled' },
+            { text: 'Can upload files', value: 'can_upload_files' },
             { text: 'Created at', value: 'created_at' },
             { text: 'Updated at', value: 'updated_at' },
-            { text: 'Email verified at', value: 'email_verified_at' },
-            { text: 'Actions', value: 'actions' , sortable: false}
+            { text: 'Actions', value: 'actions' , sortable: false},
         ],
         selectOptions: [
             { name: 'True', value: 1 },
@@ -230,6 +250,7 @@ export default {
         ],
         dirty: false,
         refreshUsers: false,
+        currentUser: [],
     }),
     watch: {
         refreshUsers: {
@@ -251,6 +272,9 @@ export default {
         }
     },
     mounted() {
+        current_user.then(({data}) => {
+            this.currentUser = data;
+        });
         this.loading = true;
         this.getUsersList();
         Fire.$on('searchUser', () => {
@@ -273,7 +297,11 @@ export default {
         handleSelectChange() {
             this.users.forEach((value, index) => {
                 if (value.email === this.userForm.email) {
-                    if (value.is_admin !== this.userForm.is_admin || value.is_disabled !== this.userForm.is_disabled) {
+                    if (
+                        value.is_admin !== this.userForm.is_admin ||
+                        value.is_disabled !== this.userForm.is_disabled ||
+                        value.can_upload_files !== this.userForm.can_upload_files
+                    ) {
                         this.dirty = true;
                         return;
                     }
@@ -305,7 +333,7 @@ export default {
             .catch((error) => {
                 this.loading = false;
                 this.error = error.response.data;
-            })
+            });
         },
         editUser(user) {
             this.editUserDialog = true;
@@ -326,6 +354,15 @@ export default {
                 });
                 this.loading = true;
                 this.getUsersList();
+                if (this.userForm.email === this.currentUser.email) {
+                    updateCurrentUser();
+                    current_user.then(({data}) => {
+                        this.currentUser = data;
+                    });
+                }
+                if (this.userForm.is_admin !== this.currentUser.is_admin) {
+                    window.location.reload();
+                }
             })
             .catch(() => {
                 this.$toastr.Add({
@@ -336,7 +373,7 @@ export default {
                     progressbar: true,
                     position: 'toast-top-right',
                 });
-            })
+            });
         }
     }
 }

@@ -5,6 +5,8 @@
 <script>
 import {hideScrollbar} from '../../app';
     export default {
-        hideScrollbar
+        mounted() {
+            hideScrollbar();
+        }
     }
 </script>

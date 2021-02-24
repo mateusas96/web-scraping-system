@@ -6,7 +6,7 @@
                 v-model="panelOpened"
                 :mandatory="true"
             >
-                <v-expansion-panel>
+                <v-expansion-panel v-show="currentUser.can_upload_files">
                     <v-expansion-panel-header>
                         Upload files
                     </v-expansion-panel-header>
@@ -101,7 +101,7 @@
                 </v-expansion-panel>
                 <v-expansion-panel>
                     <v-expansion-panel-header>
-                        Manage files
+                        {{currentUser.can_upload_files == true ? 'Manage files' : 'View uploaded files'}}
                         <div
                             class="d-flex justify-end mr-6"
                         >
@@ -151,6 +151,7 @@
                                 <template v-slot:[`item.hashtag`]="{}">
                                     #
                                 </template>
+
                                 <template v-slot:[`item.actions`]="{ item }">
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
@@ -185,6 +186,7 @@
                                                 class="ml-2"
                                                 v-on:click="deleteFile(item.uuid, item.file_name)"
                                                 dense
+                                                v-show="currentUser.is_admin"
                                             >
                                                 fas fa-trash
                                             </v-icon>
@@ -308,7 +310,7 @@
 </template>
 
 <script>
-import {showScrollbar ,hideScrollbar} from '../../app';
+import {showScrollbar ,hideScrollbar, current_user} from '../../app';
 
 export default {
     data: () => {
@@ -327,7 +329,7 @@ export default {
                 { text: 'File size', value: 'file_size' },
                 { text: 'Error message', value: 'error_msg' },
                 { text: 'Uploaded at', value: 'updated_at' },
-                { text: 'Actions', value: 'actions' , sortable: false},
+                { text: 'Actions', value: 'actions' , sortable: false },
             ],
             loading: true,
             search: '',
@@ -342,9 +344,27 @@ export default {
             formData: new FormData(),
             canUpload: false,
             fileReuploadError: [],
+            currentUser: [],
         }
     },
     mounted() {
+        console.log(current_user);
+        current_user.then(({data}) => {
+            if (data.can_upload_files == false) {
+                this.loading = true;
+                this.panelOpened = 1;
+                this.headers = [
+                    { text: '#', align: 'start', sortable: false, value: 'hashtag' },
+                    { text: 'File name', value: 'file_name' },
+                    { text: 'File version', value: 'version' },
+                    { text: 'Uploaded by', value: 'uploaded_by_user_username' },
+                    { text: 'File size', value: 'file_size' },
+                    { text: 'Error message', value: 'error_msg' },
+                    { text: 'Uploaded at', value: 'updated_at' },
+                ];
+            }
+            this.currentUser = data;
+        });
         hideScrollbar();
         Fire.$on('refreshFiles', () => {
             this.canUpload = false;

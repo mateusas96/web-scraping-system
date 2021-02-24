@@ -25,6 +25,7 @@ class User extends Authenticatable
         'is_admin',
         'is_disabled',
         'username',
+        'can_upload_files',
     ];
 
     /**
