@@ -348,7 +348,6 @@ export default {
         }
     },
     mounted() {
-        console.log(current_user);
         current_user.then(({data}) => {
             if (data.can_upload_files == false) {
                 this.loading = true;
