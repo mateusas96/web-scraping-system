@@ -21,12 +21,6 @@ class ScrapingService implements ScrapingServiceInterface
         2 => 'Children',
     ];
 
-    public function make(array $request)
-    {
-        // TODO: Implement make() method.
-        // put all the logic in this class
-    }
-
     /**
      * Initiate scraping
      * 

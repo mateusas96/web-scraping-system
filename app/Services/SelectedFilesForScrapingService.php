@@ -10,12 +10,6 @@ use App\Models\ScrapingCategoryData AS SCD;
 
 class SelectedFilesForScrapingService implements SelectedFilesForScrapingServiceServiceInterface
 {
-    public function make(array $request)
-    {
-        // TODO: Implement make() method.
-        // put all the logic in this class
-    }
-
     public function updateScraperStatus($uuid, $scraper_status, $system){
         $sffs = SFFS::findByUuid($uuid);
         $currentSffsStatusId = $sffs['status_id'];

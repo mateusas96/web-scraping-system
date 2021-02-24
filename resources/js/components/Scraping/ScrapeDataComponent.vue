@@ -1,7 +1,7 @@
 <template>
     <div class="container component" style="width: 80vw;">
         <div class="row justify-content-center">
-            <v-card 
+            <v-card
                 class="mx-auto"
             >
                 <v-card-title>
@@ -11,7 +11,7 @@
                         My scrapers
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-btn 
+                                <v-btn
                                     v-on:click="refreshMyFiles = !refreshMyFiles"
                                     v-on="on"
                                     small
@@ -26,7 +26,7 @@
                         </v-tooltip>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-btn 
+                                <v-btn
                                     v-on:click="showDrawer = !showDrawer"
                                     v-on="on"
                                     small
@@ -97,7 +97,7 @@
                         >
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-btn 
+                                    <v-btn
                                         v-on:click="
                                             () => {
                                                 search = '';
@@ -288,7 +288,7 @@
                                     <small>Open scraper</small>
                                 </v-tooltip>
                             </v-speed-dial>
-                            
+
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
                                     <v-icon
@@ -473,9 +473,9 @@
                                             >
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on }">
-                                                        <v-icon 
-                                                            v-if="index === 0" 
-                                                            medium 
+                                                        <v-icon
+                                                            v-if="index === 0"
+                                                            medium
                                                             v-on="on"
                                                             v-on:click="addScraperParam"
                                                         >fas fa-plus</v-icon>
@@ -484,9 +484,9 @@
                                                 </v-tooltip>
                                                 <v-tooltip bottom>
                                                     <template v-slot:activator="{ on }">
-                                                        <v-icon 
-                                                            v-if="index > 0" 
-                                                            medium 
+                                                        <v-icon
+                                                            v-if="index > 0"
+                                                            medium
                                                             v-on="on"
                                                             v-on:click="deleteScraperParam(index)"
                                                         >fas fa-trash</v-icon>
@@ -523,7 +523,7 @@
                                         ></v-select>
                                     </validation-provider>
                                 </v-col>
-                                <v-row 
+                                <v-row
                                     align="center"
                                     v-bind:style="{ marginTop: selectedFilesForm.scrape_all ? '-1.5rem' : '1rem' }"
                                 >
@@ -535,7 +535,7 @@
                                             hide-details
                                             v-on:change="
                                                 () => {
-                                                    selectedFilesForm.scraper_params = [{ name: '' }]; 
+                                                    selectedFilesForm.scraper_params = [{ name: '' }];
                                                     selectedFilesForm.detailed_information_about_product = false;
                                                 }
                                             "
@@ -548,7 +548,7 @@
                                         </v-subheader>
                                     </v-col>
                                 </v-row>
-                                <v-row 
+                                <v-row
                                     align="center"
                                     style="margin-top: -2.5rem"
                                 >
@@ -584,8 +584,8 @@
                                         sm="7"
                                         style="margin-top: -2rem"
                                     >
-                                        <v-subheader 
-                                            v-show="selectedFilesForm.scrape_all" 
+                                        <v-subheader
+                                            v-show="selectedFilesForm.scrape_all"
                                             style="font-size: 12px;"
                                         >Can not scrape detailed product information if scrape everything is selected</v-subheader>
                                     </v-col>
@@ -602,8 +602,8 @@
 
 <script>
 import {hideScrollbar, showScrollbar} from '../../app';
-import { required, min, max, regex } from 'vee-validate/dist/rules'
-import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
+import { required, min, max } from 'vee-validate/dist/rules';
+import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate';
 
 setInteractionMode('eager');
 
@@ -635,7 +635,7 @@ export default {
             selectedFilesForm: new Form({
                 scraper_name: '',
                 scraper_params: [
-                    { selected_root_category: '', subcategory: '', name: '' },
+                    {selected_root_category: '', subcategory: '', name: ''},
                 ],
                 selected_files: [],
                 scrape_all: true,
@@ -645,44 +645,44 @@ export default {
             scrapeAll: true,
             filesForSelect: [],
             headers: [
-                { text: '#', align: 'start', sortable: false, value: 'hashtag' },
-                { text: 'Scraper name', value: 'scraper_name' },
-                { text: 'Selected files', value: 'selected_files', width: '250px' },
-                { text: 'Scrape everything', value: 'scrape_all' },
-                { text: 'Scraped detailed product info', value: 'detailed_information_about_product' },
-                { text: 'Scraping parameters', value: 'scraping_params' },
-                { text: 'Scraping status', value: 'scraping_status' },
-                { text: 'Schedule', value: 'schedule' },
-                { text: 'Scraper stopped', value: 'scraper_stopped' },
-                { text: 'Started scraping date', value: 'started_scraping_date' },
-                { text: 'Stopped scraping date', value: 'stopped_scraping_date' },
-                { text: 'Scraper created at', value: 'scraper_created_at' },
-                { text: 'Actions', value: 'actions', sortable: false, width: '100px' },
+                {text: '#', align: 'start', sortable: false, value: 'hashtag'},
+                {text: 'Scraper name', value: 'scraper_name'},
+                {text: 'Selected files', value: 'selected_files', width: '250px'},
+                {text: 'Scrape everything', value: 'scrape_all'},
+                {text: 'Scraped detailed product info', value: 'detailed_information_about_product'},
+                {text: 'Scraping parameters', value: 'scraping_params'},
+                {text: 'Scraping status', value: 'scraping_status'},
+                {text: 'Schedule', value: 'schedule'},
+                {text: 'Scraper stopped', value: 'scraper_stopped'},
+                {text: 'Started scraping date', value: 'started_scraping_date'},
+                {text: 'Stopped scraping date', value: 'stopped_scraping_date'},
+                {text: 'Scraper created at', value: 'scraper_created_at'},
+                {text: 'Actions', value: 'actions', sortable: false, width: '100px'},
             ],
             search: '',
             scrapingEverything: [
-                { name: 'Yes', value: 1 },
-                { name: 'No', value: 0 },
+                {name: 'Yes', value: 1},
+                {name: 'No', value: 0},
             ],
             scrapingStatus: [
-                { value: 'scraping_not_started', name: 'Scraping not started' },
-                { value: 'scraping_initiated', name: 'Scraping started' },
-                { value: 'scraping_finished', name: 'Scraping finished' },
-                { value: 'scraping_stopped_for_a_reason', name: 'Scraping stopped for a reason' },
-                { value: 'scraping_stopped_manually', name: 'Scraping was stopped manually' },
+                {value: 'scraping_not_started', name: 'Scraping not started'},
+                {value: 'scraping_initiated', name: 'Scraping started'},
+                {value: 'scraping_finished', name: 'Scraping finished'},
+                {value: 'scraping_stopped_for_a_reason', name: 'Scraping stopped for a reason'},
+                {value: 'scraping_stopped_manually', name: 'Scraping was stopped manually'},
             ],
             scrape_everything: '',
             scraping_status: '',
             root_category: [
-                { name: 'Women', value: 'Women' },
-                { name: 'Men', value: 'Men' },
-                { name: 'Children', value: 'Children' },
+                {name: 'Women', value: 'Women'},
+                {name: 'Men', value: 'Men'},
+                {name: 'Children', value: 'Children'},
             ],
             scraping: false,
             fab: false,
             scraping_schedule: [
-                { name: 'Daily (at 6AM)', value: 'daily' },
-                { name: 'Weekly (every Monday at 6AM)', value: 'weekly' },
+                {name: 'Daily (at 6AM)', value: 'daily'},
+                {name: 'Weekly (every Monday at 6AM)', value: 'weekly'},
             ],
         }
     },
@@ -699,7 +699,7 @@ export default {
     },
     watch: {
         refreshMyFiles: {
-            handler: function(newVal, oldVal) {
+            handler: function (newVal, oldVal) {
                 if (newVal) {
                     this.loading = true;
                     this.getMyFiles();
@@ -707,7 +707,7 @@ export default {
             }
         },
         showDrawer: {
-            handler: function(newVal, oldVal) {
+            handler: function (newVal, oldVal) {
                 if (oldVal) {
                     this.$refs.form.reset();
                     this.selectedFilesForm.reset();
@@ -715,12 +715,12 @@ export default {
             }
         },
         myFiles: {
-            handler: function(newVal, oldVal) {
+            handler: function (newVal, oldVal) {
                 setTimeout(() => {
                     $(window).height() < 950 &&
                     $('.container.component').height() > $(window).height() - 110 ?
-                    showScrollbar() : hideScrollbar();
-                }, 300);        
+                        showScrollbar() : hideScrollbar();
+                }, 300);
             }
         }
     },
@@ -732,49 +732,50 @@ export default {
                 'scraping_status': this.scraping_status,
             };
 
-            await axios.get('/api/selectedFilesForScraping', { params: params })
-            .then(({data}) => {
-                this.myFilesPagination = data;
-                this.myFiles = data.data;
-                this.loading = false;
-                this.refreshMyFiles = false;
-            })
-            .catch({});
+            await axios.get('/api/selectedFilesForScraping', {params: params})
+                .then(({data}) => {
+                    this.myFilesPagination = data;
+                    this.myFiles = data.data;
+                    this.loading = false;
+                    this.refreshMyFiles = false;
+                })
+                .catch({});
         },
         submitSelectedFilesForm() {
             axios.post('/api/selectedFilesForScraping', this.selectedFilesForm)
-            .then(({data}) => {
-                if (!data.error) {
-                    this.$toastr.Add({
-                        title: 'Success',
-                        msg: data.message,
-                        type: 'success',
-                        timeout: 3500,
-                        progressbar: true,
-                        position: 'toast-top-right',
-                    });
-                    this.loading = true;
-                    this.showDrawer = false;
-                    this.getMyFiles();
-                }
-            })
-            .catch((error) => {
-                if (error.response.status === 422) {
-                    this.$refs.form.setErrors({
-                        'scraper name': 'You have already created scraper with this name',
-                    });
-                }
-            });
+                .then(({data}) => {
+                    if (!data.error) {
+                        this.$toastr.Add({
+                            title: 'Success',
+                            msg: data.message,
+                            type: 'success',
+                            timeout: 3500,
+                            progressbar: true,
+                            position: 'toast-top-right',
+                        });
+                        this.loading = true;
+                        this.showDrawer = false;
+                        this.getMyFiles();
+                    }
+                })
+                .catch((error) => {
+                    if (error.response.status === 422) {
+                        this.$refs.form.setErrors({
+                            'scraper name': 'You have already created scraper with this name',
+                        });
+                    }
+                });
         },
         getFilesForSelect() {
             axios.get('/api/get_files_for_select')
-            .then(({data}) => {
-                this.filesForSelect = data;
-            })
-            .catch(() => {})
+                .then(({data}) => {
+                    this.filesForSelect = data;
+                })
+                .catch(() => {
+                })
         },
         addScraperParam() {
-            this.selectedFilesForm.scraper_params.push({ name: '' });
+            this.selectedFilesForm.scraper_params.push({name: ''});
         },
         deleteScraperParam(index) {
             this.selectedFilesForm.scraper_params.splice(index, 1);
@@ -788,13 +789,13 @@ export default {
                 'scraping_status': this.scraping_status,
             };
 
-            axios.get('/api/selectedFilesForScraping', { params: params })
-            .then(({data}) => {
-                this.myFilesPagination = data;
-                this.myFiles = data.data;
-                this.loading = false;
-                this.refreshMyFiles = false;
-            });
+            axios.get('/api/selectedFilesForScraping', {params: params})
+                .then(({data}) => {
+                    this.myFilesPagination = data;
+                    this.myFiles = data.data;
+                    this.loading = false;
+                    this.refreshMyFiles = false;
+                });
         },
         searchit: _.debounce(() => {
             Fire.$emit('searchMyFile');
@@ -814,48 +815,48 @@ export default {
             }
 
             axios.post(`/api/scrape_data_once/${itemUuid}`)
-            .then(({data}) => {
-                this.scraping = false;
-                this.$toastr.Add({
-                    title: 'Success',
-                    msg: data.message,
-                    type: 'success',
-                    timeout: 3500,
-                    progressbar: true,
-                    position: 'toast-top-right',
+                .then(({data}) => {
+                    this.scraping = false;
+                    this.$toastr.Add({
+                        title: 'Success',
+                        msg: data.message,
+                        type: 'success',
+                        timeout: 3500,
+                        progressbar: true,
+                        position: 'toast-top-right',
+                    });
+                })
+                .catch(error => {
+                    this.scraping = false;
+
+                    this.$toastr.Add({
+                        title: 'Error',
+                        msg: 'Something went wrong, we will fix it soon',
+                        type: 'error',
+                        timeout: 3500,
+                        progressbar: true,
+                        position: 'toast-top-right',
+                    });
+
+                    let error_params = {
+                        'error_message': error.response.data.message,
+                        'uuid': itemUuid,
+                    };
+
+                    axios.put('/api/update_file_with_error_message_from_scraper', error_params);
+
+                    let status_params = {
+                        'uuid': itemUuid,
+                        'status_code': 'scraping_stopped_for_a_reason',
+                        'system': false,
+                    };
+
+                    axios.put('/api/update_scraper_status', status_params)
+                        .then(() => {
+                            this.getMyFiles();
+                        });
+
                 });
-            })
-            .catch(error => {
-                this.scraping = false;
-
-                this.$toastr.Add({
-                    title: 'Error',
-                    msg: 'Something went wrong, we will fix it soon',
-                    type: 'error',
-                    timeout: 3500,
-                    progressbar: true,
-                    position: 'toast-top-right',
-                });
-
-                let error_params = {
-                    'error_message': error.response.data.message,
-                    'uuid': itemUuid,
-                };
-
-                axios.put('/api/update_file_with_error_message_from_scraper', error_params);
-                
-                let status_params = {
-                    'uuid': itemUuid,
-                    'status_code': 'scraping_stopped_for_a_reason',
-                    'system': false,
-                };
-
-                axios.put('/api/update_scraper_status', status_params)
-                .then(() => {
-                    this.getMyFiles();
-                });
-                
-            });
         },
         deleteScraper(itemUuid, scraperName) {
             Swal.fire({
@@ -869,20 +870,20 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.delete(`/api/selectedFilesForScraping/${itemUuid}`)
-                    .then(({data}) => {
-                        if (!data.error) {
-                            this.loading = true;
-                            this.getMyFiles();
-                            this.$toastr.Add({
-                                title: 'Success',
-                                msg: data.message,
-                                type: 'success',
-                                timeout: 3500,
-                                progressbar: true,
-                                position: 'toast-top-right',
-                            });
-                        }
-                    });
+                        .then(({data}) => {
+                            if (!data.error) {
+                                this.loading = true;
+                                this.getMyFiles();
+                                this.$toastr.Add({
+                                    title: 'Success',
+                                    msg: data.message,
+                                    type: 'success',
+                                    timeout: 3500,
+                                    progressbar: true,
+                                    position: 'toast-top-right',
+                                });
+                            }
+                        });
                 }
             });
         },
@@ -907,9 +908,9 @@ export default {
             }
 
             axios.put('/api/change_scraper_stopped_status', params)
-            .then(() => {
-                this.getMyFiles();
-            });
+                .then(() => {
+                    this.getMyFiles();
+                });
         }
     },
 }
