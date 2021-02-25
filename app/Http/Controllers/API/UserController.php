@@ -88,29 +88,7 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function search(Request $request){
-        if($search = $request->get('query')){
-            $users = User::select(
-                'first_name',
-                'last_name',
-                'username',
-                'email',
-                'is_admin',
-                'is_disabled',
-                'can_upload_files',
-                'created_at',
-                'updated_at',
-            )->where(function($query) use ($search){
-                $query
-                    ->where('first_name', 'LIKE', "%$search%")
-                    ->orWhere('last_name', 'LIKE', "%$search%")
-                    ->orWhere('username', 'LIKE', "%$search%")
-                    ->orWhere('email', 'LIKE', "%$search%")
-                    ->orWhere('created_at', 'LIKE', "%$search%");
-            })->paginate(10);
-            return $users;
-        }
-        
-        return $users = User::select(
+        $users = User::select(
             'first_name',
             'last_name',
             'username',
@@ -120,7 +98,21 @@ class UserController extends Controller
             'can_upload_files',
             'created_at',
             'updated_at',
-        )->paginate(10);
+        );
+
+        if($search = $request->get('query')){
+            $users->where(function($query) use ($search){
+                $query
+                    ->where('first_name', 'LIKE', "%$search%")
+                    ->orWhere('last_name', 'LIKE', "%$search%")
+                    ->orWhere('username', 'LIKE', "%$search%")
+                    ->orWhere('email', 'LIKE', "%$search%")
+                    ->orWhere('created_at', 'LIKE', "%$search%");
+            });
+            return $users;
+        }
+        
+        return $users->paginate(10);
     }
 
     // returns all current (logged in) user's information

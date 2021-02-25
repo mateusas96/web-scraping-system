@@ -21,6 +21,9 @@ class File extends Model
         'uploaded_by_user_username',
         'version',
         'error_msg',
+        'approvement_status_id',
+        'returned_for_fixing_message',
+        'approvement_date',
     ];
 
     /**
@@ -39,6 +42,7 @@ class File extends Model
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
         'updated_at' => 'datetime:Y-m-d H:i:s',
+        'approvement_date' => 'datetime:Y-m-d H:i:s',
     ];
 
     /**

@@ -1,13 +1,12 @@
-import VueRouter from 'vue-router';
-import { Form, HasError, AlertError } from 'vform';
-import VueProgressBar from 'vue-progressbar';
 import Swal from 'sweetalert2';
+import { AlertError, Form, HasError } from 'vform';
 import VueMaterial from 'vue-material';
-import 'vue-material/dist/vue-material.min.css';
 import 'vue-material/dist/theme/default.css';
-import Vuetify from 'vuetify';
+import 'vue-material/dist/vue-material.min.css';
+import VueProgressBar from 'vue-progressbar';
+import VueRouter from 'vue-router';
 import VueToastr from 'vue-toastr';
-import { template } from 'lodash';
+import Vuetify from 'vuetify';
 
 require('./bootstrap');
 

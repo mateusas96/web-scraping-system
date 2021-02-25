@@ -49,4 +49,10 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
     Route::put('change_scraper_stopped_status', 'API\SelectedFilesForScrapingController@changeScraperStoppedStatus')->name('change.scraper.stopped.status');
 
     Route::get('current', 'API\UserController@getCurrentUser')->name('get.current.user');
+
+    Route::put('reject_file', 'API\FileController@rejectFile')->name('reject.file');
+
+    Route::put('approve_file', 'API\FileController@approveFile')->name('approve.file');
+
+    Route::post('resend_file_for_approval/{uuid}', 'API\FileController@resendForApproval')->name('resend.file.for.approval');
 });

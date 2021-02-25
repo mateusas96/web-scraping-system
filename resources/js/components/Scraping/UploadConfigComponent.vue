@@ -11,7 +11,7 @@
                         Upload files
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="mt-12">
-                        <v-row no-gutters justify="center" align="center">
+                        <!-- <v-row no-gutters align="center"> -->
                             <v-col cols="10">
                                 <v-file-input
                                     type="file"
@@ -37,16 +37,25 @@
                                     </template>
                                 </v-file-input>
                             </v-col>
-                            <v-col cols="2" class="pl-8 pb-8">
+                            <v-col cols="12" class="pl-11 pb-8">
+                                <v-btn
+                                    color="info"
+                                    href="./config-uploads/example.json"
+                                    download
+                                    style="text-decoration: none !important; color: white;"
+                                >
+                                    Download file example
+                                </v-btn>
                                 <v-btn
                                     color="success"
                                     v-on:click="uploadFiles"
                                     :disabled="readyForUploadFiles.length < 1"
+                                    class="ml-4"
                                 >
                                     Upload files
                                 </v-btn>
                             </v-col>
-                        </v-row>
+                        <!-- </v-row> -->
                         <v-card v-if="readyForUploadFiles.length > 0" class="mx-auto">
                             <v-simple-table
                                 fixed-header
@@ -152,47 +161,141 @@
                                     #
                                 </template>
 
-                                <template v-slot:[`item.actions`]="{ item }">
+                                <template v-slot:[`item.status_code`]="{ item }">
+                                    <div 
+                                        v-for="status in approvalStatus"
+                                        :key="status.value"
+                                        v-show="
+                                            currentUser.is_admin == false ||
+                                            item.status_code != 'approvement_sent_for_approval'
+                                        "
+                                    >
+                                        {{ status.value == item.status_code ? status.name : null }}
+                                    </div>
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                            <a
-                                                :href="item.file_path + item.file_name"
-                                                download
+                                            <v-icon
                                                 v-on="on"
+                                                v-show="currentUser.is_admin == true && item.status_code == 'approvement_sent_for_approval'"
+                                                color="green"
+                                                v-on:click="approveFile(item.uuid, item.file_name)"
+                                            >
+                                                fas fa-check
+                                            </v-icon>
+                                        </template>
+                                        <small>Approve uploaded config</small>
+                                    </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon
+                                                v-on="on"
+                                                v-show="currentUser.is_admin == true && item.status_code == 'approvement_sent_for_approval'"
+                                                class="ml-3"
+                                                color="red"
+                                                v-on:click="rejectFile(item)"
+                                            >
+                                                fas fa-times
+                                            </v-icon>
+                                        </template>
+                                        <small>Return for fixing</small>
+                                    </v-tooltip>
+                                </template>
+
+                                <template v-slot:[`item.fixing_actions`]="{ item }">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon
+                                                v-on="on"
+                                                v-show="item.returned_for_fixing_message != null"
+                                                v-on:click="previewReturnedForFixingMessage(item)"
+                                                class="ml-8"
+                                            >
+                                                fas fa-info
+                                            </v-icon>
+                                        </template>
+                                        <small>Preview message</small>
+                                    </v-tooltip>
+                                </template>
+
+                                <template v-slot:[`item.actions`]="{ item }">
+                                    <v-speed-dial
+                                        :top="false"
+                                        direction="left"
+                                        :open-on-hover="false"
+                                        transition="slide-x-reverse-transition"
+                                    >
+                                        <template v-slot:activator>
+                                            <v-btn
+                                                v-model="fab"
+                                                color="blue darken-2"
+                                                dark
+                                                fab
+                                                small
                                             >
                                                 <v-icon>
-                                                    mdi-arrow-down-bold
+                                                    fas fa-cog
                                                 </v-icon>
-                                            </a>
+                                            </v-btn>
+                                        </template>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                    v-on="on"
+                                                    class="ml-2"
+                                                    v-on:click="deleteFile(item.uuid, item.file_name)"
+                                                    dense
+                                                    v-show="currentUser.is_admin"
+                                                    small
+                                                    fab
+                                                    dark
+                                                    color="orange"
+                                                >
+                                                    <v-icon small>
+                                                        fas fa-trash
+                                                    </v-icon>
+                                                </v-btn>
                                             </template>
-                                        <small>Download file</small>
-                                    </v-tooltip>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-icon
-                                                class="ml-1"
-                                                v-on="on"
-                                                v-on:click="prepareReuploadFileDialog(item)"
-                                            >
-                                                mdi-pencil
-                                            </v-icon>
-                                        </template>
-                                        <small>Edit file</small>
-                                    </v-tooltip>
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-icon
-                                                v-on="on"
-                                                class="ml-2"
-                                                v-on:click="deleteFile(item.uuid, item.file_name)"
-                                                dense
-                                                v-show="currentUser.is_admin"
-                                            >
-                                                fas fa-trash
-                                            </v-icon>
-                                        </template>
-                                        <small>Delete file</small>
-                                    </v-tooltip>
+                                            <small>Delete file</small>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                    class="ml-1"
+                                                    v-on="on"
+                                                    v-on:click="prepareFileReuploadDialog(item)"
+                                                    v-show="currentUser.is_admin || item.uploaded_by_user_username == currentUser.username"
+                                                    small
+                                                    fab
+                                                    dark
+                                                    color="blue"
+                                                >
+                                                    <v-icon>
+                                                        mdi-pencil
+                                                    </v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <small>Edit file</small>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on }">
+                                                <v-btn
+                                                    :href="item.file_path + item.file_name"
+                                                    download
+                                                    v-on="on"
+                                                    dark
+                                                    fab
+                                                    small
+                                                    color="pink"
+                                                    style="text-decoration: none !important"
+                                                >
+                                                    <v-icon color="white">
+                                                        mdi-arrow-down-bold
+                                                    </v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <small>Download file</small>
+                                        </v-tooltip>
+                                    </v-speed-dial>
                                 </template>
 
                                 <template v-slot:top>
@@ -293,7 +396,94 @@
                                         </v-card-actions>
                                         </v-card>
                                     </v-dialog>
+
+                                     <v-dialog
+                                        v-model="showReturnedForFixingMessageDialog"
+                                        max-width="500px"
+                                        @click:outside="
+                                            showReturnedForFixingMessageDialog = false;
+                                            $refs.form.reset();
+                                        "
+                                    >
+                                        <validation-observer
+                                            ref="form"
+                                            v-slot="{ invalid }"
+                                        >
+                                            <v-card>
+                                            <v-card-title>
+                                                <span class="headline">{{ previewMode ? 'File returned for fixing' : 'Reject file' }}</span>
+                                            </v-card-title>
+                                
+                                            <v-card-text>
+                                                <v-container>
+                                                    <v-row>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="12"
+                                                        >
+                                                            <v-text-field
+                                                                v-model="rejectFileForm.file_name"
+                                                                label="File name"
+                                                                :disabled="true"
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                    </v-row>
+                                                    <v-row>
+                                                        <v-col
+                                                            cols="12"
+                                                            md="12"
+                                                        >
+                                                            <validation-provider
+                                                                v-slot="{ errors }"
+                                                                name="rejection message"
+                                                                :rules="{
+                                                                    required: true,
+                                                                    max: 500,
+                                                                }"
+                                                            >
+                                                                <v-textarea
+                                                                    v-model="rejectFileForm.returned_for_fixing_message"
+                                                                    label="Rejection message"
+                                                                    rows="1"
+                                                                    row-height="10"
+                                                                    auto-grow
+                                                                    :counter="500"
+                                                                    :error-messages="errors"
+                                                                    :disabled="previewMode"
+                                                                ></v-textarea>
+                                                            </validation-provider>
+                                                        </v-col>
+                                                    </v-row>
+                                                </v-container>
+                                            </v-card-text>
+                                
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="error darken-1"
+                                                    text
+                                                    v-on:click="
+                                                        showReturnedForFixingMessageDialog = false;
+                                                        $refs.form.reset();
+                                                    "
+                                                >
+                                                    {{ previewMode ? 'Close' : 'Cancel' }}
+                                                </v-btn>
+                                                <v-btn
+                                                    color="success darken-1"
+                                                    text
+                                                    v-on:click="sendFileRejection"
+                                                    :disabled="invalid"
+                                                    v-show="!previewMode"
+                                                >
+                                                    Reject file
+                                                </v-btn>
+                                            </v-card-actions>
+                                            </v-card>
+                                        </validation-observer>
+                                    </v-dialog>
                                 </template>
+
                             </v-data-table>
                             <v-pagination
                                 v-model="filesPagination.current_page"
@@ -311,8 +501,25 @@
 
 <script>
 import {showScrollbar ,hideScrollbar, current_user} from '../../app';
+import { required, max } from 'vee-validate/dist/rules';
+import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate';
+
+setInteractionMode('eager');
+
+extend('required', {
+    ...required,
+    message: 'The {_field_} can not be empty',
+});
+extend('max', {
+    ...max,
+    message: 'The {_field_} may not be greater than {length} characters',
+});
 
 export default {
+    components: {
+        ValidationProvider,
+        ValidationObserver,
+    },
     data: () => {
         return {
             panelOpened: 0,
@@ -326,8 +533,11 @@ export default {
                 { text: 'File name', value: 'file_name' },
                 { text: 'File version', value: 'version' },
                 { text: 'Uploaded by', value: 'uploaded_by_user_username' },
-                { text: 'File size', value: 'file_size' },
+                { text: 'File size', value: 'file_size', width: '7rem' },
                 { text: 'Error message', value: 'error_msg' },
+                { text: 'Approvement status', value: 'status_code' },
+                { text: 'Returned for fixing message', value: 'fixing_actions' },
+                { text: 'Approvement date', value: 'approvement_date' },
                 { text: 'Uploaded at', value: 'updated_at' },
                 { text: 'Actions', value: 'actions' , sortable: false },
             ],
@@ -345,6 +555,19 @@ export default {
             canUpload: false,
             fileReuploadError: [],
             currentUser: [],
+            approvalStatus: [
+                { value: 'approvement_sent_for_approval', name: 'Sent for approval' },
+                { value: 'approvement_approved', name: 'Approved' },
+                { value: 'approvement_returned_for_fixing', name: 'Returned for fixing' },
+            ],
+            fab: false,
+            showReturnedForFixingMessageDialog: false,
+            rejectFileForm: new Form({
+                uuid: '',
+                file_name: '',
+                returned_for_fixing_message: '',
+            }),
+            previewMode: false,
         }
     },
     mounted() {
@@ -419,7 +642,7 @@ export default {
     },
     methods: {
         handleFileReupload() {
-            if (this.fileReuploadForm.file === undefined || this.fileReuploadForm.file < 1 ) {
+            if (this.fileReuploadForm.file === undefined || this.fileReuploadForm.file < 1) {
                 this.fileReuploadError = [];
                 this.canUpload = false;
                 return;
@@ -440,8 +663,9 @@ export default {
             }
         },
         reuploadFile() {
-            this.formData.append('file', this.fileReuploadForm.file);
-            axios.post('/api/update_file/' + this.fileReuploadForm.uuid, this.formData)
+            if (this.currentUser.is_admin) {
+                this.formData.append('file', this.fileReuploadForm.file);
+                axios.post(`/api/update_file/${this.fileReuploadForm.uuid}`, this.formData)
                 .then(({data}) => {
                     if (data.error) {
                         Swal.fire({
@@ -455,6 +679,11 @@ export default {
                         });
                         return;
                     }
+                    this.refreshFiles = true;
+                    this.canUpload = false;
+                    this.fileReuploadForm.clear();
+                    this.formData = new FormData();
+                    this.reuploadFileDialog = false;
                     Swal.fire({
                         toast: true,
                         position: 'top-end',
@@ -464,15 +693,41 @@ export default {
                         timer: 3500,
                         timerProgressBar: true,
                     });
+                });
+            } else {
+                this.formData.append('file', this.fileReuploadForm.file);
+                axios.post(`/api/resend_file_for_approval/${this.fileReuploadForm.uuid}`, this.formData)
+                .then(({data}) => {
+                    if (data.error) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 3500,
+                            timerProgressBar: true,
+                        });
+                        return;
+                    }
+                    this.refreshFiles = true;
                     this.canUpload = false;
-                    this.loading = true;
                     this.fileReuploadForm.clear();
                     this.formData = new FormData();
                     this.reuploadFileDialog = false;
-                    this.getFilesData();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true,
+                    });
                 });
+            }
         },
-        prepareReuploadFileDialog(file) {
+        prepareFileReuploadDialog(file) {
             this.reuploadFileDialog = true;
             this.fileReuploadForm.clear();
             this.fileReuploadForm.fill(file);
@@ -619,7 +874,7 @@ export default {
         deleteFile(fileUuid, fileName) {
             Swal.fire({
                 title: 'Delete file',
-                text: `Are you sure you want to  delete file - ${fileName}?`,
+                text: `Are you sure you want to delete file - ${fileName}?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Delete',
@@ -640,6 +895,64 @@ export default {
                                 position: 'toast-top-right',
                             });
                         }
+                    });
+                }
+            });
+        },
+        rejectFile(file) {
+            this.showReturnedForFixingMessageDialog = true;
+            this.previewMode = false;
+            this.rejectFileForm.clear();
+            this.rejectFileForm.fill(file);
+        },
+        sendFileRejection() {
+            this.rejectFileForm.put('/api/reject_file')
+            .then(({data}) => {
+                this.showReturnedForFixingMessageDialog = false;
+                this.rejectFileForm.clear();
+                this.refreshFiles = true;
+                this.$toastr.Add({
+                    title: 'Success',
+                    msg: data.message,
+                    type: 'success',
+                    timeout: 3500,
+                    progressbar: true,
+                    position: 'toast-top-right',
+                });
+            });
+        },
+        previewReturnedForFixingMessage(file) {
+            this.showReturnedForFixingMessageDialog = true;
+            this.previewMode = true;
+            this.rejectFileForm.clear();
+            this.rejectFileForm.fill(file);
+        },
+        approveFile(fileUuid, fileName) {
+            Swal.fire({
+                title: 'Approve file',
+                text: `Are you sure you want to approve file - ${fileName}?`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Approve',
+                cancelButtonText: 'Cancel',
+                cancelButtonColor: '#d33',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let params = {
+                        uuid: fileUuid
+                    };
+
+                    axios.put('/api/approve_file', params)
+                    .then(({data}) => {
+                        this.refreshFiles = true;
+                        this.$toastr.Add({
+                            title: 'Success',
+                            msg: data.message,
+                            type: 'success',
+                            timeout: 3500,
+                            progressbar: true,
+                            position: 'toast-top-right',
+                        });
                     });
                 }
             });

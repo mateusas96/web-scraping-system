@@ -90,7 +90,7 @@
 
                         <template v-slot:top>
                             <v-dialog
-                                v-model="editUserDialog"
+                                v-model="showEditUserDialog"
                                 max-width="500px"
                                 @click:outside="dirty = false"
                             >
@@ -178,7 +178,7 @@
                                     <v-btn
                                         color="error darken-1"
                                         text
-                                        v-on:click="editUserDialog = false"
+                                        v-on:click="showEditUserDialog = false"
                                     >
                                         Cancel
                                     </v-btn>
@@ -214,7 +214,7 @@ import {showScrollbar, hideScrollbar, updateCurrentUser, current_user} from '../
 export default {
     data: () => ({
         loading: false,
-        editUserDialog: false,
+        showEditUserDialog: false,
         error: [
             { 'error': false },
             { 'message': '' },
@@ -336,14 +336,14 @@ export default {
             });
         },
         editUser(user) {
-            this.editUserDialog = true;
+            this.showEditUserDialog = true;
             this.userForm.clear();
             this.userForm.fill(user); 
         },
         updateUser() {
             this.userForm.put('/api/user/' + this.userForm.email)
             .then(() => {
-                this.editUserDialog = false;
+                this.showEditUserDialog = false;
                 this.$toastr.Add({
                     title: 'Updated',
                     msg: 'User info updated successfully',
@@ -359,9 +359,9 @@ export default {
                     current_user.then(({data}) => {
                         this.currentUser = data;
                     });
-                }
-                if (this.userForm.is_admin !== this.currentUser.is_admin) {
-                    window.location.reload();
+                    if (this.userForm.is_admin !== this.currentUser.is_admin) {
+                        window.location.reload();
+                    }
                 }
             })
             .catch(() => {
