@@ -64,7 +64,7 @@ class RunScraperWeekly extends Command
         foreach($data as $value) {
             $sffsService->updateScraperStatus($value['uuid'], 'scraping_initiated', true);
 
-            $scraper = new ScrapeData($value['uuid'], $value['selected_by_user_id']);
+            $scraper = new ScrapeData($value['uuid'], $value['selected_by_user_id'], true);
             dispatch($scraper);
         }
     }

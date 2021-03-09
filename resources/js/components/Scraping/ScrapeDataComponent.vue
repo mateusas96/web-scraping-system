@@ -16,7 +16,7 @@
                                     v-on="on"
                                     small
                                     :disabled="refreshMyFiles"
-                                    class="ml-16"
+                                    class="ml-6"
                                 >
                                     <v-icon v-if="refreshMyFiles" small>fas fa-sync fa-spin</v-icon>
                                     <v-icon v-else small>fas fa-sync</v-icon>
@@ -40,7 +40,10 @@
                     </v-col>
                     <v-row>
                         <v-col
-                            cols="2"
+                            cols="12"
+                            sm="12"
+                            md="3"
+                            xl="2"
                         >
                             <v-select
                                 v-model="scrape_everything"
@@ -60,7 +63,10 @@
                             ></v-select>
                         </v-col>
                         <v-col
-                            cols="2"
+                            cols="12"
+                            sm="12"
+                            md="3"
+                            xl="2"
                         >
                             <v-select
                                 v-model="scraping_status"
@@ -80,7 +86,10 @@
                             ></v-select>
                         </v-col>
                         <v-col
-                            cols="2"
+                            cols="9"
+                            sm="9"
+                            md="3"
+                            xl="2"
                         >
                             <v-text-field
                                 v-on:input="searchit"
@@ -93,7 +102,9 @@
                             ></v-text-field>
                         </v-col>
                         <v-col
-                            cols="2"
+                            cols="3"
+                            sm="3"
+                            md="2"
                         >
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
@@ -150,8 +161,8 @@
                     <template v-slot:[`item.started_scraping_date`]="{ item }">
                         {{item.started_scraping_date === null ? '-' : item.started_scraping_date}}
                     </template>
-                    <template v-slot:[`item.stopped_scraping_date`]="{ item }">
-                        {{item.stopped_scraping_date === null ? '-' : item.stopped_scraping_date}}
+                    <template v-slot:[`item.finished_scraping_date`]="{ item }">
+                        {{item.finished_scraping_date === null ? '-' : item.finished_scraping_date}}
                     </template>
 
                     <template v-slot:[`item.actions`]="{ item }">
@@ -321,6 +332,7 @@
                 width="30vw"
                 height="100vh"
                 class="mt-12"
+                style="position: fixed"
             >
                 <v-container>
                     <v-list-item>
@@ -397,6 +409,7 @@
                                             v-bind:style="{ marginTop: index > 0 ? '-1.5rem' : '0rem' }"
                                         >
                                             <v-col
+                                                cols="10"
                                                 sm="10"
                                                 v-bind:style="{ marginTop: index > 0 ? '0.75rem' : '0rem' }"
                                             >
@@ -501,7 +514,7 @@
                                 <v-col
                                     cols="12"
                                     sm="11"
-                                    style="margin-top: -1.5rem;"
+                                    v-bind:style="{ marginTop: selectedFilesForm.scrape_all ? '-1.5rem' : '1rem' }"
                                 >
                                     <validation-provider
                                         v-slot="{ errors }"
@@ -525,7 +538,7 @@
                                 </v-col>
                                 <v-row
                                     align="center"
-                                    v-bind:style="{ marginTop: selectedFilesForm.scrape_all ? '-1.5rem' : '1rem' }"
+                                    v-bind:style="{ marginTop: selectedFilesForm.scrape_all ? '-1.5rem' : '-1rem' }"
                                 >
                                     <v-col cols="1">
                                         <v-checkbox
@@ -542,7 +555,7 @@
                                             class="mb-5 ml-2"
                                         ></v-checkbox>
                                     </v-col>
-                                    <v-col cols="6">
+                                    <v-col cols="10" sm="6">
                                         <v-subheader>
                                             <b>Scrape everything</b>
                                         </v-subheader>
@@ -562,32 +575,33 @@
                                             class="mb-5 ml-2"
                                         ></v-checkbox>
                                     </v-col>
-                                    <v-col cols="6">
+                                    <v-col cols="10" sm="6">
                                         <v-subheader>
                                             <b>Scrape detailed information about product</b>
                                         </v-subheader>
                                     </v-col>
                                     <v-col
+                                        cols="12"
+                                        sm="7"
+                                        style="margin-top: -1.5rem"
+                                        v-show="selectedFilesForm.scrape_all"
+                                    >
+                                        <v-subheader
+                                            style="font-size: 12px;"
+                                        >Can not scrape detailed product information if scrape everything is selected</v-subheader>
+                                    </v-col>
+                                    <v-col
                                         cols="5"
                                         sm="5"
+                                        v-bind:style="{marginBottom: selectedFilesForm.scrape_all ? '1.5rem' : '0rem'}"
                                     >
                                         <v-btn
-                                            class="success ml-16"
+                                            class="success"
                                             :disabled="invalid"
                                             v-on:click="submitSelectedFilesForm"
                                         >
                                             Save
                                         </v-btn>
-                                    </v-col>
-                                    <v-col
-                                        cols="7"
-                                        sm="7"
-                                        style="margin-top: -2rem"
-                                    >
-                                        <v-subheader
-                                            v-show="selectedFilesForm.scrape_all"
-                                            style="font-size: 12px;"
-                                        >Can not scrape detailed product information if scrape everything is selected</v-subheader>
                                     </v-col>
                                 </v-row>
                             </v-row>
@@ -655,7 +669,7 @@ export default {
                 {text: 'Schedule', value: 'schedule'},
                 {text: 'Scraper stopped', value: 'scraper_stopped'},
                 {text: 'Started scraping date', value: 'started_scraping_date'},
-                {text: 'Stopped scraping date', value: 'stopped_scraping_date'},
+                {text: 'Finished scraping date', value: 'finished_scraping_date'},
                 {text: 'Scraper created at', value: 'scraper_created_at'},
                 {text: 'Actions', value: 'actions', sortable: false, width: '100px'},
             ],
@@ -848,7 +862,6 @@ export default {
                     let status_params = {
                         'uuid': itemUuid,
                         'status_code': 'scraping_stopped_for_a_reason',
-                        'system': false,
                     };
 
                     axios.put('/api/update_scraper_status', status_params)

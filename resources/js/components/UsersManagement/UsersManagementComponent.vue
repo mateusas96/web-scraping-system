@@ -39,7 +39,7 @@
                             label="Search"
                             single-line
                             hide-details
-                            style="max-width: 18.75rem;"
+                            style="max-width: 18.75rem; margin-bottom: 1.25rem"
                             clearable
                             clear-icon="mdi-close-circle-outline"
                         ></v-text-field>

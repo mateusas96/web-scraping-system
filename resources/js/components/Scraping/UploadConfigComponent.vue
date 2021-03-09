@@ -11,8 +11,8 @@
                         Upload files
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="mt-12">
-                        <!-- <v-row no-gutters align="center"> -->
-                            <v-col cols="10">
+                        <v-row>
+                            <v-col cols="12">
                                 <v-file-input
                                     type="file"
                                     v-model="tempFiles"
@@ -37,7 +37,15 @@
                                     </template>
                                 </v-file-input>
                             </v-col>
-                            <v-col cols="12" class="pl-11 pb-8">
+                        </v-row>
+                        <v-row style="margin-left: 1rem;">
+                            <v-card
+                                class="pa-2"
+                                outlined
+                                tile
+                                width="fit-content"
+                                style="border: none"
+                            >
                                 <v-btn
                                     color="info"
                                     href="./config-uploads/example.json"
@@ -46,16 +54,23 @@
                                 >
                                     Download file example
                                 </v-btn>
+                            </v-card>
+                            <v-card
+                                class="pa-2"
+                                outlined
+                                tile
+                                width="fit-content"
+                                style="border: none"
+                            >
                                 <v-btn
                                     color="success"
                                     v-on:click="uploadFiles"
                                     :disabled="readyForUploadFiles.length < 1"
-                                    class="ml-4"
                                 >
                                     Upload files
                                 </v-btn>
-                            </v-col>
-                        <!-- </v-row> -->
+                            </v-card>
+                        </v-row>
                         <v-card v-if="readyForUploadFiles.length > 0" class="mx-auto">
                             <v-simple-table
                                 fixed-header
@@ -639,6 +654,15 @@ export default {
                 }, 300);
             }
         },
+        readyForUploadFiles: {
+            handler: function() {
+                setTimeout(() => {
+                    $(window).height() < 950 &&
+                    $('.container.component').height() > $(window).height() - 110 ?
+                    showScrollbar() : hideScrollbar();
+                }, 300);
+            }
+        }
     },
     methods: {
         handleFileReupload() {

@@ -40,7 +40,7 @@ class SelectedFilesForScrapingController extends Controller
                         ->orWhere('selected_files_for_scraping_view.selected_files', 'LIKE', "%$search%")
                         ->orWhere('selected_files_for_scraping_view.scraping_params', 'LIKE', "%$search%")
                         ->orWhere('selected_files_for_scraping_view.started_scraping_date', 'LIKE', "%$search%")
-                        ->orWhere('selected_files_for_scraping_view.stopped_scraping_date', 'LIKE', "%$search%")
+                        ->orWhere('selected_files_for_scraping_view.finished_scraping_date', 'LIKE', "%$search%")
                         ->orWhere('selected_files_for_scraping_view.scraper_created_at', 'LIKE', "%$search%");
                 })->whereRaw(
                     '(
@@ -166,9 +166,8 @@ class SelectedFilesForScrapingController extends Controller
     {
         $uuid = $request->get('uuid');
         $scraper_status = $request->get('status_code');
-        $system = $request->get('system');
 
-        SFFSS::updateScraperStatus($uuid, $scraper_status, $system);
+        SFFSS::updateScraperStatus($uuid, $scraper_status);
 
         return response()->json([
             'error' => false,

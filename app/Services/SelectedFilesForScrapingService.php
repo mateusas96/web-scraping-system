@@ -10,7 +10,7 @@ use App\Models\ScrapingCategoryData AS SCD;
 
 class SelectedFilesForScrapingService implements SelectedFilesForScrapingServiceServiceInterface
 {
-    public function updateScraperStatus($uuid, $scraper_status, $system){
+    public function updateScraperStatus($uuid, $scraper_status, $system = false){
         $sffs = SFFS::findByUuid($uuid);
         $currentSffsStatusId = $sffs['status_id'];
         $sffsFilesId = $sffs['selected_files_id'];
@@ -28,13 +28,13 @@ class SelectedFilesForScrapingService implements SelectedFilesForScrapingService
         if ($scraper_status == 'scraping_initiated') {
             $sffs->status_id = $statusId;
             $sffs->started_scraping_date = Carbon::now();
-            $sffs->stopped_scraping_date = null;
+            $sffs->finished_scraping_date = null;
             $sffs->save();
         }
 
         if ($scraper_status == 'scraping_finished') {
             $sffs->status_id = $statusId;
-            $sffs->stopped_scraping_date = Carbon::now();
+            $sffs->finished_scraping_date = Carbon::now();
             $sffs->save();
         }
         
@@ -49,7 +49,7 @@ class SelectedFilesForScrapingService implements SelectedFilesForScrapingService
                 SFFS::where('selected_files_id', 'LIKE',  "%$temp_val%")
                     ->update([
                         'status_id' => $statusId,
-                        'stopped_scraping_date' => Carbon::now()
+                        'finished_scraping_date' => null
                     ]);
             }
             SCD::where('scraper_name', $sffs['scraper_name'])->where('user_id', '=', auth()->user()-id)->delete();
@@ -68,7 +68,7 @@ class SelectedFilesForScrapingService implements SelectedFilesForScrapingService
                     SFFS::where('selected_files_id', 'LIKE',  "%$temp_val%")
                         ->update([
                             'status_id' => $statusId,
-                            'stopped_scraping_date' => Carbon::now()
+                            'finished_scraping_date' => null
                         ]);
                 }
             } else {

@@ -26,7 +26,7 @@ class ScrapingService implements ScrapingServiceInterface
      * 
      * @param String selected file for scraping $uuid  
      */
-    public function scrape($uuid, $user_id)
+    public function scrape($uuid, $user_id, $system = false)
     {
         set_time_limit(0);
         $config = $file_name = $scraper_name = $scrape_detailed_product_info = null;
@@ -96,8 +96,11 @@ class ScrapingService implements ScrapingServiceInterface
                     ->update(['scraped_detail_info' => 1]);
             }
         }
-        $sffsService = new SFFSS();
-        $sffsService->updateScraperStatus($uuid, 'scraping_finished', true);
+
+        if ($system) {
+            $sffsService = new SFFSS();
+            $sffsService->updateScraperStatus($uuid, 'scraping_finished', true);
+        }
 
         SCD::where('scraper_name', $scraper_name)->where('user_id', '=', $user_id)->delete();
 
@@ -377,6 +380,7 @@ class ScrapingService implements ScrapingServiceInterface
                             $parsed_data['product_name'][] = $node->filterXpath($product_name_selector)->text();
 
                             if (stristr($node->filterXpath($product_link_selector)->text(), $domain_url)) {
+                                dump($node->filterXpath($product_link_selector)->text());
                                 $parsed_data['product_link'][] = $node->filterXpath($product_link_selector)->text();
                             } else {
                                 $parsed_data['product_link'][] = $domain_url . $node->filterXpath($product_link_selector)->text();
@@ -418,7 +422,6 @@ class ScrapingService implements ScrapingServiceInterface
                                 $parsed_data['product_link'][] = $domain_url . $node->filter($product_link_selector)->extract([$product_link_attribute])[0];
                             }
 
-                            $parsed_data['product_link'][] = $node->filter($product_link_selector)->extract([$product_link_attribute])[0];
                             $parsed_data['normal_price'][] = 
                                 (
                                     $node->filter($normal_price_selector)->extract([$normal_price_attribute]) == null ||
