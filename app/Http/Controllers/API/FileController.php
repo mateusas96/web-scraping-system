@@ -51,22 +51,47 @@ class FileController extends Controller
      */
     public function getFilesForSelect()
     {
-        return File::select(
-            'files.id',
-            'files.uuid',
-            'file_name'
+        $files = File::select(
+            DB::raw(
+                '
+                    files.id,
+                    files.uuid,
+                    IF (
+                        s.code != "approvement_approved",
+                        CONCAT(file_name, " (Unapproved)"),
+                        file_name
+                    ) AS file_name
+                '
+            )
         )->leftJoin(
             'status as s', 's.id', 'approvement_status_id'
-        )->whereRaw(
-            '
-                error_msg IS NULL AND
-                (
-                    s.code = "approvement_approved" OR
-                    approvement_status_id IS NULL
-                ) AND
-                file_name NOT LIKE "%example%"
-            '
-        )->get();
+        );
+
+        if(auth()->user()->is_admin) {
+            $files->where(function($query){
+                $query->whereRaw(
+                    '
+                        error_msg IS NULL AND
+                        file_name NOT LIKE "%example%"
+                    '
+                );
+            }); 
+        } else {
+            $files->where(function($query){
+                $query->whereRaw(
+                    '
+                        error_msg IS NULL AND
+                        (
+                            s.code = "approvement_approved" OR
+                            approvement_status_id IS NULL
+                        ) AND
+                        file_name NOT LIKE "%example%"
+                    '
+                );
+            }); 
+        }
+
+        return $files->get();
     }
 
     /**
