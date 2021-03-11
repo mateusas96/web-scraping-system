@@ -380,7 +380,6 @@ class ScrapingService implements ScrapingServiceInterface
                             $parsed_data['product_name'][] = $node->filterXpath($product_name_selector)->text();
 
                             if (stristr($node->filterXpath($product_link_selector)->text(), $domain_url)) {
-                                dump($node->filterXpath($product_link_selector)->text());
                                 $parsed_data['product_link'][] = $node->filterXpath($product_link_selector)->text();
                             } else {
                                 $parsed_data['product_link'][] = $domain_url . $node->filterXpath($product_link_selector)->text();
