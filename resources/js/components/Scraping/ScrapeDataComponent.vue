@@ -698,7 +698,6 @@ export default {
                 {name: 'Daily (at 6AM)', value: 'daily'},
                 {name: 'Weekly (every Monday at 6AM)', value: 'weekly'},
             ],
-            windowWidth: 0,
         }
     },
     mounted() {
@@ -708,7 +707,6 @@ export default {
         Fire.$on('searchMyFile', () => {
             this.getMyFiles();
         });
-        this.windowWidth = window.innerWidth;
     },
     destroyed() {
         hideScrollbar();
