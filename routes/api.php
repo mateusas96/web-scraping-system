@@ -18,11 +18,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function(){
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin', 'verified']], function(){
     Route::get('user', 'API\UserController@index')->name('user.index');
 });
 
-Route::group(['middleware' => ['auth', 'validateBackHistory']], function() {
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'verified']], function() {
     Route::apiResources([
         'user' => 'API\UserController',
         'file' => 'API\FileController',
