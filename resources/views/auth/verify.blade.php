@@ -27,8 +27,4 @@
 </div>
 @endsection
 <style>
-    button[type="submit"]:hover {
-        background-color: green !important;
-        border-color: green !important;
-    }
 </style>

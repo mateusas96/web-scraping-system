@@ -66,12 +66,18 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $admin = false;
+
+        if ($data['email'] === env('ADMIN_EMAIL', '')) {
+            $admin = true;
+        }
         return User::create([
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'username' => $data['username'],
             'short_name' => strtoupper(substr($data['first_name'], 0, 1)) . ' ' . strtoupper(substr($data['last_name'], 0, 1)),
             'email' => $data['email'],
+            'is_admin' => $admin,
             'password' => Hash::make($data['password']),
         ]);
     }

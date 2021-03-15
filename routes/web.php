@@ -16,9 +16,9 @@ Route::get('/', function () {
     return view('auth.login');
 })->middleware('guest');
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'verified']], function(){
     Route::get('/home', 'HomeController@index')->name('home');
 
     Route::get('/upload-configs', 'HomeController@index')->name('config.upload');
@@ -30,7 +30,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory']], function(){
     Route::get('/403', 'HomeController@index')->name('scrape.data');
 });
 
-Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin']], function(){
+Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin', 'verified']], function(){
     Route::get('/users/management', 'HomeController@index')->name('users.management');
 });
 

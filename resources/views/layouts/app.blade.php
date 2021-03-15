@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" style="overflow-y: auto !important;">
 
 <head>
     <meta charset="utf-8">
@@ -27,7 +27,7 @@
         <!-- <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm" > -->
         <div class="container">
             <a class="navbar-brand" href="{{ route('login') }}">
-                <img src="./img/bot.jpeg" alt="Bot" style="height: 90px; width: 90px;">
+                <img src="{!! asset('./img/bot.jpeg')!!}" alt="Bot" style="height: 90px; width: 90px;">
                 {{ config('app.name') }}
             </a>
             <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
