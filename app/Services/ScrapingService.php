@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services;
-use App\Services\Contracts\ScrapingServiceInterface;
 use App\Models\SelectedFilesForScraping as SFFS;
 use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
@@ -13,7 +12,7 @@ use Mail;
 use Weidner\Goutte\GoutteFacade AS Goutte;
 use App\Services\SelectedFilesForScrapingService as SFFSS;
 
-class ScrapingService implements ScrapingServiceInterface
+class ScrapingService
 {
     private $main_category = [
         0 => 'Women',

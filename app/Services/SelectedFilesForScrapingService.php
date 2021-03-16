@@ -1,14 +1,13 @@
 <?php
 
 namespace App\Services;
-use App\Services\Contracts\SelectedFilesForScrapingServiceServiceInterface;
 use App\Models\SelectedFilesForScraping as SFFS;
 use DB;
 use Carbon\Carbon;
 use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
 
-class SelectedFilesForScrapingService implements SelectedFilesForScrapingServiceServiceInterface
+class SelectedFilesForScrapingService
 {
     public function updateScraperStatus($uuid, $scraper_status, $system = false){
         $sffs = SFFS::findByUuid($uuid);
