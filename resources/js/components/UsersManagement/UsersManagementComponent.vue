@@ -58,16 +58,16 @@
                             #
                         </template>
                         <template v-slot:[`item.is_admin`]="{ item }">
-                            <span v-if="item.is_admin" style="color: green;">True</span>
-                            <span v-else style="color: red;">False</span>
+                            <span v-if="item.is_admin" style="color: green;">Yes</span>
+                            <span v-else style="color: red;">No</span>
                         </template>
                         <template v-slot:[`item.is_disabled`]="{ item }">
-                            <span v-if="item.is_disabled" style="color: red;">True</span>
-                            <span v-else style="color: green;">False</span>
+                            <span v-if="item.is_disabled" style="color: red;">Yes</span>
+                            <span v-else style="color: green;">No</span>
                         </template>
                         <template v-slot:[`item.can_upload_files`]="{ item }">
-                            <span v-if="item.can_upload_files" style="color: green;">True</span>
-                            <span v-else style="color: red;">False</span>
+                            <span v-if="item.can_upload_files" style="color: green;">Yes</span>
+                            <span v-else style="color: red;">No</span>
                         </template>
                         <template v-slot:[`item.email_verified_at`]="{ item }">
                             <span v-if="item.email_verified_at !== null">{{item.email_verified_at}}</span>
@@ -245,8 +245,8 @@ export default {
             { text: 'Actions', value: 'actions' , sortable: false},
         ],
         selectOptions: [
-            { name: 'True', value: 1 },
-            { name: 'False', value: 0 },
+            { name: 'Yes', value: 1 },
+            { name: 'No', value: 0 },
         ],
         dirty: false,
         refreshUsers: false,
