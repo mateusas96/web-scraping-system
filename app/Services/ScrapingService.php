@@ -7,7 +7,6 @@ use App\Models\ScrapingCategoryData AS SCD;
 use App\Models\ScrapingCategoryDataHarvest AS SCDH;
 use App\Models\ScrapingProductScrape AS SPS;
 use App\Models\ScrapingParam as SP;
-use App\Mail\VerifyEmail;
 use Mail;
 use Weidner\Goutte\GoutteFacade AS Goutte;
 use App\Services\SelectedFilesForScrapingService as SFFSS;
