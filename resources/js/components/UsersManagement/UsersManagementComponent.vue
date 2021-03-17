@@ -137,6 +137,7 @@
                                                 item-text="name"
                                                 item-value="value"
                                                 v-on:change="handleSelectChange"
+                                                :disabled="userForm.email === 'matasxlx@gmail.com' && currentUser.email !== 'matasxlx@gmail.com'"
                                             ></v-select>
                                         </v-col>
                                     </v-row>
