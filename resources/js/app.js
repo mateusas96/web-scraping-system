@@ -33,7 +33,7 @@ let routes = [
     { path: '/users/management', component: require('./components/UsersManagement/UsersManagementComponent.vue').default },
     { path: '/upload-configs', component: require('./components/Scraping/UploadConfigComponent.vue').default },
     { path: '/scrape-data', component: require('./components/Scraping/ScrapeDataComponent.vue').default },
-    { path: '/scrape-data/view-scraper/:scraperName', component: require('./components/Scraping/ViewScraperByUuidComponent.vue').default },
+    { path: '/scrape-data/view-scraper/:scraperName', component: require('./components/Scraping/ViewScraperByScraperNameComponent.vue').default },
     { path: '/403', component: require('./components/Errors/403.vue').default },
 ];
 
