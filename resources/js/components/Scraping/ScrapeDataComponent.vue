@@ -223,7 +223,7 @@
                                             dark
                                             color="pink"
                                             small
-                                            v-on:click="changeScraperStoppedStatus(item.uuid, 'scraping_stopped_manually')"
+                                            v-on:click="changeScraperStatus(item.uuid, 'scraping_stopped_manually')"
                                         >
                                             <v-icon small>
                                                 fas fa-ban
@@ -248,7 +248,7 @@
                                             dark
                                             color="green"
                                             small
-                                            v-on:click="changeScraperStoppedStatus(item.uuid, 'scraping_not_started')"
+                                            v-on:click="changeScraperStatus(item.uuid, 'scraping_not_started')"
                                         >
                                             <v-icon small>
                                                 fas fa-play-circle
@@ -903,12 +903,26 @@ export default {
         openScraperInfo(scraperName) {
             window.location.href = `/scrape-data/view-scraper/${scraperName}`;
         },
-        changeScraperStoppedStatus(scraperUuid, statusCode) {
+        changeScraperStatus(scraperUuid, statusCode) {
             let params = {
                 'status_code': statusCode,
                 'uuid': scraperUuid,
             };
 
+            axios.put('/api/change_scraper_stopped_status', params)
+                .then(() => {
+                    this.getMyFiles();
+                });
+
+            this.$toastr.Add({
+                title: 'Success',
+                msg: 'Scraper updated',
+                type: 'success',
+                timeout: 3500,
+                progressbar: true,
+                position: 'toast-top-right',
+            });
+            
             if (statusCode == 'scraping_not_started') {
                 this.$toastr.Add({
                     title: 'Info',
@@ -919,11 +933,6 @@ export default {
                     position: 'toast-top-right',
                 });
             }
-
-            axios.put('/api/change_scraper_stopped_status', params)
-                .then(() => {
-                    this.getMyFiles();
-                });
         }
     },
 }
