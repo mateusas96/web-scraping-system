@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
 use App\Services\SelectedFilesForScrapingService as SFFSS;
+use App\Models\ScrapingCategoryDataHarvest AS SCDH;
+use App\Models\ScrapingProductScrape AS SPS;
 
 class SelectedFilesForScrapingController extends Controller
 {
@@ -146,7 +148,11 @@ class SelectedFilesForScrapingController extends Controller
     {
         $sffs = SFFS::select('scraper_name')->where('uuid', $uuid)->get()[0];
 
-        SP::where('scraper_name', $sffs['scraper_name'])->delete();
+        SP::where('scraper_name', $sffs['scraper_name'])->where('user_id', auth()->user()->id)->delete();
+
+        SCDH::where('scraper_name', $sffs['scraper_name'])->where('user_id', auth()->user()->id)->delete();
+
+        SPS::where('scraper_name', $sffs['scraper_name'])->where('user_id', auth()->user()->id)->delete();
 
         SFFS::where('uuid', $uuid)->delete();
 
