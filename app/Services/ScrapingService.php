@@ -8,7 +8,7 @@ use App\Models\ScrapingCategoryDataHarvest AS SCDH;
 use App\Models\ScrapingProductScrape AS SPS;
 use App\Models\ScrapingParam as SP;
 use Weidner\Goutte\GoutteFacade AS Goutte;
-use App\Services\SelectedFilesForScrapingService as SFFSS;
+use App\Services\StatusService;
 
 class ScrapingService
 {
@@ -95,8 +95,8 @@ class ScrapingService
         }
 
         if ($system) {
-            $sffsService = new SFFSS();
-            $sffsService->updateScraperStatus($uuid, 'scraping_finished', true);
+            $statusService = new StatusService();
+            $statusService->updateScraperStatus($uuid, 'scraping_finished', true);
         }
 
         SCD::where('scraper_name', $scraper_name)->where('user_id', '=', $user_id)->delete();

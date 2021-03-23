@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
 
-class SelectedFilesForScrapingService
+class StatusService
 {
     public function updateScraperStatus($uuid, $scraper_status, $system = false){
         $sffs = SFFS::findByUuid($uuid);
@@ -81,7 +81,7 @@ class SelectedFilesForScrapingService
                         ]);
                 }
 
-                SCD::where('scraper_name', $sffs['scraper_name'])->where('user_id', '=', auth()->user()-id)->delete();
+                SCD::where('scraper_name', $sffs['scraper_name'])->where('user_id', '=', auth()->user()->id)->delete();
             }
         }
     }

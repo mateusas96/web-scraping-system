@@ -10,7 +10,7 @@ use DB;
 use Carbon\Carbon;
 use App\Models\File;
 use App\Models\ScrapingCategoryData AS SCD;
-use App\Services\SelectedFilesForScrapingService as SFFSS;
+use App\Services\StatusService;
 use App\Models\ScrapingCategoryDataHarvest AS SCDH;
 use App\Models\ScrapingProductScrape AS SPS;
 
@@ -173,7 +173,9 @@ class SelectedFilesForScrapingController extends Controller
         $uuid = $request->get('uuid');
         $scraper_status = $request->get('status_code');
 
-        SFFSS::updateScraperStatus($uuid, $scraper_status);
+        $statusService = new StatusService();
+
+        $statusService->updateScraperStatus($uuid, $scraper_status);
 
         return response()->json([
             'error' => false,

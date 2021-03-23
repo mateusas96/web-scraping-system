@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\SelectedFilesForScraping as SFFS;
 use App\Jobs\ScrapeData;
-use App\Services\SelectedFilesForScrapingService as SFFSS;
+use App\Services\StatusService;
 
 class RunScraperDaily extends Command
 {
@@ -59,10 +59,10 @@ class RunScraperDaily extends Command
             0
         )->get();
 
-        $sffsService = new SFFSS();
+        $statusService = new StatusService();
 
         foreach($data as $value) {
-            $sffsService->updateScraperStatus($value['uuid'], 'scraping_initiated', true);
+            $statusService->updateScraperStatus($value['uuid'], 'scraping_initiated', true);
 
             $scraper = new ScrapeData($value['uuid'], $value['selected_by_user_id'], true);
             dispatch($scraper);
