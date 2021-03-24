@@ -189,7 +189,7 @@ class SelectedFilesForScrapingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function changeScraperStoppedStatus(Request $request)
+    public function changeScraperStatus(Request $request)
     {
         $uuid = $request->get('uuid');
         $status_code = $request->get('status_code');

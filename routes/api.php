@@ -46,7 +46,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'verified']], func
 
     Route::put('update_scraper_status', 'API\SelectedFilesForScrapingController@updateStatus')->name('update.scraper.status');
 
-    Route::put('change_scraper_stopped_status', 'API\SelectedFilesForScrapingController@changeScraperStoppedStatus')->name('change.scraper.stopped.status');
+    Route::put('change_scraper_stopped_status', 'API\SelectedFilesForScrapingController@changeScraperStatus')->name('change.scraper.stopped.status');
 
     Route::get('current', 'API\UserController@getCurrentUser')->name('get.current.user');
 
