@@ -1,0 +1,53 @@
+@import "~vuetify/dist/vuetify.min.css";
+@import "toastr";
+@import 'variables';
+
+@import url('https://fonts.googleapis.com/css?family=Material+Icons');
+@import url('https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css');
+
+
+a.nav-link.btn {
+    border-color: darkRed !important;
+    &:hover {
+        background-color: darkRed !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-link.btn {
+        background-color: darkRed !important;
+    }
+}
+
+ul.nav-treeview {
+    margin-left: 30px;
+}
+
+.container.component {
+    width: 65vw;
+}
+
+a.nav-link {
+    color: $primary2 !important;
+    &.router-link-active {
+        background-color: lightGrey !important;
+        color: black !important;
+    }
+}
+
+.main-footer {
+    position: fixed;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+
+.layout-fixed .brand-link {
+    width: 270px;
+}
+
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Web Scraping System'),
 
     /*
     |--------------------------------------------------------------------------
@@ -27,6 +27,10 @@ return [
     */
 
     'env' => env('APP_ENV', 'production'),
+
+    'contentUrl' => env('APP_CONTENT_URL', 'https://github.com/mateusas96/web-scraping-system'),
+
+    'creator' => env('APP_CREATOR', 'Matas Mikušauskas'),
 
     /*
     |--------------------------------------------------------------------------
@@ -165,6 +169,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Weidner\Goutte\GoutteServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -226,7 +231,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Goutte' => Weidner\Goutte\GoutteFacade::class,
     ],
 
 ];
