@@ -159,7 +159,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     {{ __('Scrape anything you want') }}
                 </div>
                 <!-- Default to the left -->
-                <strong>2021 <a href="{{ config('app.contentUrl') }}" target="_blank">{{ config('app.creator') }}</a>.</strong>
+                <div>
+                    <strong>2021 <a href="{{ config('app.contentUrl') }}" target="_blank">{{ config('app.creator') }}</a>.</strong> 
+                    Administration email: <a href="mailto: {{ config('app.administrationEmail') }}">{{ config('app.administrationEmail') }}</a></div>
             </footer>
         <!-- </v-app> -->
     </div>

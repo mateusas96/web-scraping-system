@@ -30,6 +30,8 @@ return [
 
     'contentUrl' => env('APP_CONTENT_URL', 'https://github.com/mateusas96/web-scraping-system'),
 
+    'administrationEmail' => env('ADMINISTRATION_EMAIL', ''),
+
     'creator' => env('APP_CREATOR', 'Matas Mikušauskas'),
 
     /*

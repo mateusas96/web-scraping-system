@@ -80,11 +80,17 @@
             <!-- </div> -->
         </div>
         <!-- </nav> -->
-
         <main class="py-4">
             <router-view></router-view>
             @yield('content')
         </main>
+
+        <footer class="footer">
+            <div>
+                Administration email: 
+                <a href="mailto: {{ config('app.administrationEmail') }}">{{ config('app.administrationEmail') }}</a>
+            </div>
+        </footer>
     </div>
 </body>
 
@@ -112,5 +118,15 @@ html {
 html::-webkit-scrollbar {
     width: 0;
     height: 0;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #ff9900;
+    color: black;
+    text-align: center;
 }
 </style>
