@@ -9,6 +9,7 @@ use App\Models\ScrapingProductScrape AS SPS;
 use App\Models\ScrapingParam as SP;
 use Weidner\Goutte\GoutteFacade AS Goutte;
 use App\Services\StatusService;
+use Storage;
 
 class ScrapingService
 {
@@ -41,14 +42,16 @@ class ScrapingService
             true : false;
         $scrape_all = $selected_files_data['scrape_all'] == 1 ?
             true : false;
-
         for($i = 0; $i < count($selected_files); $i++) {
 
             $file_name = explode('.', $selected_files[$i]['file_name'])[0];
             
             $config = json_decode(
                 file_get_contents(
-                    public_path() . $selected_files[$i]['file_path'] . $selected_files[$i]['file_name']
+                    Storage::disk('s3')->temporaryUrl(  
+                        $selected_files[$i]['file_name'],
+                        now()->addHour()
+                    )
                 )
             , true);
             

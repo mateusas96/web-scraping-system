@@ -14,7 +14,7 @@ class WSS112 extends Migration
     public function up()
     {
         $sql = "
-                ALTER TABLE `selected_files_for_scrapings` DROP IF EXISTS `scraping_params`;
+                ALTER TABLE `selected_files_for_scrapings` DROP `scraping_params`;
         ";
 
         DB::connection()->getPdo()->exec($sql);

@@ -17,6 +17,7 @@
         "laravel/helpers": "^1.4",
         "laravel/tinker": "^2.5",
         "laravel/ui": "2.4",
+        "league/flysystem-aws-s3-v3": "~1.0",
         "weidner/goutte": "^1.6"
     },
     "require-dev": {

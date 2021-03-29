@@ -55,4 +55,6 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'verified']], func
     Route::put('approve_file', 'API\FileController@approveFile')->name('approve.file');
 
     Route::post('resend_file_for_approval/{uuid}', 'API\FileController@resendForApproval')->name('resend.file.for.approval');
+
+    Route::post('download_file', 'API\FileController@downloadFile')->name('download.file');
 });

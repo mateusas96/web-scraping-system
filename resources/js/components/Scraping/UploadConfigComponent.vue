@@ -48,8 +48,7 @@
                             >
                                 <v-btn
                                     color="info"
-                                    href="./config-uploads/example.json"
-                                    download
+                                    v-on:click="downloadFile('example.json')"
                                     style="text-decoration: none !important; color: white;"
                                 >
                                     Download file example
@@ -294,14 +293,13 @@
                                         <v-tooltip bottom>
                                             <template v-slot:activator="{ on }">
                                                 <v-btn
-                                                    :href="item.file_path + item.file_name"
-                                                    download
                                                     v-on="on"
                                                     dark
                                                     fab
                                                     small
                                                     color="pink"
                                                     style="text-decoration: none !important"
+                                                    v-on:click="downloadFile(item.file_name)"
                                                 >
                                                     <v-icon color="white">
                                                         mdi-arrow-down-bold
@@ -979,6 +977,18 @@ export default {
                         });
                     });
                 }
+            });
+        },
+        downloadFile(fileName) {
+            let params = {
+                file_name: fileName
+            };
+
+            axios.post('/api/download_file', params)
+            .then((response) => {
+               if (response.status === 200) {
+                   window.location.href = response.data['link'];
+               }
             });
         }
     }

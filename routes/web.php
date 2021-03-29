@@ -36,7 +36,7 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin', 'v
 
 Route::get('/testscraper', function() {
 
-    $crawler = Goutte::request('GET', 'https://gb.benetton.com/sweater-in-shetland-wool-dark-green-103MK1N24_570.html');
+    $crawler = Goutte::request('GET', 'https://gb.benetton.com/gray-and-dark-blue-striped-blazer-multi-color-2BY652414_616.html');
 
     // dump($crawler->html());
 

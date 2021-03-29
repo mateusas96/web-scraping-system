@@ -129,17 +129,18 @@ class FileController extends Controller
                     $existingFiles = $existingFiles . ', ' . $file->getClientOriginalName();
             } else {
                 array_push($filesUploaded, $i);
-                Storage::disk('public')->put(
+                Storage::disk('s3')->put(
                     $file->getClientOriginalName(), 
                     StorageFile::get($file)
                 );
+
                 File::create([
                     'uploaded_by_user_id' => $activeUserId,
                     'uploaded_by_user_username' => $activeUserUsername,
                     'file_name' => $file->getClientOriginalName(),
                     'mime_type' => $file->getClientMimeType(),
                     'file_size' => $file->getSize() === 0 ? '0 KB' : round($file->getSize() / 1024, 3) . ' KB',
-                    'file_path' => './config-uploads/',
+                    'file_path' => Storage::disk('s3')->url($file->getClientOriginalName()),
                     'approvement_status_id' => auth()->user()->is_admin == true ? null : $sent_for_approval_status_id,
                 ]);
             }
@@ -205,9 +206,9 @@ class FileController extends Controller
 
         $reuploadedFile = $request->file('file');
 
-        unlink($file['file_path'] . $file['file_name']);
+        Storage::disk('s3')->delete($file['file_name']);
 
-        Storage::disk('public')->put(
+        Storage::disk('s3')->put(
             $reuploadedFile->getClientOriginalName(), 
             StorageFile::get($reuploadedFile)
         );
@@ -247,7 +248,7 @@ class FileController extends Controller
     {
         $file = File::select('file_path', 'file_name')->where('uuid', $uuid)->get()[0];
 
-        unlink($file['file_path'] . $file['file_name']);
+        Storage::disk('s3')->delete($file['file_name']);
 
         File::where('uuid', $uuid)->delete();
 
@@ -425,5 +426,27 @@ class FileController extends Controller
             'error' => false,
             'message' => 'File successfully resent for approval',
         ]);
+    }
+
+    /**
+     * Download file from s3
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadFile(Request $request) {
+        $file_name = $request->get('file_name');
+
+        $headers = [
+            'Content-Type'        => 'Content-Type: application/zip',
+            'Content-Disposition' => 'attachment; filename="'. $file_name .'"',
+        ];
+
+        $link = Storage::disk('s3')->temporaryUrl(  
+            $file_name,
+            now()->addHour(),
+            ['ResponseContentDisposition' => 'attachment']
+        );
+        return response(['link' => $link], 200);
     }
 }
