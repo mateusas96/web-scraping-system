@@ -50,7 +50,7 @@
                         hide-default-footer
                         :loading="loading"
                         sort-by="created_at"
-                        sort-desc="true"
+                        :sort-desc="true"
                         loading-text="Loading... Please wait"
                         :headers="headers"
                         :items="users"
