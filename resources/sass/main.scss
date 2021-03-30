@@ -24,7 +24,7 @@ ul.nav-treeview {
 }
 
 .container.component {
-    width: 65vw;
+    width: 80vw;
 }
 
 a.nav-link {
@@ -50,4 +50,8 @@ a.nav-link {
     top: 0;
     left: 0;
     right: 0;
+}
+
+.v-dialog:not(.v-dialog--fullscreen) {
+    max-height: 75%;
 }

@@ -49,7 +49,8 @@
                         :items-per-page="usersPagination.per_page"
                         hide-default-footer
                         :loading="loading"
-                        sort-by="last_name"
+                        sort-by="created_at"
+                        sort-desc="true"
                         loading-text="Loading... Please wait"
                         :headers="headers"
                         :items="users"

@@ -38,7 +38,7 @@
                                 </v-file-input>
                             </v-col>
                         </v-row>
-                        <v-row style="margin-left: 1rem;">
+                        <v-row>
                             <v-card
                                 class="pa-2"
                                 outlined
