@@ -25,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('run-scraper:daily')->dailyAt('6:00');
-        $schedule->command('run-scraper:weekly')->weeklyOn(1, '6:00');
+        $schedule->command('run-scraper:daily')->dailyAt('6:00')->onOneServer();
+        $schedule->command('run-scraper:weekly')->weeklyOn(1, '6:00')->onOneServer();
     }
 
     /**

@@ -111,8 +111,6 @@ class ScrapingController extends Controller
             'finished_scraping' => true,
             'message' => 'Scraping was successful',
         ], 200);
-        // $scraper = new ScrapeData($uuid, auth()->user()->id);
-        // dispatch($scraper);
     }
 
     /**

@@ -437,11 +437,6 @@ class FileController extends Controller
     public function downloadFile(Request $request) {
         $file_name = $request->get('file_name');
 
-        $headers = [
-            'Content-Type'        => 'Content-Type: application/zip',
-            'Content-Disposition' => 'attachment; filename="'. $file_name .'"',
-        ];
-
         $link = Storage::disk('s3')->temporaryUrl(  
             $file_name,
             now()->addHour(),

@@ -15,16 +15,18 @@ class ScrapeData implements ShouldQueue
 
     protected $sffs_uuid;
     protected $user_id;
+    protected $system;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sffs_uuid, $user_id)
+    public function __construct($sffs_uuid, $user_id, $system = false)
     {
         $this->sffs_uuid = $sffs_uuid;
         $this->user_id = $user_id;
+        $this->system = $system;
     }
 
     /**
@@ -35,6 +37,6 @@ class ScrapeData implements ShouldQueue
     public function handle()
     {
         $scrapingService = new ScrapingService();
-        $scrapingService->scrape($this->sffs_uuid, $this->user_id);
+        $scrapingService->scrape($this->sffs_uuid, $this->user_id, $this->system);
     }
 }

@@ -203,7 +203,9 @@ class SelectedFilesForScrapingController extends Controller
             SFFS::where('uuid', $uuid)
                 ->update([
                     'status_id' => $status_id,
-                    'scraper_stopped' => $status_code == 'scraping_stopped_manually' ? 1 : 0
+                    'scraper_stopped' => $status_code == 'scraping_stopped_manually' ? 1 : 0,
+                    'started_scraping_date' => null,
+                    'finished_scraping_date' => null,
                 ]);
             
             return response()->json([

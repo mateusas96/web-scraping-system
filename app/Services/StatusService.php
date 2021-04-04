@@ -48,7 +48,8 @@ class StatusService
                 SFFS::where('selected_files_id', 'LIKE',  "%$temp_val%")
                     ->update([
                         'status_id' => $statusId,
-                        'finished_scraping_date' => null
+                        'started_scraping_date' => null,
+                        'finished_scraping_date' => null,
                     ]);
             }
             SCD::where('scraper_name', $sffs['scraper_name'])->where('user_id', '=', auth()->user()-id)->delete();
@@ -67,7 +68,8 @@ class StatusService
                     SFFS::where('selected_files_id', 'LIKE',  "%$temp_val%")
                         ->update([
                             'status_id' => $statusId,
-                            'finished_scraping_date' => null
+                            'started_scraping_date' => null,
+                            'finished_scraping_date' => null,
                         ]);
                 }
             } else {
