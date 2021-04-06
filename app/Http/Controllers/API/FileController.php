@@ -200,7 +200,7 @@ class FileController extends Controller
         $file = File::findByUuid($uuid);
         $file_id = $file['id'];
 
-        if (array_key_exists('error', $file)) {
+        if (property_exists('error', $file)) {
             return $file;
         }
 

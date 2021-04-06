@@ -336,7 +336,7 @@ class ScrapingService
                         });
                     }
 
-                    $page_size = $temp_page_size[0];
+                    $page_size = isset($temp_page_size[0]) ? $temp_page_size[0] : null;
 
                     for(
                         $j = $config[$file_name]['category_scrape']['pagination_parameters']['start_index']; 
