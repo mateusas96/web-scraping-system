@@ -36,11 +36,11 @@ Route::group(['middleware' => ['auth', 'validateBackHistory', 'checkIfAdmin', 'v
 
 Route::get('/testscraper', function() {
 
-    $crawler = Goutte::request('GET', 'https://gb.benetton.com/gray-and-dark-blue-striped-blazer-multi-color-2BY652414_616.html');
+    $crawler = Goutte::request('GET', 'https://www.closed.com/en/men/pants/#all');
 
     // dump($crawler->html());
 
-    $crawler->filter("#size-1-pdp .btn-outline-secondary:not([disabled])")->each(function ($node) {
+    $crawler->filter("#itemsPagerbottom li:nth-last-child(2) a span")->each(function ($node) {
 
         dump($node->text());
     //     // echo $node->html();
