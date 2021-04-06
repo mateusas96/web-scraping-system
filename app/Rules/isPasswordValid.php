@@ -82,6 +82,11 @@ class isPasswordValid implements Rule
                 && $this->specialCharacterPasses:
                 return 'The :attribute must contain at least one uppercase character and one number.';
 
+            case $this->uppercasePasses
+                && ! $this->numericPasses
+                && ! $this->specialCharacterPasses:
+                return 'The :attribute must contain at least one special character and one number.';
+
             case ! $this->uppercasePasses
                 && ! $this->specialCharacterPasses
                 && $this->numericPasses:
