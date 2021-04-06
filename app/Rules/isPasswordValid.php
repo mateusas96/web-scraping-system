@@ -65,40 +65,40 @@ class isPasswordValid implements Rule
             case ! $this->uppercasePasses
                 && $this->numericPasses
                 && $this->specialCharacterPasses:
-                return 'The :attribute must contain at least one uppercase character.';
+                return 'The :attribute also must contain at least one uppercase character.';
 
             case ! $this->numericPasses
                 && $this->uppercasePasses
                 && $this->specialCharacterPasses:
-                return 'The :attribute must contain at least one number.';
+                return 'The :attribute also must contain at least one number.';
 
             case ! $this->specialCharacterPasses
                 && $this->uppercasePasses
                 && $this->numericPasses:
-                return 'The :attribute must contain at least one special character.';
+                return 'The :attribute also must contain at least one special character.';
 
             case ! $this->uppercasePasses
                 && ! $this->numericPasses
                 && $this->specialCharacterPasses:
-                return 'The :attribute must contain at least one uppercase character and one number.';
+                return 'The :attribute also must contain at least one uppercase character and one number.';
 
             case $this->uppercasePasses
                 && ! $this->numericPasses
                 && ! $this->specialCharacterPasses:
-                return 'The :attribute must contain at least one special character and one number.';
+                return 'The :attribute also must contain at least one special character and one number.';
 
             case ! $this->uppercasePasses
                 && ! $this->specialCharacterPasses
                 && $this->numericPasses:
-                return 'The :attribute must contain at least one uppercase character and one special character.';
+                return 'The :attribute also must contain at least one uppercase character and one special character.';
 
             case ! $this->uppercasePasses
                 && ! $this->numericPasses
                 && ! $this->specialCharacterPasses:
-                return 'The :attribute must contain at least one uppercase character, one number, and one special character.';
+                return 'The :attribute also must contain at least one uppercase character, one number, and one special character.';
 
             default:
-                return 'The :attribute must be at least 8 characters.';
+                return 'The :attribute also must be at least 8 characters.';
         }
     }
 }
