@@ -3,14 +3,10 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Rules\isPasswordValid;
 
 class PasswordTest extends TestCase
 {
-    use RefreshDatabase;
-
     /**
      * Valid password requirements:
      * - one uppercase letter

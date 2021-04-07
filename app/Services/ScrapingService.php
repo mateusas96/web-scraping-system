@@ -32,6 +32,10 @@ class ScrapingService
 
         $selected_files_data = SFFS::findByUuidAndActiveUserId($uuid, $user_id);
 
+        if (isset($selected_files_data['error']) && $selected_files_data['error']) {
+            return false;
+        }
+
         $selected_files = File::select('file_path', 'file_name')
             ->whereRaw('FIND_IN_SET(id, ?)', $selected_files_data['selected_files_id'])
             ->get();
