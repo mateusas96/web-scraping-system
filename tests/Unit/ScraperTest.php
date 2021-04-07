@@ -18,6 +18,10 @@ class ScraperTest extends TestCase
         $scraperUuid = '65832202-92fd-11eb-9324-902b345ebf46';
         $scraperCreatorId = 1;
 
+        /**
+         * scraper should return value - true, 
+         * because scraping should be successful with given existing data
+         */
         $scraperResult = $scraper->scrape($scraperUuid, $scraperCreatorId);
 
         $this->assertEquals($scraperResult, true);
@@ -34,6 +38,10 @@ class ScraperTest extends TestCase
         $scraperUuid = '65832202-92fd';
         $scraperCreatorId = 0;
 
+        /**
+         * scraper should return value - false, 
+         * because scraping should be unsuccessful with given not existing data
+         */
         $scraperResult = $scraper->scrape($scraperUuid, $scraperCreatorId);
 
         $this->assertEquals($scraperResult, false);
