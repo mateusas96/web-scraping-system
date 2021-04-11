@@ -9,17 +9,17 @@ class PasswordTest extends TestCase
 {
     /**
      * Valid password requirements:
-     * - one uppercase letter
+     * - one upper_case letter
      * - one number
      * - one special character
      */
 
     /**
-     * Testing password only with lowercase letters
+     * Testing password only with lower case letters
      *
      * @return void
      */
-    public function test_password_only_with_lowercase_letters()
+    public function test_password_only_with_lower_case_letters()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -30,11 +30,11 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters and one number
+     * Testing password with lower case letters and one number
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_number()
+    public function test_password_with_lower_case_letters_and_one_number()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -45,11 +45,11 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters and one uppercase letter
+     * Testing password with lower case letters and one upper case letter
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_uppercase_letter()
+    public function test_password_with_lower_case_letters_and_one_upper_case_letter()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -64,7 +64,7 @@ class PasswordTest extends TestCase
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_special_char_and_one_uppercase_letter()
+    public function test_password_with_lower_case_letters_and_one_special_char_and_one_upper_case_letter()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -75,11 +75,11 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters, one special char and one number
+     * Testing password with lower case letters, one special char and one number
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_special_char_and_one_number()
+    public function test_password_with_lower_case_letters_and_one_special_char_and_one_number()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -90,11 +90,11 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters and one special char
+     * Testing password with lower case letters and one special char
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_special_char()
+    public function test_password_with_lower_case_letters_and_one_special_char()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -105,11 +105,11 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters, one number and one special char
+     * Testing password with lower case letters, one number and one special char
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_number_and_one_special_char()
+    public function test_password_with_lower_case_letters_and_one_number_and_one_special_char()
     {
         $isPasswordValid = new isPasswordValid();
 
@@ -120,12 +120,12 @@ class PasswordTest extends TestCase
     }
 
     /**
-     * Testing password with lowercase letters, one number, one special char and one uppercase letter
+     * Testing password with lower case letters, one number, one special char and one upper case letter
      * In other words - testing valid password
      *
      * @return void
      */
-    public function test_password_with_lowercase_letters_and_one_number_and_one_special_char_and_one_uppercase_letter()
+    public function test_password_with_lower_case_letters_and_one_number_and_one_special_char_and_one_upper_case_letter()
     {
         $isPasswordValid = new isPasswordValid();
 
