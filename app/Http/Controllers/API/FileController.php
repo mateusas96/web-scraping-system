@@ -406,9 +406,9 @@ class FileController extends Controller
 
         $reuploadedFile = $request->file('file');
 
-        unlink($file['file_path'] . $file['file_name']);
+        Storage::disk('s3')->delete($file['file_name']);
 
-        Storage::disk('public')->put(
+        Storage::disk('s3')->put(
             $reuploadedFile->getClientOriginalName(), 
             StorageFile::get($reuploadedFile)
         );
