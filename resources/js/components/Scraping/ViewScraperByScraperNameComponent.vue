@@ -336,11 +336,9 @@ export default {
             };
 
             this.showChart = true;
-            this.handleScrollbar();
         },
         handleScrollbar() {
             setTimeout(() => {
-                $(window).height() < 950 &&
                 $('.container.component').height() > $(window).height() - 110 ?
                 showScrollbar() : hideScrollbar();
             }, 300);
