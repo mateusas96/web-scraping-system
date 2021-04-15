@@ -418,6 +418,7 @@ class FileController extends Controller
         )->first()->statusId;
 
         $file->version = $file['version'] + 1;
+        $file->file_size = $reuploadedFile->getSize() === 0 ? '0 KB' : round($reuploadedFile->getSize() / 1024, 3) . ' KB';
         $file->approvement_status_id = $sent_for_approval_status_id;
         $file->returned_for_fixing_message = null;
         $file->save();
