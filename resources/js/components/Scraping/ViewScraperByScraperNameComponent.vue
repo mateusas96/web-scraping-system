@@ -336,6 +336,7 @@ export default {
             };
 
             this.showChart = true;
+            this.handleScrollbar();
         },
         handleScrollbar() {
             setTimeout(() => {
