@@ -79,6 +79,7 @@ class RegisterController extends Controller
             'short_name' => strtoupper(substr($data['first_name'], 0, 1)) . ' ' . strtoupper(substr($data['last_name'], 0, 1)),
             'email' => $data['email'],
             'is_admin' => $admin,
+            'can_upload_files' => 1,
             'password' => Hash::make($data['password']),
         ]);
     }

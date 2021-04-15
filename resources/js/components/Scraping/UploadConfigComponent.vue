@@ -485,7 +485,10 @@
                                                 <v-btn
                                                     color="success darken-1"
                                                     text
-                                                    v-on:click="sendFileRejection"
+                                                    v-on:click="
+                                                        sendFileRejection();
+                                                        $refs.form.reset();
+                                                    "
                                                     :disabled="invalid"
                                                     v-show="!previewMode"
                                                 >
