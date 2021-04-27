@@ -150,13 +150,24 @@ class ScrapingController extends Controller
             if (is_numeric($value['normal_price'])) {
                 $normal_price[] = $value['normal_price'];
             } else {
-                $normal_price[] = preg_split('/\D+/', $value['normal_price'])[1];
+                if (is_numeric(preg_split('/\D+/', $value['normal_price'])[0])) {
+                    $normal_price[] = preg_split('/\D+/', $value['normal_price'])[0];
+                    
+                } else if (is_numeric(preg_split('/\D+/', $value['normal_price'])[1])) {
+                    $normal_price[] = preg_split('/\D+/', $value['normal_price'])[1];
+                }
             }
 
             if (($value['old_price'] != '' || $value['old_price'] != null) && is_numeric($value['old_price'])) {
                 $old_price[] = $value['old_price'];
-            } else if ($value['old_price'] != '' || $value['old_price'] != null) {
-                $old_price[] = preg_split('/\D+/', $value['old_price'])[1];
+            } else if ($value['old_price'] != '' || $value['old_price'] != null && !is_numeric($value['old_price'])) {
+                if (is_numeric(preg_split('/\D+/', $value['old_price'])[0])) {
+                    $old_price[] = preg_split('/\D+/', $value['old_price'])[0];
+                    continue;
+                } else if (is_numeric(preg_split('/\D+/', $value['old_price'])[1])) {
+                    $old_price[] = preg_split('/\D+/', $value['old_price'])[1];
+                    continue;
+                }
             } else {
                 $old_price[] = '';
             }
