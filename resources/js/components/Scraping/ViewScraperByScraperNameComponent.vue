@@ -176,6 +176,7 @@
                                 v-on:input="toDateMenu = false"
                                 :first-day-of-week="1"
                                 :max="maxDate"
+                                :min="fromDate"
                                 v-on:change="
                                     () => {
                                         newChartDateLoading = true;
